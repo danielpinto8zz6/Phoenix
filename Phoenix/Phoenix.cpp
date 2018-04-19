@@ -5,15 +5,11 @@
 
 typedef void(__cdecl *DLLFUNC)();
 
-int main(void) {
+void check_dll() {
   HINSTANCE hinstLib;
   DLLFUNC ProcAdd;
-  BOOL fFreeResult, fRunTimeLinkSuccess = FALSE;
 
-#ifdef UNICODE
-  _setmode(_fileno(stdin), _O_WTEXT);
-  _setmode(_fileno(stdout), _O_WTEXT);
-#endif
+  BOOL fFreeResult, fRunTimeLinkSuccess = FALSE;
 
   // Get a handle to the DLL module.
 
@@ -39,6 +35,16 @@ int main(void) {
   // If unable to call the DLL function, use an alternative.
   if (!fRunTimeLinkSuccess)
     _tprintf(TEXT("Could not load DLL\n"));
+}
+
+int main(void) {
+
+#ifdef UNICODE
+  _setmode(_fileno(stdin), _O_WTEXT);
+  _setmode(_fileno(stdout), _O_WTEXT);
+#endif
+
+  check_dll();
 
   system("pause");
 
