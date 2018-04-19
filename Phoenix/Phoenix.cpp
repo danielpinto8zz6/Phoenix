@@ -10,6 +10,11 @@ int main(void) {
   DLLFUNC ProcAdd;
   BOOL fFreeResult, fRunTimeLinkSuccess = FALSE;
 
+#ifdef UNICODE
+  _setmode(_fileno(stdin), _O_WTEXT);
+  _setmode(_fileno(stdout), _O_WTEXT);
+#endif
+
   // Get a handle to the DLL module.
 
   hinstLib = LoadLibrary(TEXT("PhoenixLibrary.dll"));

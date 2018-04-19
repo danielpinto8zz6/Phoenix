@@ -3,9 +3,16 @@
 
 #include "stdafx.h"
 
+#ifdef __cplusplus
 extern "C" {
-	__declspec(dllexport) void CheckDLL() {
-		_tprintf(TEXT("DLL Loaded !\n"));
-		return;
-	}
+#endif
+
+__declspec(dllexport) void CheckDLL() {
+
+  _tprintf(TEXT("DLL Loaded !\n"));
+  return;
 }
+
+#ifdef __cplusplus
+}
+#endif
