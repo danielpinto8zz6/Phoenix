@@ -37,7 +37,7 @@ void check_dll() {
     _tprintf(TEXT("Could not load DLL\n"));
 }
 
-int main(void) {
+int _tmain(int argc, LPTSTR argv[]) {
 
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
