@@ -2,15 +2,14 @@
 //
 
 #include "stdafx.h"
+#include <strsafe.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-__declspec(dllexport) void CheckDLL() {
-
-  _tprintf(TEXT("DLL Loaded !\n"));
-  return;
+__declspec(dllexport) void MessageHandler(LPTSTR lpszFunction) {
+  _tprintf(TEXT("MESSAGE : %s\n"), lpszFunction);
 }
 
 #ifdef __cplusplus

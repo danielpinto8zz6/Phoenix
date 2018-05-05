@@ -1,9 +1,9 @@
 #pragma once
 #include "stdafx.h"
 
-enum PowerupType { SHIELD, ICE, BATTERY, PLUS, ALCOOL };
+typedef enum { SHIELD, ICE, BATTERY, PLUS, ALCOOL } PowerupType;
 
-enum InvaderType { BASIC, DODGE };
+typedef enum { BASIC, DODGE } InvaderType;
 
 enum PowerupEffect {};
 
