@@ -1,15 +1,7 @@
 #include "stdafx.h"
 
-#define ENEMYSHIPS 20
-
-HANDLE EnemyShipsMutex;
-
-DWORD WINAPI ThreadEnemyShip(LPVOID);
-DWORD WINAPI ThreadManageEnemyShips(LPVOID lpParam);
-
-typedef void(__cdecl *DLLFUNC)(LPTSTR);
-
-void load_dll();
+#include "../PhoenixDll/PhoenixDll.h"
+#include "main.h"
 
 int _tmain(int argc, LPTSTR argv[]) {
   DWORD threadManageEnemyShipsId;
@@ -20,7 +12,7 @@ int _tmain(int argc, LPTSTR argv[]) {
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
-  load_dll();
+  CheckDLL();
 
   hThreadManageEnemyShips =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadManageEnemyShips,
@@ -39,7 +31,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 DWORD WINAPI ThreadManageEnemyShips(LPVOID lpParam) {
   HANDLE aThread[ENEMYSHIPS];
-  DWORD ThreadID;
+  DWORD ThreadID = 0;
   int i;
 
   _tprintf(TEXT("[ManageEnemyShips] -> Thread-%d\n"), GetCurrentThreadId());
@@ -88,27 +80,4 @@ DWORD WINAPI ThreadEnemyShip(LPVOID lpParam) {
   ReleaseMutex(EnemyShipsMutex);
 
   return TRUE;
-}
-
-void load_dll() {
-  HINSTANCE hinstLib;
-  DLLFUNC MessageHandler;
-
-  // Get a handle to the DLL module.
-  hinstLib = LoadLibrary(TEXT("PhoenixLibrary.dll"));
-
-  // If the handle is valid, try to get the function address.
-  if (hinstLib != NULL) {
-    MessageHandler = (DLLFUNC)GetProcAddress(hinstLib, "MessageHandler");
-
-    // If the function address is valid, call the function.
-    if (NULL != MessageHandler) {
-      MessageHandler((LPTSTR)TEXT("DLL LOADED"));
-    } else {
-      _tprintf(TEXT("Could not load DLL\n"));
-    }
-
-    // Free the DLL module.
-    FreeLibrary(hinstLib);
-  }
 }
