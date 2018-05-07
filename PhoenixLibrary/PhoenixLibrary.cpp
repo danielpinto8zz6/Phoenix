@@ -2,7 +2,6 @@
 //
 
 #include "stdafx.h"
-#include <strsafe.h>
 
 #ifdef __cplusplus
 extern "C" {
