@@ -1,4 +1,5 @@
-#include "../PhoenixDll/PhoenixDll.h"
+#pragma once
+#include "../phoenix_dll/phoenix_dll.h"
 #include "stdafx.h"
 
 #define ENEMYSHIPS 20
