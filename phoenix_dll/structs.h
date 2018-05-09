@@ -4,10 +4,12 @@
 
 #define PLAYERS 10
 #define ENEMYSHIPS 20
+#define WIDTH 10
+#define HEIGHT 40
 
 typedef enum { SHIELD, ICE, BATTERY, PLUS, ALCOOL } PowerupType;
 
-typedef enum { BASIC, DODGE } InvaderType;
+typedef enum { BASIC, DODGE } EnemyType;
 
 enum PowerupEffect {};
 
@@ -44,7 +46,7 @@ typedef struct {
   int points;
   int velocity;
   Size size;
-  InvaderType type;
+  EnemyType type;
   Bomb bombs[50];
 } EnemyShip;
 
@@ -64,6 +66,7 @@ typedef struct {
 	int level;
 	Player player[PLAYERS];
 	EnemyShip enemy_ship[ENEMYSHIPS];
+	TCHAR map[WIDTH][HEIGHT];
 } Game;
 
 
