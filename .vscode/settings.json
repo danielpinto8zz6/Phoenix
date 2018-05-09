@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "*.c": "c",
+        "*.cpp": "c",
+        "*.rh": "c",
+        "stdafx.h": "c",
+        "phoenixlibrary.h": "c",
+        "windows.h": "c",
+        "phoenixdll.h": "c",
+        "main.h": "c",
+        "structs.h": "c",
+        "tchar.h": "c"
+    }
+}
