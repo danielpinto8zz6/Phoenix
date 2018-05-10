@@ -9,6 +9,12 @@
 
 #define MAX_SEM_COUNT 10
 
+#define Buffers 10
+
+TCHAR NomeSemaforoPodeEscrever[] = TEXT("Semáforo Pode Escrever");
+TCHAR NomeSemaforoPodeLer[] = TEXT("Semáforo Pode Ler");HANDLE PodeEscrever;
+HANDLE PodeLer;
+
 #ifdef __cplusplus // If used by C++ code,
 extern "C" {       // we need to export the C interface
 #endif
