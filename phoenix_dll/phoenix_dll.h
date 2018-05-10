@@ -8,28 +8,33 @@
 extern "C" {       // we need to export the C interface
 #endif
 
-__declspec(dllexport) int myPuts(LPWSTR lpszMsg) {
-  DWORD cchWritten;
-  HANDLE hConout;
-  BOOL fRet;
-
-  // Get a handle to the console output device.
-
-  hConout = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
-  if (INVALID_HANDLE_VALUE == hConout)
-    return EOF;
-
-  // Write a null-terminated string to the console output device.
-
-  while (*lpszMsg != L'\0') {
-    fRet = WriteConsole(hConout, lpszMsg, 1, &cchWritten, NULL);
-    if ((FALSE == fRet) || (1 != cchWritten))
-      return EOF;
-    lpszMsg++;
+__declspec(dllexport) BOOL initMemAndSync(ControlData *data) {
+  data->hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
+                                     0, sizeof(Game), TEXT("phoenixShm"));
+  if (data->hMapFile == NULL) {
+    _tprintf(TEXT("Erro na memoria partilhada (%d).\n"), GetLastError());
+    return FALSE;
   }
-  return 1;
+
+  data->hMutex = CreateMutex(NULL, FALSE, TEXT("phoenixMutex"));
+  if (data->hMutex == NULL) {
+    _tprintf(TEXT("Erro no mutex (%d).\n"), GetLastError());
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+__declspec(dllexport) void writeData(ControlData *data, Game *game) {
+  WaitForSingleObject(data->hMutex, INFINITE);
+  CopyMemory(data->game, game, sizeof(Game));
+  ReleaseMutex(data->hMutex);
+}
+
+__declspec(dllexport) void readData(ControlData *data, Game *game) {
+  WaitForSingleObject(data->hMutex, INFINITE);
+  CopyMemory(game, data->game, sizeof(Game));
+  ReleaseMutex(data->hMutex);
 }
 
 #ifdef __cplusplus

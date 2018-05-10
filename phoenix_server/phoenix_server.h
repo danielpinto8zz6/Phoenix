@@ -7,5 +7,3 @@ HANDLE EnemyShipsMutex;
 
 DWORD WINAPI ThreadEnemyShip(LPVOID lpParam);
 DWORD WINAPI ThreadManageEnemyShips(LPVOID lpParam);
-DWORD WINAPI ThreadManageSharedMemory(LPVOID lpParam);
-void FillMap();

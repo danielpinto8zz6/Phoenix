@@ -71,7 +71,7 @@ typedef struct {
 
 
 typedef struct {
-  HANDLE *hMapFile;
+  HANDLE hMapFile;
   Game *game;
   int ThreadMustConinue;
   HANDLE hMutex;
