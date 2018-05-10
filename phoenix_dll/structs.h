@@ -67,7 +67,7 @@ typedef struct {
   unsigned num;
   Player player[PLAYERS];
   EnemyShip enemy_ship[ENEMYSHIPS];
-  TCHAR map[WIDTH][HEIGHT];
+  TCHAR map[HEIGHT][WIDTH];
 } Game;
 
 typedef struct {
