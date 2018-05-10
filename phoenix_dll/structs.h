@@ -63,16 +63,18 @@ typedef struct {
 } Powerup;
 
 typedef struct {
-	int level;
-	Player player[PLAYERS];
-	EnemyShip enemy_ship[ENEMYSHIPS];
-	TCHAR map[WIDTH][HEIGHT];
+  int level;
+  unsigned num;
+  Player player[PLAYERS];
+  EnemyShip enemy_ship[ENEMYSHIPS];
+  TCHAR map[WIDTH][HEIGHT];
 } Game;
-
 
 typedef struct {
   HANDLE hMapFile;
   Game *game;
   int ThreadMustConinue;
   HANDLE hMutex;
+  HANDLE smRead;
+  HANDLE smWrite;
 } ControlData;

@@ -2,7 +2,12 @@
 #include <tchar.h>
 #include <windows.h>
 
-#define EOF (-1)
+#define smReadName TEXT("smReadName")
+#define smWriteName TEXT("smWriteName")
+#define mReadName TEXT("mRead")
+#define mWriteName TEXT("mWrite")
+
+#define MAX_SEM_COUNT 10
 
 #ifdef __cplusplus // If used by C++ code,
 extern "C" {       // we need to export the C interface
@@ -27,6 +32,7 @@ __declspec(dllexport) BOOL initMemAndSync(ControlData *data) {
 
 __declspec(dllexport) void writeData(ControlData *data, Game *game) {
   WaitForSingleObject(data->hMutex, INFINITE);
+  data->game->num++;
   CopyMemory(data->game, game, sizeof(Game));
   ReleaseMutex(data->hMutex);
 }
@@ -35,6 +41,52 @@ __declspec(dllexport) void readData(ControlData *data, Game *game) {
   WaitForSingleObject(data->hMutex, INFINITE);
   CopyMemory(game, data->game, sizeof(Game));
   ReleaseMutex(data->hMutex);
+}
+
+__declspec(dllexport) unsigned peekData(ControlData *data) {
+  unsigned num;
+  WaitForSingleObject(data->hMutex, INFINITE);
+  num = data->game->num;
+  ReleaseMutex(data->hMutex);
+  return num;
+}
+
+__declspec(dllexport) unsigned int __stdcall listenerThread(LPVOID lpParam) {
+  ControlData *data = (ControlData *)lpParam;
+  unsigned int current = peekData(data);
+  Game game;
+  while (1) {
+    WaitForSingleObject(data->smWrite, INFINITE);
+    if (peekData(data) > current) {
+      readData(data, &game);
+      current = game.num;
+      // system("cls");
+      for (int x = 0; x < HEIGHT; x++) {
+        for (int y = 0; y < WIDTH; y++) {
+          _tprintf(TEXT("%d "), game.map[x][y]);
+        }
+      }
+    }
+    ReleaseSemaphore(data->smRead, 1, NULL);
+  }
+  return 0;
+}
+
+__declspec(dllexport) BOOL initSemaphores(ControlData *data) {
+  data->smWrite =
+      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, smWriteName);
+  if (data->smWrite == NULL) {
+    _tprintf(TEXT("CreateSemaphore error: %d\n"), GetLastError());
+    return FALSE;
+  }
+
+  data->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, smReadName);
+  if (data->smRead == NULL) {
+    _tprintf(TEXT("CreateSemaphore error: %d\n"), GetLastError());
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 #ifdef __cplusplus
