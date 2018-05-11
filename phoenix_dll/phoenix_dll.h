@@ -11,10 +11,6 @@
 
 #define Buffers 10
 
-TCHAR NomeSemaforoPodeEscrever[] = TEXT("Sem·foro Pode Escrever");
-TCHAR NomeSemaforoPodeLer[] = TEXT("Sem·foro Pode Ler");HANDLE PodeEscrever;
-HANDLE PodeLer;
-
 #ifdef __cplusplus // If used by C++ code,
 extern "C" {       // we need to export the C interface
 #endif
@@ -23,13 +19,13 @@ __declspec(dllexport) BOOL initMemAndSync(ControlData *data) {
   data->hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
                                      0, sizeof(Game), TEXT("phoenixShm"));
   if (data->hMapFile == NULL) {
-    _tprintf(TEXT("Erro na memoria partilhada (%d).\n"), GetLastError());
+    _tprintf(TEXT("[Erro] Criar mem√≥ria partilhada: %d\n"), GetLastError());
     return FALSE;
   }
 
   data->hMutex = CreateMutex(NULL, FALSE, TEXT("phoenixMutex"));
   if (data->hMutex == NULL) {
-    _tprintf(TEXT("Erro no mutex (%d).\n"), GetLastError());
+    _tprintf(TEXT("[Erro] Criar mutex: %d\n"), GetLastError());
     return FALSE;
   }
 
@@ -57,38 +53,17 @@ __declspec(dllexport) unsigned peekData(ControlData *data) {
   return num;
 }
 
-__declspec(dllexport) unsigned int __stdcall listenerThread(LPVOID lpParam) {
-  ControlData *data = (ControlData *)lpParam;
-  unsigned int current = peekData(data);
-  Game game;
-  while (1) {
-    WaitForSingleObject(data->smWrite, INFINITE);
-    if (peekData(data) > current) {
-      readData(data, &game);
-      current = game.num;
-      // system("cls");
-      for (int x = 0; x < HEIGHT; x++) {
-        for (int y = 0; y < WIDTH; y++) {
-          _tprintf(TEXT("%d "), game.map[x][y]);
-        }
-      }
-    }
-    ReleaseSemaphore(data->smRead, 1, NULL);
-  }
-  return 0;
-}
-
 __declspec(dllexport) BOOL initSemaphores(ControlData *data) {
   data->smWrite =
       CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, smWriteName);
   if (data->smWrite == NULL) {
-    _tprintf(TEXT("CreateSemaphore error: %d\n"), GetLastError());
+    _tprintf(TEXT("[Erro] Criar sem√°foro: %d\n"), GetLastError());
     return FALSE;
   }
 
   data->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, smReadName);
   if (data->smRead == NULL) {
-    _tprintf(TEXT("CreateSemaphore error: %d\n"), GetLastError());
+    _tprintf(TEXT("[Erro] ao criar sem√°foro: %d\n"), GetLastError());
     return FALSE;
   }
 

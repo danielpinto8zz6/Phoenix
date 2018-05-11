@@ -5,9 +5,9 @@
 Coordinates *GetFirstEmptyPosition(Game *game) {
   Coordinates coordinates;
 
-  for (int x = 0; x < WIDTH; x++) {
-    for (int y = 0; y < HEIGHT; y++) {
-      if (game->map[x][y] == ' ' || game->map[x][y] == '\0') {
+  for (int y = 0; y < HEIGHT; y++) {
+    for (int x = 0; x < WIDTH; x++) {
+      if (game->map[y][x] == ' ' || game->map[y][x] == '\0') {
         coordinates.x = x;
         coordinates.y = y;
         return &coordinates;

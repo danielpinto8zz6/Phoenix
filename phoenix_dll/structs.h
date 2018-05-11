@@ -5,7 +5,7 @@
 #define PLAYERS 10
 #define ENEMYSHIPS 20
 #define WIDTH 10
-#define HEIGHT 40
+#define HEIGHT 15
 
 typedef enum { SHIELD, ICE, BATTERY, PLUS, ALCOOL } PowerupType;
 
