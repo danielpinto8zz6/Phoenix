@@ -3,9 +3,9 @@
 
 #include "stdafx.h"
 
-#include "phoenix_client.h"
 #include "../phoenix_dll/phoenix_dll.h"
 #include "../phoenix_dll/structs.h"
+#include "phoenix_client.h"
 #include <fcntl.h>
 #include <io.h>
 #include <tchar.h>
@@ -27,7 +27,7 @@ int _tmain() {
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)dataReceiver, &data, 0,
                    &threadDataReceiverId);
   if (hThreadDataReceiver == NULL) {
-     _tprintf(TEXT("[Erro] Criar thread"));
+    _tprintf(TEXT("[Erro] Criar thread"));
     return -1;
   }
 
@@ -41,7 +41,7 @@ int _tmain() {
 // Receive data from server
 unsigned int __stdcall dataReceiver() {
   TCHAR buf[256];
-  HANDLE hPipe;
+  HANDLE hServerPipe;
   BOOL fSuccess = FALSE;
   DWORD n;
   // Temporary
@@ -53,9 +53,9 @@ unsigned int __stdcall dataReceiver() {
     system("pause");
     exit(-1);
   }
-  hPipe = CreateFile(SERVER_PIPE_NAME, GENERIC_READ, 0, NULL, OPEN_EXISTING,
-                     FILE_ATTRIBUTE_NORMAL, NULL);
-  if (hPipe == NULL) {
+  hServerPipe = CreateFile(SERVER_PIPE_NAME, GENERIC_READ, 0, NULL,
+                           OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (hServerPipe == NULL) {
     _tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (CreateFile)\n"),
              SERVER_PIPE_NAME);
     system("pause");
@@ -64,7 +64,7 @@ unsigned int __stdcall dataReceiver() {
 
   // Connected
   do {
-    fSuccess = ReadFile(hPipe, buf, sizeof(buf), &n, NULL);
+    fSuccess = ReadFile(hServerPipe, buf, sizeof(buf), &n, NULL);
     buf[n / sizeof(TCHAR)] = '\0';
 
     if (!fSuccess || !n) {
@@ -75,7 +75,42 @@ unsigned int __stdcall dataReceiver() {
     // Do what you gotta do...
   } while (!STOP);
 
-  CloseHandle(hPipe);
+  CloseHandle(hServerPipe);
 
   return 0;
+}
+
+void dataSender(int data) {
+  DWORD n;
+  HANDLE hClientPipe;
+  TCHAR buf[256];
+
+  hClientPipe =
+      CreateNamedPipe(TEXT("NONE"), PIPE_ACCESS_OUTBOUND,
+                      PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, 1,
+                      sizeof(buf), sizeof(buf), 1000, NULL);
+  if (hClientPipe == INVALID_HANDLE_VALUE) {
+    _tprintf(TEXT("[ERRO] Criar Named Pipe! %d\n"), GetLastError());
+    system("pause");
+    exit(-1);
+  }
+
+  while (1) {
+    if (!ConnectNamedPipe(hClientPipe, NULL)) {
+      _tprintf(TEXT("[ERRO] Ligação ao leitor! %d\n"), GetLastError());
+      system("pause");
+      exit(-1);
+    }
+    if (!WriteFile(hClientPipe, &data, sizeof(data), &n, NULL)) {
+      _tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+      exit(-1);
+    }
+
+    if (!DisconnectNamedPipe(hClientPipe)) {
+      _tprintf(TEXT("[ERRO] Desligar o pipe! %d"), GetLastError());
+      system("pause");
+      exit(-1);
+    }
+  }
+  CloseHandle(hClientPipe);
 }
