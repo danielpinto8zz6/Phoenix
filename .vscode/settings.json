@@ -10,5 +10,16 @@
         "main.h": "c",
         "structs.h": "c",
         "tchar.h": "c"
+    },
+    // Configure glob patterns for excluding files and folders.
+    "files.exclude": {
+        "**/*.vcxproj" : true,
+        "**/*.filters" : true,
+        "**/*.user" : true,
+        "**/.git": true,
+        "**/.gitignore": true,
+        "**/.gitattributes": true,
+        "**/x64": true,
+        "**/Debug": true
     }
 }
