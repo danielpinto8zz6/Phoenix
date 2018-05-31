@@ -11,7 +11,7 @@ typedef enum { SHIELD, ICE, BATTERY, PLUS, ALCOOL } PowerupType;
 
 typedef enum { BASIC, DODGE } EnemyType;
 
-enum PowerupEffect {};
+typedef enum { NONE } PowerupEffect;
 
 typedef struct {
   int x;
