@@ -7,7 +7,7 @@
 #define mReadName TEXT("mRead")
 #define mWriteName TEXT("mWrite")
 
-#define SERVER_PIPE_NAME TEXT("\\\\.\\pipe\\server")
+#define GATEWAY_PIPE_NAME TEXT("\\\\.\\pipe\\server")
 
 #define MAX_SEM_COUNT 10
 
