@@ -19,8 +19,6 @@ int _tmain() {
   DWORD threadDataReceiverId;
   HANDLE hThreadDataReceiver;
 
-  Player client[50];
-
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
   _setmode(_fileno(stdout), _O_WTEXT);
@@ -55,7 +53,7 @@ int _tmain() {
    * Gateway thread to receive info from clients
    */
   hThreadDataReceiver =
-      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)clientsDataReceiver, 0, 0,
+      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)manageClients, 0, 0,
                    &threadDataReceiverId);
   if (hThreadDataReceiver == NULL) {
     _tprintf(TEXT("[Erro] Criar thread"));
@@ -106,84 +104,62 @@ unsigned int __stdcall threadListener(LPVOID lpParam) {
   return 0;
 }
 
-// Receive data from server
-LPVOID clientsDataReceiver() {
-  TCHAR buf[256];
-  HANDLE hGatewayPipe;
-  BOOL fSuccess = FALSE;
-  DWORD n;
-  // Temporary
-  BOOL STOP = FALSE;
+DWORD WINAPI manageClients(LPVOID lpParam) {
+  _tprintf(TEXT("Creating an instance of a named pipe...\n"));
 
-  if (!WaitNamedPipe(GATEWAY_PIPE_NAME, NMPWAIT_WAIT_FOREVER)) {
-    _tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (WaitNamedPipe)\n"),
-             GATEWAY_PIPE_NAME);
+  // Create a pipe to send data
+  HANDLE hGatewayPipe =
+      CreateNamedPipe(GATEWAY_PIPE_NAME,    // name of the pipe
+                      PIPE_ACCESS_OUTBOUND, // 1-way pipe -- send only
+                      PIPE_TYPE_BYTE,       // send data as a byte stream
+                      1,   // only allow 1 instance of this pipe
+                      0,   // no outbound buffer
+                      0,   // no inbound buffer
+                      0,   // use default wait time
+                      NULL // use default security attributes
+      );
+
+  if (hGatewayPipe == NULL || hGatewayPipe == INVALID_HANDLE_VALUE) {
+    _tprintf(TEXT("Failed to create outbound pipe instance.\n"));
+    // look up error code here using GetLastError()
     system("pause");
-    exit(-1);
+    return 1;
   }
 
-  hGatewayPipe = CreateFile(GATEWAY_PIPE_NAME, GENERIC_READ, 0, NULL,
-                            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  if (hGatewayPipe == NULL) {
-    _tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (CreateFile)\n"),
-             GATEWAY_PIPE_NAME);
+  _tprintf(TEXT("Waiting for a client to connect to the pipe...\n"));
+
+  // This call blocks until a client process connects to the pipe
+  BOOL result = ConnectNamedPipe(hGatewayPipe, NULL);
+  if (!result) {
+    _tprintf(TEXT("Failed to make connection on named pipe.\n"));
+    // look up error code here using GetLastError()
+    CloseHandle(hGatewayPipe); // close the pipe
     system("pause");
-    exit(-1);
+    return 1;
   }
 
-  // Connected
-  do {
-    fSuccess = ReadFile(hGatewayPipe, buf, sizeof(buf), &n, NULL);
-    buf[n / sizeof(TCHAR)] = '\0';
+  _tprintf(TEXT("Sending data to pipe...\n"));
 
-    if (!fSuccess || !n) {
-      _tprintf(TEXT("[ERRO] %d %d... (ReadFile)\n"), fSuccess, n);
-      break;
-    }
+  // This call blocks until a client process reads all the data
+  const TCHAR *data = TEXT("*** Hello Pipe World ***");
+  DWORD numBytesWritten = 0;
+  result = WriteFile(
+      hGatewayPipe,                   // handle to our outbound pipe
+      data,                           // data to send
+      wcslen(data) * sizeof(wchar_t), // length of data to send (bytes)
+      &numBytesWritten,               // will store actual amount of data sent
+      NULL                            // not using overlapped IO
+  );
 
-    // Do what you gotta do...
-  } while (!STOP);
+  if (result) {
+    _tprintf(TEXT("Number of bytes sent: %d\n"), numBytesWritten);
+  } else {
+    _tprintf(TEXT("Failed to send data."));
+    // look up error code here using GetLastError()
+  }
 
+  // Close the pipe (automatically disconnects client too)
   CloseHandle(hGatewayPipe);
 
-  return 0;
-}
-
-/**
- * To send data we specificate the client pipe by parameter
- */
-LPVOID sendDataToClient(int clientId, LPVOID data) {
-  DWORD n;
-  HANDLE hClientPipe;
-
-  hClientPipe =
-      CreateNamedPipe(TEXT("PHOENIX-CLIENT-%d",clientId), PIPE_ACCESS_OUTBOUND,
-                      PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, 1,
-                      sizeof(data), sizeof(data), 1000, NULL);
-  if (hClientPipe == INVALID_HANDLE_VALUE) {
-    _tprintf(TEXT("[ERRO] Criar Named Pipe! %d\n"), GetLastError());
-    system("pause");
-    exit(-1);
-  }
-
-  if (!ConnectNamedPipe(hClientPipe, NULL)) {
-    _tprintf(TEXT("[ERRO] Ligação ao leitor! %d\n"), GetLastError());
-    system("pause");
-    exit(-1);
-  }
-
-  /**
-   * Here we send the data specified by parameter trought the pipe
-   */
-  if (!WriteFile(hClientPipe, &data, sizeof(data), &n, NULL)) {
-    _tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
-    exit(-1);
-  }
-
-  if (!DisconnectNamedPipe(hClientPipe)) {
-    _tprintf(TEXT("[ERRO] Desligar o pipe! %d"), GetLastError());
-    system("pause");
-    exit(-1);
-  }
-  CloseHandle(hClientPipe);
+  system("pause");
 }

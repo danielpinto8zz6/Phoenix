@@ -3,5 +3,4 @@
 
 int _tmain();
 unsigned int __stdcall threadListener(LPVOID lpParam);
-LPVOID clientsDataReceiver();
-LPVOID sendDataToClient(int clientId, LPVOID data);
+DWORD WINAPI manageClients(LPVOID lpParam);

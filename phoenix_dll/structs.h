@@ -78,3 +78,7 @@ typedef struct {
   HANDLE smRead;
   HANDLE smWrite;
 } ControlData;
+
+typedef struct {
+  int id;
+} Message;
