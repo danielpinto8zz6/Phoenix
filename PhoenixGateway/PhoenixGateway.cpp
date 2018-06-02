@@ -46,7 +46,7 @@ int _tmain() {
    * Gateway thread to receive info from clients
    */
   hThreadDataReceiver =
-      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)manageClients, 0, 0,
+      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)manageClients, &data, 0,
                    &threadDataReceiverId);
   if (hThreadDataReceiver == NULL) {
     Error(TEXT("Creating thread to manage clients"));

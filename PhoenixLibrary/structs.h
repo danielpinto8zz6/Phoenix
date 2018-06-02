@@ -36,7 +36,6 @@ typedef struct {
 } DefenderShip;
 
 typedef struct {
-  TCHAR username[50];
   DefenderShip ship;
   int lifes;
   int points;
@@ -93,4 +92,9 @@ typedef struct {
 typedef struct {
   HANDLE inboundPipe;
   HANDLE outboundPipe;
-} ClientPipes;
+} Pipes;
+
+typedef struct {
+  TCHAR username[50];
+  Pipes pipes;
+} Client;

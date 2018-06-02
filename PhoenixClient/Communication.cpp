@@ -4,8 +4,8 @@
 #include <process.h>
 
 DWORD WINAPI dataReceiver(LPVOID lpParam) {
-  ClientPipes *clientPipes;
-  clientPipes = (ClientPipes *)lpParam;
+  Pipes *clientPipes;
+  clientPipes = (Pipes *)lpParam;
 
   Message msg;
   BOOL result;
@@ -25,7 +25,7 @@ DWORD WINAPI dataReceiver(LPVOID lpParam) {
   return 0;
 }
 
-BOOL connectPipes(ClientPipes *clientPipes) {
+BOOL connectPipes(Pipes *clientPipes) {
   if (!WaitNamedPipe(PIPE_NAME_INBOUND, NMPWAIT_WAIT_FOREVER)) {
     Error(TEXT("Connecting to inbound pipe"));
     return FALSE;

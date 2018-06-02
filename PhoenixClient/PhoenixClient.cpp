@@ -9,7 +9,7 @@
 int _tmain() {
   HANDLE hThreadDataReceiver;
   DWORD threadDataReceiverId;
-  ClientPipes clientPipes;
+  Pipes clientPipes;
   BOOL success = FALSE;
 
 #ifdef UNICODE

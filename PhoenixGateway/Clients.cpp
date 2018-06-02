@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+
 #include "Clients.h"
 
 DWORD WINAPI manageClients(LPVOID lpParam) {
@@ -55,16 +56,16 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
       return -1;
     }
 
-    ClientPipes clientPipes;
-    clientPipes.inboundPipe = hGatewayPipe;
-    clientPipes.outboundPipe = clientPipe[TOTAL];
+    Client client;
+    client.pipes.inboundPipe = hGatewayPipe;
+    client.pipes.outboundPipe = clientPipe[TOTAL];
 
     /**
      * Client connected, create thread
      */
     hThreadManageClient[TOTAL] =
         CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)manageClient,
-                     (LPVOID)&clientPipes, 0, NULL);
+                     (LPVOID)&client, 0, NULL);
     if (hThreadManageClient[TOTAL] == NULL) {
       Error(TEXT("Creating client thread"));
       return -1;
@@ -85,25 +86,27 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
 }
 
 DWORD WINAPI manageClient(LPVOID lpParam) {
-  ClientPipes *clientPipes;
-  clientPipes = (ClientPipes *)lpParam;
+  Client *client;
+  client = (Client *)lpParam;
   Message msg;
   BOOL result;
   DWORD nBytes;
 
   do {
-    result = ReadFile(clientPipes->inboundPipe, (LPVOID)&msg, sizeof(msg),
+    result = ReadFile(client->pipes.inboundPipe, (LPVOID)&msg, sizeof(msg),
                       &nBytes, NULL);
     if (nBytes > 0) {
       switch (msg.cmd) {
       case LOGIN:
-        _tprintf(TEXT("Client Login : %s\n"), msg.text);
+        _tcscpy_s(client->username, _tcslen(msg.text) + 1, msg.text);
+        clientLogged(client);
+        _tprintf(TEXT("Client Login : %s\n"), client->username);
 
         /**
          * Tell client he's logged
          */
         msg.cmd = LOGGED;
-        result = WriteFile(clientPipes->outboundPipe, (LPCVOID)&msg,
+        result = WriteFile(client->pipes.outboundPipe, (LPCVOID)&msg,
                            sizeof(msg), &nBytes, NULL);
         if (!result) {
           Error(TEXT("Failed to send data to client."));
@@ -115,4 +118,8 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   } while (!msg.Stop);
 
   return 0;
+}
+
+VOID clientLogged(Client *client) {
+  _tprintf(TEXT("%s logged...\n"), client->username);
 }
