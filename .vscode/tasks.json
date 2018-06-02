@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "msbuild",
             "options": {
-                "cwd": "${workspaceFolder}/Phoenix"
+                "cwd": "${workspaceFolder}/PhoenixServer"
             },
             "args": [
                 // Ask msbuild to generate full paths for file names.
@@ -31,7 +31,7 @@
             "type": "shell",
             "command": "msbuild",
             "options": {
-                "cwd": "${workspaceFolder}/phoenix_library"
+                "cwd": "${workspaceFolder}/PhoenixLibrary"
             },
             "args": [
                 // Ask msbuild to generate full paths for file names.
@@ -54,7 +54,7 @@
             "type": "shell",
             "command": "msbuild",
             "options": {
-                "cwd": "${workspaceFolder}/phoenix_gateway"
+                "cwd": "${workspaceFolder}/PhoenixGateway"
             },
             "args": [
                 // Ask msbuild to generate full paths for file names.
@@ -118,7 +118,7 @@
             "type": "shell",
             "command": "msbuild",
             "options": {
-                "cwd": "${workspaceFolder}/phoenix_client"
+                "cwd": "${workspaceFolder}/PhoenixClient"
             },
             "args": [
                 // Ask msbuild to generate full paths for file names.
