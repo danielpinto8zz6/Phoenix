@@ -61,7 +61,7 @@ BOOL initSemaphores(ControlData *data) {
 }
 
 void Error(const TCHAR *text) {
-  _tprintf(TEXT("[ERROR] %s. (%d)"), text, GetLastError());
+  _tprintf(TEXT("[ERROR] %s. (%d)\n"), text, GetLastError());
 }
 
 BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes) {
@@ -71,6 +71,17 @@ BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes) {
       WriteFile(hPipe, data, size, nBytes, NULL);
   if (!success) {
     Error(TEXT("Sending data"));
+  }
+  return success;
+}
+
+BOOL receiveDataFromPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes) {
+  BOOL success;
+
+  success =
+      ReadFile(hPipe, data, size, nBytes, NULL);
+  if (!success) {
+    Error(TEXT("Receiving data"));
   }
   return success;
 }

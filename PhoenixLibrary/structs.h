@@ -16,7 +16,7 @@ typedef enum { BASIC, DODGE } EnemyType;
 
 typedef enum { NONE } PowerupEffect;
 
-typedef enum { LOGIN, SUCCESS } Command;
+typedef enum { LOGIN, SUCCESS, LOGGED } Command;
 
 typedef struct {
   int x;

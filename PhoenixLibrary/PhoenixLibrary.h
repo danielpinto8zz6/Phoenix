@@ -28,7 +28,10 @@ PHOENIXLIBRARY_API BOOL initSemaphores(ControlData *data);
 PHOENIXLIBRARY_API unsigned peekData(ControlData *data);
 PHOENIXLIBRARY_API void readDataFromSharedMemory(ControlData *data, Game *game);
 PHOENIXLIBRARY_API void writeDataToSharedMemory(ControlData *data, Game *game);
-PHOENIXLIBRARY_API BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes);
+PHOENIXLIBRARY_API BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe,
+                                        LPDWORD nBytes);
+PHOENIXLIBRARY_API BOOL receiveDataFromPipe(LPVOID data, SIZE_T size,
+                                            HANDLE hPipe, LPDWORD nBytes);
 #ifdef __cplusplus
 }
 #endif

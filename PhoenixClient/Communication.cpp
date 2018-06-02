@@ -15,8 +15,8 @@ DWORD WINAPI dataReceiver(LPVOID lpParam) {
                       &nBytes, NULL);
     if (nBytes > 0) {
       switch (msg.cmd) {
-      case SUCCESS:
-        _tprintf(TEXT("Succeed : %s\n"), msg.text);
+      case LOGGED:
+        _tprintf(TEXT("Succeed : %s logged\n"), msg.text);
         break;
       }
     }
@@ -30,8 +30,6 @@ BOOL connectPipes(ClientPipes *clientPipes) {
     Error(TEXT("Connecting to inbound pipe"));
     return FALSE;
   }
-
-  _tprintf(TEXT("Connected with gateway\n"));
 
   clientPipes->outboundPipe =
       CreateFile(PIPE_NAME_INBOUND, GENERIC_READ, 0, NULL, OPEN_EXISTING,

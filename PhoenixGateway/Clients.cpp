@@ -102,9 +102,7 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
         /**
          * Tell client he's logged
          */
-        msg.cmd = SUCCESS;
-        TCHAR text[] = TEXT("Login succeed");
-        _tcscpy_s(msg.text, _tcslen(text) + 1, text);
+        msg.cmd = LOGGED;
         result = WriteFile(clientPipes->outboundPipe, (LPCVOID)&msg,
                            sizeof(msg), &nBytes, NULL);
         if (!result) {

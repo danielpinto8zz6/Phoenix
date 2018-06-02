@@ -10,6 +10,7 @@ int _tmain() {
   HANDLE hThreadDataReceiver;
   DWORD threadDataReceiverId;
   ClientPipes clientPipes;
+  BOOL success = FALSE;
 
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
@@ -21,7 +22,16 @@ int _tmain() {
   /**
    * Connect inbound & outbound pipes
    */
-  connectPipes(&clientPipes);
+  while (!success) {
+    success = connectPipes(&clientPipes);
+    /**
+     * Keep trying to connect every 5 seconds
+     */
+    if (!success) {
+      Error(TEXT("Connection to gateway failed! Trying again in 5 sec"));
+      Sleep(5000);
+    }
+  }
 
   /**
    * Create thread to receive info from gateway
