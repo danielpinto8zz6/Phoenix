@@ -1,4 +1,5 @@
 #pragma once
+
 #include <tchar.h>
 #include <windows.h>
 
@@ -7,11 +8,17 @@
 #define WIDTH 10
 #define HEIGHT 15
 
+#define PIPE_NAME_INBOUND TEXT("\\\\.\\pipe\\phoenix-gateway-inbountd")
+#define PIPE_NAME_OUTBOUND TEXT("\\\\.\\pipe\\phoenix-gateway-outbound")
+
+
 typedef enum { SHIELD, ICE, BATTERY, PLUS, ALCOOL } PowerupType;
 
 typedef enum { BASIC, DODGE } EnemyType;
 
 typedef enum { NONE } PowerupEffect;
+
+typedef enum { LOGIN } Command;
 
 typedef struct {
   int x;
@@ -80,5 +87,11 @@ typedef struct {
 } ControlData;
 
 typedef struct {
-  int id;
+  Command cmd;
+  BOOL Stop;
 } Message;
+
+typedef struct {
+  HANDLE inboundPipe;
+  HANDLE outboundPipe;
+} ClientPipes;

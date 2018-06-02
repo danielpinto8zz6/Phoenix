@@ -1,3 +1,5 @@
+#pragma once
+
 #include "structs.h"
 #include <tchar.h>
 #include <windows.h>
@@ -6,8 +8,6 @@
 #define smWriteName TEXT("smWriteName")
 #define mReadName TEXT("mRead")
 #define mWriteName TEXT("mWrite")
-
-#define GATEWAY_PIPE_NAME TEXT("\\\\.\\pipe\\phoenix-gateway")
 
 #define MAX_SEM_COUNT 10
 

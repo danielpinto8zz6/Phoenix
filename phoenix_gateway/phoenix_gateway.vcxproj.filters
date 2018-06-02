@@ -24,12 +24,18 @@
     <ClInclude Include="phoenix_gateway.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clients.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="phoenix_gateway.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clients.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
