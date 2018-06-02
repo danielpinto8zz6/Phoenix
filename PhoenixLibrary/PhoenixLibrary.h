@@ -26,8 +26,9 @@ PHOENIXLIBRARY_API void Error(const TCHAR *text);
 PHOENIXLIBRARY_API BOOL initMemAndSync(ControlData *data);
 PHOENIXLIBRARY_API BOOL initSemaphores(ControlData *data);
 PHOENIXLIBRARY_API unsigned peekData(ControlData *data);
-PHOENIXLIBRARY_API void readData(ControlData *data, Game *game);
-PHOENIXLIBRARY_API void writeData(ControlData *data, Game *game);
+PHOENIXLIBRARY_API void readDataFromSharedMemory(ControlData *data, Game *game);
+PHOENIXLIBRARY_API void writeDataToSharedMemory(ControlData *data, Game *game);
+PHOENIXLIBRARY_API BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes);
 #ifdef __cplusplus
 }
 #endif

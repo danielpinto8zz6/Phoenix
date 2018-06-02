@@ -76,7 +76,7 @@ DWORD WINAPI threadListener(LPVOID lpParam) {
     WaitForSingleObject(data->smRead, INFINITE);
 
     if (peekData(data) > current) {
-      readData(data, data->game);
+      readDataFromSharedMemory(data, data->game);
       current = data->game->num;
 
       // Clear the console

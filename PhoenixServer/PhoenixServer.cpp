@@ -122,7 +122,7 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
     data.game->map[c->y][c->x] = '#';
   }
 
-  writeData(&data, data.game);
+  writeDataToSharedMemory(&data, data.game);
 
   ReleaseSemaphore(data.smRead, 1, NULL);
 

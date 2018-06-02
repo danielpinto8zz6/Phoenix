@@ -22,14 +22,14 @@ BOOL initMemAndSync(ControlData *data) {
   return TRUE;
 }
 
-void writeData(ControlData *data, Game *game) {
+void writeDataToSharedMemory(ControlData *data, Game *game) {
   WaitForSingleObject(data->hMutex, INFINITE);
   data->game->num++;
   CopyMemory(data->game, game, sizeof(Game));
   ReleaseMutex(data->hMutex);
 }
 
-void readData(ControlData *data, Game *game) {
+void readDataFromSharedMemory(ControlData *data, Game *game) {
   WaitForSingleObject(data->hMutex, INFINITE);
   CopyMemory(game, data->game, sizeof(Game));
   ReleaseMutex(data->hMutex);
@@ -62,4 +62,15 @@ BOOL initSemaphores(ControlData *data) {
 
 void Error(const TCHAR *text) {
   _tprintf(TEXT("[ERROR] %s. (%d)"), text, GetLastError());
+}
+
+BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes) {
+  BOOL success;
+
+  success =
+      WriteFile(hPipe, data, size, nBytes, NULL);
+  if (!success) {
+    Error(TEXT("Sending data"));
+  }
+  return success;
 }

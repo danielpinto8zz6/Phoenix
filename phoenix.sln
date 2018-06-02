@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixServer", "PhoenixServer\PhoenixServer.vcxproj", "{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixLibrary", "PhoenixLibrary\PhoenixLibrary.vcxproj", "{148C77B0-5C3A-4F4C-87CC-46E6A06C0976}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixServer", "PhoenixServer\PhoenixServer.vcxproj", "{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixClient", "PhoenixClient\PhoenixClient.vcxproj", "{400FC49D-9208-4B5F-B0D2-764A09D42D55}"
 EndProject
