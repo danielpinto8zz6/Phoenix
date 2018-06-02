@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "../phoenix_dll/structs.h"
 #include "clients.h"

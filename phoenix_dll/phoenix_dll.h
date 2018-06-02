@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "structs.h"
 #include <tchar.h>
@@ -21,7 +21,7 @@ __declspec(dllexport) BOOL initMemAndSync(ControlData *data) {
   data->hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
                                      0, sizeof(Game), TEXT("phoenixShm"));
   if (data->hMapFile == NULL) {
-    _tprintf(TEXT("[Erro] Criar memória partilhada: %d\n"), GetLastError());
+    _tprintf(TEXT("[Erro] Criar memÃ³ria partilhada: %d\n"), GetLastError());
     return FALSE;
   }
 
@@ -59,13 +59,13 @@ __declspec(dllexport) BOOL initSemaphores(ControlData *data) {
   data->smWrite =
       CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, smWriteName);
   if (data->smWrite == NULL) {
-    _tprintf(TEXT("[Erro] Criar semáforo: %d\n"), GetLastError());
+    _tprintf(TEXT("[Erro] Criar semÃ¡foro: %d\n"), GetLastError());
     return FALSE;
   }
 
   data->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, smReadName);
   if (data->smRead == NULL) {
-    _tprintf(TEXT("[Erro] ao criar semáforo: %d\n"), GetLastError());
+    _tprintf(TEXT("[Erro] ao criar semÃ¡foro: %d\n"), GetLastError());
     return FALSE;
   }
 

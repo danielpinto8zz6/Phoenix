@@ -1,4 +1,4 @@
-// phoenix_client.cpp : Defines the entry point for the console application.
+﻿// phoenix_client.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -70,7 +70,7 @@ int _tmain() {
 
   _tprintf(TEXT("[CLIENTE] Ligação ao servidor... (CreateFile)\n"));
   // Duplex a leitura e escrita tem de ser na mesma thread
-  // soluçao 2 pipes
+  // soluÃ§ao 2 pipes
   clientPipes.outboundPipe =
       CreateFile(PIPE_NAME_INBOUND, GENERIC_READ, 0, NULL, OPEN_EXISTING,
                  FILE_ATTRIBUTE_NORMAL, NULL);

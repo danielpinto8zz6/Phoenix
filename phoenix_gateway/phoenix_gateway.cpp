@@ -1,4 +1,4 @@
-// phoenix_gateway.cpp : Defines the entry point for the console application.
+﻿// phoenix_gateway.cpp : Defines the entry point for the console application.
 //
 #include "stdafx.h"
 
@@ -37,7 +37,7 @@ int _tmain() {
                                     sizeof(Game));
 
   if (data.game == NULL) {
-    _tprintf(TEXT("[Erro] Mapeamento da memória partilhada(%d)\n"),
+    _tprintf(TEXT("[Erro] Mapeamento da memÃ³ria partilhada(%d)\n"),
              GetLastError());
     return -1;
   }

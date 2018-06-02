@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "../phoenix_dll/phoenix_dll.h"
 #include "../phoenix_dll/structs.h"
@@ -32,7 +32,7 @@ int _tmain(int argc, LPTSTR argv[]) {
  
 
   if (data.game == NULL) {
-    _tprintf(TEXT("[Erro] Mapeamento da memória partilhada(%d)\n"),
+    _tprintf(TEXT("[Erro] Mapeamento da memÃ³ria partilhada(%d)\n"),
              GetLastError());
     return -1;
   }

@@ -1,4 +1,4 @@
-# Phoenix
+﻿# Phoenix
 
 ## TODO
 - [ ] Send received data on gateway to server
