@@ -1,4 +1,4 @@
-﻿// PhoenixServer.cpp : Defines the entry point for the console application.
+﻿// PhoenixServer.cpp : Defines the entry poINT for the console application.
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 
 ControlData data;
 
-int _tmain(int argc, LPTSTR argv[]) {
+INT _tmain(INT argc, LPTSTR argv[]) {
   DWORD threadManageEnemyShipsId;
   HANDLE hThreadManageEnemyShips;
 
@@ -46,7 +46,7 @@ int _tmain(int argc, LPTSTR argv[]) {
   WaitForSingleObject(hThreadManageEnemyShips, INFINITE);
 
   // DEBUG
-  for (int i = 0; i < ENEMYSHIPS; i++) {
+  for (INT i = 0; i < ENEMYSHIPS; i++) {
     _tprintf(TEXT("Position X Y: (%d , %d)\n"),
              data.game->enemy_ship[i].position.x,
              data.game->enemy_ship[i].position.y);
@@ -67,8 +67,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
   HANDLE aThread[ENEMYSHIPS];
   DWORD ThreadID = 0;
-  int i;
-  int pos[ENEMYSHIPS];
+  INT i;
+  INT pos[ENEMYSHIPS];
 
   _tprintf(TEXT("[ManageEnemyShips] -> Thread-%d\n"), GetCurrentThreadId());
 
@@ -107,7 +107,7 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
 }
 
 DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
-  int position = *(int *)lpParam;
+  INT position = *(INT *)lpParam;
 
   WaitForSingleObject(EnemyShipsMutex, INFINITE);
 

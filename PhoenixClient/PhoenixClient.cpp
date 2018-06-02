@@ -1,4 +1,4 @@
-﻿// PhoenixClient.cpp : Defines the entry point for the console application.
+﻿// PhoenixClient.cpp : Defines the entry poINT for the console application.
 //
 
 #include "stdafx.h"
@@ -6,7 +6,7 @@
 #include "Communication.h"
 #include "PhoenixClient.h"
 
-int _tmain() {
+INT _tmain() {
   HANDLE hThreadDataReceiver;
   DWORD threadDataReceiverId;
   Pipes clientPipes;

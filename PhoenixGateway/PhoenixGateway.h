@@ -1,4 +1,4 @@
 ﻿#pragma once
 
-int _tmain();
+INT _tmain();
 DWORD WINAPI threadListener(LPVOID lpParam);

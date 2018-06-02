@@ -1,4 +1,4 @@
-﻿// PhoenixGateway.cpp : Defines the entry point for the console application.
+﻿// PhoenixGateway.cpp : Defines the entry poINT for the console application.
 //
 
 #include "stdafx.h"
@@ -6,7 +6,7 @@
 #include "PhoenixGateway.h"
 #include "Clients.h"
 
-int _tmain() {
+INT _tmain() {
   ControlData data;
   DWORD threadListenerId;
   HANDLE hThreadListener;
@@ -69,7 +69,7 @@ int _tmain() {
 
 DWORD WINAPI threadListener(LPVOID lpParam) {
   ControlData *data = (ControlData *)lpParam;
-  unsigned int current = peekData(data);
+  DWORD current = peekData(data);
 
   while (data->ThreadMustConinue) {
     // Do not get data whitout permission
@@ -83,8 +83,8 @@ DWORD WINAPI threadListener(LPVOID lpParam) {
       system("cls");
 
       // Show the actual map of the game
-      for (int y = 0; y < HEIGHT; y++) {
-        for (int x = 0; x < WIDTH; x++) {
+      for (INT y = 0; y < HEIGHT; y++) {
+        for (INT x = 0; x < WIDTH; x++) {
           _tprintf(TEXT("%c"), data->game->map[y][x]);
         }
         _tprintf(TEXT("\n"));

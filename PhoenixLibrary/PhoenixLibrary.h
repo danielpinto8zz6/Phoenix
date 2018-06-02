@@ -22,7 +22,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-PHOENIXLIBRARY_API VOID Error(const TCHAR *text);
+PHOENIXLIBRARY_API VOID Error(CONST TCHAR *text);
 PHOENIXLIBRARY_API BOOL initMemAndSync(ControlData *data);
 PHOENIXLIBRARY_API BOOL initSemaphores(ControlData *data);
 PHOENIXLIBRARY_API unsigned peekData(ControlData *data);

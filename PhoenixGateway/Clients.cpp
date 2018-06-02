@@ -2,15 +2,13 @@
 
 #include "Clients.h"
 
+#define MAXPLAYERS 10
+
 DWORD WINAPI manageClients(LPVOID lpParam) {
-  /**
-   * Temporary : Max players
-   */
-  const int MAXPLAYERS = 10;
   /**
    * TOTAL : total of clients connected
    */
-  int TOTAL = 0;
+  INT TOTAL = 0;
   BOOL STOP = FALSE;
   BOOL result;
   HANDLE hGatewayPipe;
@@ -76,7 +74,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
   WaitForMultipleObjects(TOTAL, hThreadManageClient, TRUE, INFINITE);
 
   // Shutdown each named pipe
-  for (int i = 0; i < TOTAL; i++) {
+  for (INT i = 0; i < TOTAL; i++) {
     DisconnectNamedPipe(clientPipe[i]);
     _tprintf(TEXT("Closing pipe (CloseHandle)\n"));
     CloseHandle(clientPipe[i]);

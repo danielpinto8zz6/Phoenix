@@ -60,7 +60,7 @@ BOOL initSemaphores(ControlData *data) {
   return TRUE;
 }
 
-VOID Error(const TCHAR *text) {
+VOID Error(CONST TCHAR *text) {
   _tprintf(TEXT("[ERROR] %s. (%d)\n"), text, GetLastError());
 }
 

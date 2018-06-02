@@ -50,7 +50,7 @@ BOOL connectPipes(Pipes *clientPipes) {
   return TRUE;
 }
 
-BOOL clientLogin(const TCHAR username[], HANDLE hPipe) {
+BOOL clientLogin(CONST TCHAR username[], HANDLE hPipe) {
   BOOL success;
   DWORD nBytes;
   Message msg;

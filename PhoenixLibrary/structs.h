@@ -19,26 +19,26 @@ typedef enum { NONE } PowerupEffect;
 typedef enum { LOGIN, SUCCESS, LOGGED } Command;
 
 typedef struct {
-  int x;
-  int y;
+  INT x;
+  INT y;
 } Coordinates;
 
 typedef struct {
-  int x;
-  int y;
+  INT x;
+  INT y;
 } Size;
 
 typedef struct {
   Coordinates position;
-  int velocity;
+  INT velocity;
   Size size;
-  int firingRate;
+  INT firingRate;
 } DefenderShip;
 
 typedef struct {
   DefenderShip ship;
-  int lifes;
-  int points;
+  INT lifes;
+  INT points;
 } Player;
 
 typedef struct {
@@ -47,8 +47,8 @@ typedef struct {
 
 typedef struct {
   Coordinates position;
-  int points;
-  int velocity;
+  INT points;
+  INT velocity;
   Size size;
   EnemyType type;
   Bomb bombs[50];
@@ -56,18 +56,18 @@ typedef struct {
 
 typedef struct {
   Coordinates position;
-  int velocity;
+  INT velocity;
 } Shoot;
 
 typedef struct {
   Coordinates position;
-  int velocity;
+  INT velocity;
   PowerupType type;
   PowerupEffect effect;
 } Powerup;
 
 typedef struct {
-  int level;
+  INT level;
   unsigned num;
   Player player[PLAYERS];
   EnemyShip enemy_ship[ENEMYSHIPS];
@@ -77,7 +77,7 @@ typedef struct {
 typedef struct {
   HANDLE hMapFile;
   Game *game;
-  int ThreadMustConinue;
+  INT ThreadMustConinue;
   HANDLE hMutex;
   HANDLE smRead;
   HANDLE smWrite;
