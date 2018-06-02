@@ -5,7 +5,6 @@
 #include "game.h"
 #include "phoenix_server.h"
 
-
 ControlData data;
 
 int _tmain(int argc, LPTSTR argv[]) {
@@ -21,7 +20,7 @@ int _tmain(int argc, LPTSTR argv[]) {
     return -1;
   }
 
-  if (!initSemaphores(&data)){
+  if (!initSemaphores(&data)) {
     return -1;
   }
 
@@ -29,23 +28,19 @@ int _tmain(int argc, LPTSTR argv[]) {
                                     sizeof(Game));
 
   data.game->num = 0;
- 
 
   if (data.game == NULL) {
-    _tprintf(TEXT("[Erro] Mapeamento da memÃ³ria partilhada(%d)\n"),
-             GetLastError());
+    Error(TEXT("Mapping shared memory"));
     return -1;
   }
-
 
   hThreadManageEnemyShips =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadManageEnemyShips,
                    NULL, 0, &threadManageEnemyShipsId);
   if (hThreadManageEnemyShips == NULL) {
-    _tprintf(TEXT("[Erro] Criar thread: %d\n"), GetLastError());
+    Error(TEXT("Creating thread to manage enemy ships"));
     return -1;
   }
-
 
   WaitForSingleObject(hThreadManageEnemyShips, INFINITE);
 
@@ -80,7 +75,7 @@ DWORD WINAPI ThreadManageEnemyShips(LPVOID lpParam) {
   EnemyShipsMutex = CreateMutex(NULL, FALSE, NULL);
 
   if (EnemyShipsMutex == NULL) {
-    _tprintf(TEXT("[Erro] Criar mutex: %d\n"), GetLastError());
+    Error(TEXT("Creating enemy ships mutex"));
     return 1;
   }
 
@@ -92,10 +87,10 @@ DWORD WINAPI ThreadManageEnemyShips(LPVOID lpParam) {
                               &pos[i], 0, &ThreadID);
 
     if (aThread[i] == NULL) {
-      _tprintf(TEXT("[Erro] Criar thread: %d\n"), GetLastError());
+      Error(TEXT("Creating enemy ship thread"));
       return 1;
     }
-	Sleep(500);
+    Sleep(500);
   }
 
   // Wait for all threads to terminate
@@ -116,7 +111,7 @@ DWORD WINAPI ThreadEnemyShip(LPVOID lpParam) {
   WaitForSingleObject(EnemyShipsMutex, INFINITE);
 
   WaitForSingleObject(data.smWrite, INFINITE);
-  
+
   _tprintf(TEXT("[EnemyShip] -> %i\n"), position);
 
   // Place ship...

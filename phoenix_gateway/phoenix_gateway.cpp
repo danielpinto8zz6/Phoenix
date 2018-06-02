@@ -37,8 +37,7 @@ int _tmain() {
                                     sizeof(Game));
 
   if (data.game == NULL) {
-    _tprintf(TEXT("[Erro] Mapeamento da memória partilhada(%d)\n"),
-             GetLastError());
+    Error(TEXT("Mapping shared memory"));
     return -1;
   }
 
@@ -46,7 +45,7 @@ int _tmain() {
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadListener, &data, 0,
                    &threadListenerId);
   if (hThreadListener == NULL) {
-    _tprintf(TEXT("[Erro] Criar thread: %d\n"), GetLastError());
+    Error(TEXT("Creating shared memory thread"));
     return -1;
   }
 
@@ -57,7 +56,7 @@ int _tmain() {
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)manageClients, 0, 0,
                    &threadDataReceiverId);
   if (hThreadDataReceiver == NULL) {
-    _tprintf(TEXT("[Erro] Criar thread"));
+    Error(TEXT("Creating thread to manage clients"));
     return -1;
   }
 

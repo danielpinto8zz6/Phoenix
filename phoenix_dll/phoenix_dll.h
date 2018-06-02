@@ -72,6 +72,10 @@ __declspec(dllexport) BOOL initSemaphores(ControlData *data) {
   return TRUE;
 }
 
+__declspec(dllexport) void Error(const TCHAR *text) {
+  _tprintf(TEXT("[ERROR] %s. (%d)"), text, GetLastError());
+}
+
 #ifdef __cplusplus
 }
 #endif
