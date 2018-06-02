@@ -93,20 +93,28 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   Message msg;
   BOOL result;
   DWORD nBytes;
-  // Fase 1 - o servidor aguardo o login do jogador
+
   do {
     result = ReadFile(clientPipes->inboundPipe, (LPVOID)&msg, sizeof(msg),
                       &nBytes, NULL);
     if (nBytes > 0) {
       switch (msg.cmd) {
       case LOGIN:
-        _tprintf(TEXT("CLIENT LOGIN"));
+        _tprintf(TEXT("CLIENT LOGIN : %s\n"), msg.text);
+
+        /**
+         * Tell client he's logged
+         */
+        msg.cmd = SUCCESS;
+        TCHAR text[] = TEXT("Login efetuado com successo");
+        _tcscpy_s(msg.text, _tcslen(text) + 1, text);
+        result = WriteFile(clientPipes->outboundPipe, (LPCVOID)&msg,
+                           sizeof(msg), &nBytes, NULL);
+        if (!result) {
+          _tprintf(TEXT("Failed to send data."));
+        }
+
         break;
-      }
-      result = WriteFile(clientPipes->outboundPipe, (LPCVOID)&msg, sizeof(msg),
-                         &nBytes, NULL);
-      if (!result) {
-        _tprintf(TEXT("Failed to send data."));
       }
     }
   } while (!msg.Stop);

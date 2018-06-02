@@ -1,7 +1,4 @@
-﻿// phoenix_client.cpp : Defines the entry point for the console application.
-//
-
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "../phoenix_dll/phoenix_dll.h"
 #include "../phoenix_dll/structs.h"
@@ -10,8 +7,12 @@
 #include <io.h>
 #include <tchar.h>
 #include <windows.h>
+#include <process.h>
 
 int _tmain() {
+  HANDLE hThreadDataReceiver;
+  DWORD threadDataReceiverId;
+  BOOL success;
 
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
@@ -90,7 +91,54 @@ int _tmain() {
     return -1;
   }
 
+  /**
+   * Client thread to receive info from gateway
+   */
+  hThreadDataReceiver =
+      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)dataReceiver,
+                   (LPVOID)&clientPipes, 0, &threadDataReceiverId);
+  if (hThreadDataReceiver == NULL) {
+    _tprintf(TEXT("[Erro] Criar thread"));
+    return -1;
+  }
+
+  DWORD nBytes;
+  Message msg;
+  msg.cmd = LOGIN;
+  TCHAR text[50];
+  _stprintf_s(text, TEXT("USER-%d"), _getpid());
+  _tcscpy_s(msg.text, _tcslen(text) + 1, text);
+
+  success = WriteFile(clientPipes.inboundPipe, &msg, sizeof(msg), &nBytes, NULL);
+  if (!success) {
+    _tprintf(TEXT("Erro ao enviar dados"));
+  }
+
+  WaitForSingleObject(hThreadDataReceiver, INFINITE);
+
   system("pause");
+
+  return 0;
+}
+
+DWORD WINAPI dataReceiver(LPVOID lpParam) {
+  ClientPipes *clientPipes;
+  clientPipes = (ClientPipes *)lpParam;
+
+  Message msg;
+  BOOL result;
+  DWORD nBytes;
+  while (TRUE) {
+    result = ReadFile(clientPipes->outboundPipe, (LPVOID)&msg, sizeof(msg),
+                      &nBytes, NULL);
+    if (nBytes > 0) {
+      switch (msg.cmd) {
+      case SUCCESS:
+        _tprintf(TEXT("SUCCESS : %s\n"), msg.text);
+        break;
+      }
+    }
+  };
 
   return 0;
 }

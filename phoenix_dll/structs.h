@@ -18,7 +18,7 @@ typedef enum { BASIC, DODGE } EnemyType;
 
 typedef enum { NONE } PowerupEffect;
 
-typedef enum { LOGIN } Command;
+typedef enum { LOGIN, SUCCESS } Command;
 
 typedef struct {
   int x;
@@ -89,6 +89,7 @@ typedef struct {
 typedef struct {
   Command cmd;
   BOOL Stop;
+  TCHAR text[50];
 } Message;
 
 typedef struct {
