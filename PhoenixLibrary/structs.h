@@ -93,12 +93,17 @@ typedef struct {
 } Message;
 
 typedef struct {
-  Game *game;
+  Game *sharedGame;
+  Game game;
   BOOL ThreadMustConinue;
   HANDLE hMapFile;
   HANDLE hMutex;
   HANDLE smRead;
   HANDLE smWrite;
+  /**
+   * Hack
+   */
+  int position;
 } GameData;
 
 typedef struct {

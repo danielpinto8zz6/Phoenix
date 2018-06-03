@@ -2,36 +2,6 @@
 
 #include "MessageZone.h"
 
-BOOL initMessageZone(MessageData *messageData) {
-  if (!initMemAndSync(&messageData->hMapFile, GAMEDATA_SHARED_MEMORY_NAME,
-                      &messageData->hMutex, GAMEDATA_MUTEX_NAME)) {
-    return FALSE;
-  }
-
-  messageData->smWrite =
-      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, smWriteName);
-  if (messageData->smWrite == NULL) {
-    Error(TEXT("Initializing write semaphore"));
-    return FALSE;
-  }
-
-  messageData->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, smReadName);
-  if (messageData->smRead == NULL) {
-    Error(TEXT("Initializing read semaphore"));
-    return FALSE;
-  }
-
-  messageData->message = (Message *)MapViewOfFile(
-      messageData->hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Message));
-
-  if (messageData->message == NULL) {
-    Error(TEXT("Mapping shared memory"));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
 DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
   MessageData *messageData = (MessageData *)lpParam;
 

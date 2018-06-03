@@ -39,6 +39,8 @@ PHOENIXLIBRARY_API VOID writeDataToSharedMemory(LPVOID sharedMemory,
 PHOENIXLIBRARY_API VOID readDataFromSharedMemory(LPVOID sharedMemory,
                                                  LPVOID data, SIZE_T size,
                                                  HANDLE *hMutex);
+PHOENIXLIBRARY_API BOOL initMessageZone(MessageData *messageData);
+PHOENIXLIBRARY_API BOOL initGameZone(GameData *gameData);
 #ifdef __cplusplus
 }
 #endif

@@ -83,7 +83,7 @@ int _tmain() {
   CloseHandle(gameData.smRead);
   CloseHandle(hThreadReceiveGameDataFromServer);
 
-  UnmapViewOfFile(gameData.game);
+  UnmapViewOfFile(gameData.sharedGame);
 
   CloseHandle(messageData.smRead);
   CloseHandle(messageData.smWrite);
