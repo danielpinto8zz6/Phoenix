@@ -76,12 +76,6 @@ typedef struct {
 } Game;
 
 typedef struct {
-  Command cmd;
-  BOOL Stop;
-  TCHAR text[50];
-} Message;
-
-typedef struct {
   HANDLE inboundPipe;
   HANDLE outboundPipe;
 } Pipes;
@@ -90,6 +84,13 @@ typedef struct {
   TCHAR username[50];
   Pipes pipes;
 } Client;
+
+typedef struct {
+  Command cmd;
+  Client *client;
+  TCHAR text[50];
+  DWORD num;
+} Message;
 
 typedef struct {
   Game *game;
@@ -102,9 +103,9 @@ typedef struct {
 
 typedef struct {
   Message *message;
-  BOOL ThreadMustConinue;
   HANDLE hMapFile;
   HANDLE hMutex;
   HANDLE smRead;
   HANDLE smWrite;
+  BOOL STOP;
 } MessageData;

@@ -27,7 +27,10 @@
     <ClInclude Include="Clients.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SharedMemory.h">
+    <ClInclude Include="MessageZone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameZone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,7 +44,10 @@
     <ClCompile Include="Clients.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SharedMemory.cpp">
+    <ClCompile Include="MessageZone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameZone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

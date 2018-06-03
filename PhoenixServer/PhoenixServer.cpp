@@ -4,7 +4,8 @@
 #include "stdafx.h"
 
 #include "Game.h"
-#include "GameData.h"
+#include "GameZone.h"
+#include "MessageZone.h"
 #include "PhoenixServer.h"
 
 int _tmain(int argc, LPTSTR argv[]) {
@@ -14,7 +15,9 @@ int _tmain(int argc, LPTSTR argv[]) {
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
-  initGameData();
+  initGameZone();
+
+  initMessageZone();
 
   system("pause");
 

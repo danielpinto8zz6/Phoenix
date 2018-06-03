@@ -1,15 +1,14 @@
 #include "stdafx.h"
 
 #include "Game.h"
-#include "GameData.h"
+#include "GameZone.h"
 #include "PhoenixServer.h"
 
 HANDLE EnemyShipsMutex;
-
 GameData gameData;
 Game game;
 
-int initGameData() {
+int initGameZone() {
   DWORD threadManageEnemyShipsId;
   HANDLE hThreadManageEnemyShips;
 

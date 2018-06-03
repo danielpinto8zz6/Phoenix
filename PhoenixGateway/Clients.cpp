@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 
 #include "Clients.h"
+#include "MessageZone.h"
 
 #define MAXPLAYERS 10
 
@@ -66,6 +67,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
                      (LPVOID)&client, 0, NULL);
     if (hThreadManageClient[TOTAL] == NULL) {
       Error(TEXT("Creating client thread"));
+      system("pause");
       return -1;
     }
     TOTAL++;
@@ -87,13 +89,16 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   Client *client;
   client = (Client *)lpParam;
   Message msg;
+  msg.client = client;
   BOOL result;
   DWORD nBytes;
+  BOOL STOP = FALSE;
 
   do {
     result = ReadFile(client->pipes.inboundPipe, (LPVOID)&msg, sizeof(msg),
                       &nBytes, NULL);
     if (nBytes > 0) {
+
       switch (msg.cmd) {
       case LOGIN:
         _tcscpy_s(client->username, _tcslen(msg.text) + 1, msg.text);
@@ -113,7 +118,7 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
         break;
       }
     }
-  } while (!msg.Stop);
+  } while (!STOP);
 
   return 0;
 }
