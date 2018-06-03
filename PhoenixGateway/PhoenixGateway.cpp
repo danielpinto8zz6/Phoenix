@@ -86,7 +86,7 @@ DWORD WINAPI threadListener(LPVOID lpParam) {
 
   while (gameData->ThreadMustConinue) {
     // Do not get data whitout permission
-    // WaitForSingleObject(gameData->smRead, INFINITE);
+    WaitForSingleObject(gameData->smRead, INFINITE);
 
     if (peekData(gameData) > current) {
       readDataFromSharedMemory(gameData->game, &game, sizeof(Game),
@@ -106,7 +106,7 @@ DWORD WINAPI threadListener(LPVOID lpParam) {
     }
 
     // We can send data now
-    // ReleaseSemaphore(gameData->smWrite, 1, NULL);
+    ReleaseSemaphore(gameData->smWrite, 1, NULL);
   }
   return 0;
 }
