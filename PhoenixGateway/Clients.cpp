@@ -8,7 +8,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
   /**
    * TOTAL : total of clients connected
    */
-  INT TOTAL = 0;
+  int TOTAL = 0;
   BOOL STOP = FALSE;
   BOOL result;
   HANDLE hGatewayPipe;
@@ -74,7 +74,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
   WaitForMultipleObjects(TOTAL, hThreadManageClient, TRUE, INFINITE);
 
   // Shutdown each named pipe
-  for (INT i = 0; i < TOTAL; i++) {
+  for (int i = 0; i < TOTAL; i++) {
     DisconnectNamedPipe(clientPipe[i]);
     _tprintf(TEXT("Closing pipe (CloseHandle)\n"));
     CloseHandle(clientPipe[i]);

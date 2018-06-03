@@ -9,7 +9,9 @@
         "phoenixdll.h": "c",
         "main.h": "c",
         "structs.h": "c",
-        "tchar.h": "c"
+        "tchar.h": "c",
+        "phoenixgateway.h": "c",
+        "phoenixserver.h": "c"
     },
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {

@@ -5,61 +5,6 @@
 
 #include "PhoenixLibrary.h"
 
-BOOL initMemAndSync(ControlData *data) {
-  data->hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
-                                     0, sizeof(Game), TEXT("phoenixShm"));
-  if (data->hMapFile == NULL) {
-    Error(TEXT("Inicializing shared memory"));
-    return FALSE;
-  }
-
-  data->hMutex = CreateMutex(NULL, FALSE, TEXT("phoenixMutex"));
-  if (data->hMutex == NULL) {
-    Error(TEXT("Creating phoenix mutex"));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-VOID writeDataToSharedMemory(ControlData *data, Game *game) {
-  WaitForSingleObject(data->hMutex, INFINITE);
-  data->game->num++;
-  CopyMemory(data->game, game, sizeof(Game));
-  ReleaseMutex(data->hMutex);
-}
-
-VOID readDataFromSharedMemory(ControlData *data, Game *game) {
-  WaitForSingleObject(data->hMutex, INFINITE);
-  CopyMemory(game, data->game, sizeof(Game));
-  ReleaseMutex(data->hMutex);
-}
-
-unsigned peekData(ControlData *data) {
-  unsigned num;
-  WaitForSingleObject(data->hMutex, INFINITE);
-  num = data->game->num;
-  ReleaseMutex(data->hMutex);
-  return num;
-}
-
-BOOL initSemaphores(ControlData *data) {
-  data->smWrite =
-      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, smWriteName);
-  if (data->smWrite == NULL) {
-    Error(TEXT("Initializing write semaphore"));
-    return FALSE;
-  }
-
-  data->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, smReadName);
-  if (data->smRead == NULL) {
-    Error(TEXT("Initializing read semaphore"));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
 VOID Error(CONST TCHAR *text) {
   _tprintf(TEXT("[ERROR] %s. (%d)\n"), text, GetLastError());
 }
@@ -67,21 +12,52 @@ VOID Error(CONST TCHAR *text) {
 BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes) {
   BOOL success;
 
-  success =
-      WriteFile(hPipe, data, size, nBytes, NULL);
+  success = WriteFile(hPipe, data, size, nBytes, NULL);
   if (!success) {
     Error(TEXT("Sending data"));
   }
   return success;
 }
 
-BOOL receiveDataFromPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes) {
+BOOL receiveDataFromPipe(LPVOID data, SIZE_T size, HANDLE hPipe,
+                         LPDWORD nBytes) {
   BOOL success;
 
-  success =
-      ReadFile(hPipe, data, size, nBytes, NULL);
+  success = ReadFile(hPipe, data, size, nBytes, NULL);
   if (!success) {
     Error(TEXT("Receiving data"));
   }
   return success;
+}
+
+BOOL initMemAndSync(HANDLE *hMapFile, const TCHAR *sharedMemoryName,
+                    HANDLE *hMutex, const TCHAR *mutexName) {
+  *hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0,
+                                sizeof(Game), sharedMemoryName);
+  if (*hMapFile == NULL) {
+    Error(TEXT("Inicializing shared memory"));
+    return FALSE;
+  }
+
+  *hMutex = CreateMutex(NULL, FALSE, mutexName);
+  if (*hMutex == NULL) {
+    Error(TEXT("Creating phoenix mutex"));
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+VOID writeDataToSharedMemory(LPVOID sharedMemory, LPVOID data, SIZE_T size,
+                             HANDLE *hMutex) {
+  WaitForSingleObject(*hMutex, INFINITE);
+  CopyMemory(sharedMemory, data, size);
+  ReleaseMutex(*hMutex);
+}
+
+VOID readDataFromSharedMemory(LPVOID sharedMemory, LPVOID data, SIZE_T size,
+                              HANDLE *hMutex) {
+  WaitForSingleObject(*hMutex, INFINITE);
+  CopyMemory(data, sharedMemory, size);
+  ReleaseMutex(*hMutex);
 }
