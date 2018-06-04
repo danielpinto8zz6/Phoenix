@@ -82,7 +82,7 @@ typedef struct {
 
 typedef struct {
   TCHAR username[50];
-  Pipes pipes;
+  Pipes *pipes;
 } Client;
 
 typedef struct {
@@ -107,10 +107,17 @@ typedef struct {
 } GameData;
 
 typedef struct {
-  Message *message;
+  Message *sharedMessage;
+  Message message;
   HANDLE hMapFile;
   HANDLE hMutex;
   HANDLE smRead;
   HANDLE smWrite;
   BOOL STOP;
+  DWORD currrentMessage;
 } MessageData;
+
+typedef struct {
+  MessageData *messageData;
+  GameData *gameData;
+} Data;

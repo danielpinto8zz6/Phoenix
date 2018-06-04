@@ -8,14 +8,9 @@
 #include "MessageZone.h"
 #include "PhoenixGateway.h"
 
-typedef struct {
-  MessageData *messageData;
-  GameData *gameData;
-} Data;
-
 int _tmain() {
-  DWORD threadDataReceiverId;
-  HANDLE hThreadDataReceiver;
+  DWORD threadReceiveDataFromClientId;
+  HANDLE hThreadReceiveDataFromClient;
 
   HANDLE hThreadReceiveGameDataFromServer;
   DWORD threadReceiveGameDataFromServerId;
@@ -65,15 +60,15 @@ int _tmain() {
   /**
    * Gateway thread to receive info from clients
    */
-  hThreadDataReceiver =
-      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)manageClients, &gameData, 0,
-                   &threadDataReceiverId);
-  if (hThreadDataReceiver == NULL) {
+  hThreadReceiveDataFromClient =
+      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)manageClients, &data, 0,
+                   &threadReceiveDataFromClientId);
+  if (hThreadReceiveDataFromClient == NULL) {
     Error(TEXT("Creating thread to manage clients"));
     return -1;
   }
 
-  WaitForSingleObject(hThreadDataReceiver, INFINITE);
+  WaitForSingleObject(hThreadReceiveDataFromClient, INFINITE);
   WaitForSingleObject(hThreadReceiveGameDataFromServer, INFINITE);
   WaitForSingleObject(hThreadReceiveMessagesFromServer, INFINITE);
 
@@ -91,7 +86,7 @@ int _tmain() {
   CloseHandle(messageData.hMapFile);
   CloseHandle(hThreadReceiveMessagesFromServer);
 
-  UnmapViewOfFile(messageData.message);
+  UnmapViewOfFile(messageData.sharedMessage);
 
   system("pause");
 

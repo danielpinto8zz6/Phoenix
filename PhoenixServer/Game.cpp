@@ -7,7 +7,6 @@ Coordinates *GetFirstEmptyPosition(Game *game) {
 
   for (int y = 0; y < HEIGHT; y++) {
     for (int x = 0; x < WIDTH; x++) {
-      _tprintf(TEXT("DEBUG %c"), game->map[y][x]);
       if (game->map[y][x] == ' ' || game->map[y][x] == '\0') {
         coordinates->x = x;
         coordinates->y = y;

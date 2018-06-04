@@ -6,7 +6,6 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
   MessageData *messageData = (MessageData *)lpParam;
 
   Message msg;
-  msg.num = 0;
 
   DWORD current = peekMessageData(messageData);
 
@@ -15,7 +14,7 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
     WaitForSingleObject(messageData->smRead, INFINITE);
 
     if (peekMessageData(messageData) > current) {
-      readDataFromSharedMemory(messageData->message, &msg, sizeof(Message),
+      readDataFromSharedMemory(messageData->sharedMessage, &msg, sizeof(Message),
                                &messageData->hMutex);
       current = msg.num;
 
@@ -38,18 +37,15 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
 DWORD peekMessageData(MessageData *data) {
   DWORD num;
   WaitForSingleObject(data->hMutex, INFINITE);
-  num = data->message->num;
+  num = data->sharedMessage->num;
   ReleaseMutex(data->hMutex);
   return num;
 }
 
 BOOL sendMessageToServer(MessageData *messageData, Message *msg) {
-
   WaitForSingleObject(messageData->smWrite, INFINITE);
 
-  msg->num++;
-
-  writeDataToSharedMemory(messageData->message, msg, sizeof(Message),
+  writeDataToSharedMemory(messageData->sharedMessage, msg, sizeof(Message),
                           &messageData->hMutex);
 
   ReleaseSemaphore(messageData->smRead, 1, NULL);

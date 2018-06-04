@@ -9,14 +9,16 @@
 #include "PhoenixServer.h"
 
 int _tmain(int argc, LPTSTR argv[]) {
+  MessageData messageData;
+  GameData gameData;
+
+  DWORD threadReceiveMessagesFromServerId;
+  HANDLE hThreadReceiveMessagesFromGateway;
 
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
-
-  MessageData messageData;
-  GameData gameData;
 
   gameData.game.num = 0;
   // Temporary: map will be abandoned
@@ -39,6 +41,22 @@ int _tmain(int argc, LPTSTR argv[]) {
     system("pause");
   }
 
+  /**
+   * Hack to start messages
+   */
+  Message msg;
+  msg.num = 0;
+  writeDataToSharedMemory(messageData.sharedMessage, &msg, sizeof(Message),
+                          &messageData.hMutex);
+
+  hThreadReceiveMessagesFromGateway =
+      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromGateway,
+                   &messageData, 0, &threadReceiveMessagesFromServerId);
+  if (hThreadReceiveMessagesFromGateway == NULL) {
+    Error(TEXT("Creating thread to receive data from server"));
+    return -1;
+  }
+
   hThreadManageEnemyShips =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadManageEnemyShips,
                    &gameData, 0, &threadManageEnemyShipsId);
@@ -48,6 +66,7 @@ int _tmain(int argc, LPTSTR argv[]) {
   }
 
   WaitForSingleObject(hThreadManageEnemyShips, INFINITE);
+  WaitForSingleObject(hThreadReceiveMessagesFromGateway, INFINITE);
 
   CloseHandle(hThreadManageEnemyShips);
 
@@ -56,6 +75,14 @@ int _tmain(int argc, LPTSTR argv[]) {
   CloseHandle(gameData.hMutex);
   CloseHandle(gameData.hMapFile);
   UnmapViewOfFile(gameData.sharedGame);
+
+  CloseHandle(messageData.smRead);
+  CloseHandle(messageData.smWrite);
+  CloseHandle(messageData.hMutex);
+  CloseHandle(messageData.hMapFile);
+  CloseHandle(hThreadReceiveMessagesFromGateway);
+
+  UnmapViewOfFile(messageData.sharedMessage);
 
   system("pause");
 

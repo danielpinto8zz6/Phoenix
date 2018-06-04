@@ -63,28 +63,28 @@ VOID readDataFromSharedMemory(LPVOID sharedMemory, LPVOID data, SIZE_T size,
 }
 
 BOOL initMessageZone(MessageData *messageData) {
-  if (!initMemAndSync(&messageData->hMapFile, GAMEDATA_SHARED_MEMORY_NAME,
-                      &messageData->hMutex, GAMEDATA_MUTEX_NAME)) {
+  if (!initMemAndSync(&messageData->hMapFile, MESSAGES_SHARED_MEMORY_NAME,
+                      &messageData->hMutex, MESSAGES_MUTEX_NAME)) {
     return FALSE;
   }
 
   messageData->smWrite =
-      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, smWriteName);
+      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, GAMEDATA_WRITE_SEMAPHORE_NAME);
   if (messageData->smWrite == NULL) {
     Error(TEXT("Initializing write semaphore"));
     return FALSE;
   }
 
-  messageData->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, smReadName);
+  messageData->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, GAMEDATA_READ_SEMAPHORE_NAME);
   if (messageData->smRead == NULL) {
     Error(TEXT("Initializing read semaphore"));
     return FALSE;
   }
 
-  messageData->message = (Message *)MapViewOfFile(
+  messageData->sharedMessage = (Message *)MapViewOfFile(
       messageData->hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Message));
 
-  if (messageData->message == NULL) {
+  if (messageData->sharedMessage == NULL) {
     Error(TEXT("Mapping shared memory"));
     return FALSE;
   }
@@ -99,13 +99,13 @@ BOOL initGameZone(GameData *gameData) {
   }
 
   gameData->smWrite =
-      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, smWriteName);
+      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, MESSAGES_WRITE_SEMAPHORE_NAME);
   if (gameData->smWrite == NULL) {
     Error(TEXT("Initializing write semaphore"));
     return FALSE;
   }
 
-  gameData->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, smReadName);
+  gameData->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, MESSAGES_READ_SEMAPHORE_NAME);
   if (gameData->smRead == NULL) {
     Error(TEXT("Initializing read semaphore"));
     return FALSE;

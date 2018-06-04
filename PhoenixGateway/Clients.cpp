@@ -6,6 +6,7 @@
 #define MAXPLAYERS 10
 
 DWORD WINAPI manageClients(LPVOID lpParam) {
+  Data *data = (Data *)lpParam;
   /**
    * TOTAL : total of clients connected
    */
@@ -15,6 +16,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
   HANDLE hGatewayPipe;
   HANDLE clientPipe[MAXPLAYERS];
   HANDLE hThreadManageClient[MAXPLAYERS];
+  Pipes pipes;
 
   while (!STOP && TOTAL < MAXPLAYERS) {
 
@@ -55,16 +57,19 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
       return -1;
     }
 
+    pipes.inboundPipe = hGatewayPipe;
+    pipes.outboundPipe = clientPipe[TOTAL];
+
     Client client;
-    client.pipes.inboundPipe = hGatewayPipe;
-    client.pipes.outboundPipe = clientPipe[TOTAL];
+    client.pipes = &pipes;
+
+    data->messageData->message.client = &client;
 
     /**
      * Client connected, create thread
      */
-    hThreadManageClient[TOTAL] =
-        CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)manageClient,
-                     (LPVOID)&client, 0, NULL);
+    hThreadManageClient[TOTAL] = CreateThread(
+        NULL, 0, (LPTHREAD_START_ROUTINE)manageClient, (LPVOID)data, 0, NULL);
     if (hThreadManageClient[TOTAL] == NULL) {
       Error(TEXT("Creating client thread"));
       system("pause");
@@ -86,19 +91,25 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
 }
 
 DWORD WINAPI manageClient(LPVOID lpParam) {
+  int currentMsg = 0;
+  Data *data = (Data *)lpParam;
+
   Client *client;
-  client = (Client *)lpParam;
+  client = data->messageData->message.client;
+
   Message msg;
   msg.client = client;
+
   BOOL result;
   DWORD nBytes;
   BOOL STOP = FALSE;
 
   do {
-    result = ReadFile(client->pipes.inboundPipe, (LPVOID)&msg, sizeof(msg),
+    result = ReadFile(client->pipes->inboundPipe, (LPVOID)&msg, sizeof(msg),
                       &nBytes, NULL);
     if (nBytes > 0) {
-
+      // msg.num = data->messageData->currrentMessage ++;
+      // sendMessageToServer(data->messageData, &msg);
       switch (msg.cmd) {
       case LOGIN:
         _tcscpy_s(client->username, _tcslen(msg.text) + 1, msg.text);
@@ -109,7 +120,7 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
          * Tell client he's logged
          */
         msg.cmd = LOGGED;
-        result = WriteFile(client->pipes.outboundPipe, (LPCVOID)&msg,
+        result = WriteFile(client->pipes->outboundPipe, (LPCVOID)&msg,
                            sizeof(msg), &nBytes, NULL);
         if (!result) {
           Error(TEXT("Failed to send data to client."));

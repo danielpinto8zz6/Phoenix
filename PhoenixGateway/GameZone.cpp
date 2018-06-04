@@ -4,7 +4,6 @@
 
 DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
   GameData *gameData = (GameData *)lpParam;
-  gameData->game.num = 0;
 
   DWORD current = peekGameData(gameData);
 
@@ -13,20 +12,19 @@ DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
     WaitForSingleObject(gameData->smRead, INFINITE);
 
     if (peekGameData(gameData) > current) {
-      readDataFromSharedMemory(gameData->sharedGame, &gameData->game, sizeof(Game),
-                               &gameData->hMutex);
+      readDataFromSharedMemory(gameData->sharedGame, &gameData->game,
+                               sizeof(Game), &gameData->hMutex);
       current = gameData->game.num;
 
-      // Clear the console
-      system("cls");
+      // system("cls");
 
-      // Show the actual map of the game
-      for (int y = 0; y < HEIGHT; y++) {
-        for (int x = 0; x < WIDTH; x++) {
-          _tprintf(TEXT("%c"), gameData->game.map[y][x]);
-        }
-        _tprintf(TEXT("\n"));
-      }
+      // // Show the actual map of the game
+      // for (int y = 0; y < HEIGHT; y++) {
+      //   for (int x = 0; x < WIDTH; x++) {
+      //     _tprintf(TEXT("%c"), gameData->game.map[y][x]);
+      //   }
+      //   _tprintf(TEXT("\n"));
+      // }
     }
 
     // We can send data now
