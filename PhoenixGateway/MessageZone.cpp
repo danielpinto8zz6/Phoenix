@@ -5,27 +5,22 @@
 DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
   MessageData *messageData = (MessageData *)lpParam;
 
-  Message msg;
-
   DWORD current = peekMessageData(messageData);
 
-  while (!messageData->STOP) {
+  while (messageData->STOP) {
     // Do not get data whitout permission
     WaitForSingleObject(messageData->smRead, INFINITE);
 
     if (peekMessageData(messageData) > current) {
-      readDataFromSharedMemory(messageData->sharedMessage, &msg, sizeof(Message),
-                               &messageData->hMutex);
-      current = msg.num;
+      readDataFromSharedMemory(messageData->sharedMessage, &messageData->message,
+                               sizeof(Game), &messageData->hMutex);
+      current = messageData->message.num;
 
-      /**
-       * TODO: Perform actions related to info received
-       */
-      _tprintf(TEXT("DEBUG : Received -> %s"), msg.text);
+      system("cls");
 
-      /**
-       * TODO: Send message to client
-       */
+       _tprintf(TEXT("DEBUG : %d\n"), current);
+
+       system("pause");
     }
 
     // We can send data now

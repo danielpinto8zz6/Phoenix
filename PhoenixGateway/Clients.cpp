@@ -94,34 +94,35 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   int currentMsg = 0;
   Data *data = (Data *)lpParam;
 
-  Client *client;
-  client = data->messageData->message.client;
+  MessageData *messageData = data->messageData;
 
-  Message msg;
-  msg.client = client;
+  Client *client;
+  client = messageData->message.client;
 
   BOOL result;
   DWORD nBytes;
   BOOL STOP = FALSE;
 
   do {
-    result = ReadFile(client->pipes->inboundPipe, (LPVOID)&msg, sizeof(msg),
-                      &nBytes, NULL);
+    result = ReadFile(client->pipes->inboundPipe, (LPVOID)&messageData->message,
+                      sizeof(Message), &nBytes, NULL);
     if (nBytes > 0) {
-      // msg.num = data->messageData->currrentMessage ++;
-      // sendMessageToServer(data->messageData, &msg);
-      switch (msg.cmd) {
+      messageData->message.num = data->messageData->currrentMessage++;
+      sendMessageToServer(data->messageData, &messageData->message);
+      switch (messageData->message.cmd) {
       case LOGIN:
-        _tcscpy_s(client->username, _tcslen(msg.text) + 1, msg.text);
+        _tcscpy_s(client->username, _tcslen(messageData->message.text) + 1,
+                  messageData->message.text);
         clientLogged(client);
         _tprintf(TEXT("Client Login : %s\n"), client->username);
 
         /**
          * Tell client he's logged
          */
-        msg.cmd = LOGGED;
-        result = WriteFile(client->pipes->outboundPipe, (LPCVOID)&msg,
-                           sizeof(msg), &nBytes, NULL);
+        messageData->message.cmd = LOGGED;
+        result = WriteFile(client->pipes->outboundPipe,
+                           (LPCVOID)&messageData->message, sizeof(Message),
+                           &nBytes, NULL);
         if (!result) {
           Error(TEXT("Failed to send data to client."));
         }
