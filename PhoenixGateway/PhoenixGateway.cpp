@@ -15,8 +15,8 @@ int _tmain() {
   HANDLE hThreadReceiveGameDataFromServer;
   DWORD threadReceiveGameDataFromServerId;
 
-  // HANDLE hThreadReceiveMessagesFromServer;
-  // DWORD threadReceiveMessagesFromServerId;
+  HANDLE hThreadReceiveMessagesFromServer;
+  DWORD threadReceiveMessagesFromServerId;
 
   GameData gameData;
   MessageData messageData;
@@ -70,14 +70,13 @@ int _tmain() {
     return FALSE;
   }
 
-  // hThreadReceiveMessagesFromServer =
-  //     CreateThread(NULL, 0,
-  //     (LPTHREAD_START_ROUTINE)receiveMessagesFromServer,
-  //                  &messageData, 0, &threadReceiveMessagesFromServerId);
-  // if (hThreadReceiveMessagesFromServer == NULL) {
-  //   Error(TEXT("Creating thread to receive data from server"));
-  //   return -1;
-  // }
+  hThreadReceiveMessagesFromServer =
+      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromServer,
+                   &messageData, 0, &threadReceiveMessagesFromServerId);
+  if (hThreadReceiveMessagesFromServer == NULL) {
+    Error(TEXT("Creating thread to receive data from server"));
+    return -1;
+  }
 
   /**
    * Gateway thread to receive info from clients
@@ -92,13 +91,13 @@ int _tmain() {
 
   WaitForSingleObject(hThreadReceiveDataFromClient, INFINITE);
   WaitForSingleObject(hThreadReceiveGameDataFromServer, INFINITE);
-  // WaitForSingleObject(hThreadReceiveMessagesFromServer, INFINITE);
+  WaitForSingleObject(hThreadReceiveMessagesFromServer, INFINITE);
 
   CloseHandle(gameData.hMapFile);
   CloseHandle(gameData.hMutex);
   CloseHandle(gameData.gameUpdateEvent);
 
-  // CloseHandle(hThreadReceiveGameDataFromServer);
+  CloseHandle(hThreadReceiveGameDataFromServer);
 
   UnmapViewOfFile(gameData.sharedGame);
 
@@ -106,7 +105,7 @@ int _tmain() {
   CloseHandle(messageData.hMapFile);
   CloseHandle(messageData.gatewayMessageUpdateEvent);
   CloseHandle(messageData.serverMessageUpdateEvent);
-  // CloseHandle(hThreadReceiveMessagesFromServer);
+  CloseHandle(hThreadReceiveMessagesFromServer);
 
   UnmapViewOfFile(messageData.sharedMessage);
 
