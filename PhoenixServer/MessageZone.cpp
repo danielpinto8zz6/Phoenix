@@ -13,8 +13,6 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
 
   while (!messageData->STOP) {
     // Do not get data whitout permission
-    WaitForSingleObject(messageData->smRead, INFINITE);
-
     if (peekMessageData(messageData) > current) {
       readDataFromSharedMemory(messageData->sharedMessage, &msg,
                                sizeof(Message), &messageData->hMutex);
@@ -27,7 +25,6 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
     }
 
     // We can send data now
-    ReleaseSemaphore(messageData->smWrite, 1, NULL);
   }
   return 0;
 }

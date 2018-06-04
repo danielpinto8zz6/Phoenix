@@ -63,12 +63,11 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   gameData->game.num++;
 
-  WaitForSingleObject(gameData->smWrite, INFINITE);
-
   writeDataToSharedMemory(gameData->sharedGame, &gameData->game, sizeof(Game),
                           &gameData->hMutex);
-
-  ReleaseSemaphore(gameData->smRead, 1, NULL);
+  if (!SetEvent(gameData->gameUpdateEvent)) {
+    Error(TEXT("SetEvent failed"));
+  }
 
   ReleaseMutex(hMutexManageEnemyShips);
 

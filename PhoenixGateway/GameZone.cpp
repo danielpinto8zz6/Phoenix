@@ -5,30 +5,30 @@
 DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
   GameData *gameData = (GameData *)lpParam;
 
-  DWORD current = peekGameData(gameData);
+  DWORD dwWaitResult;
 
   while (gameData->ThreadMustConinue) {
-    // Do not get data whitout permission
-    WaitForSingleObject(gameData->smRead, INFINITE);
-
-    if (peekGameData(gameData) > current) {
+    dwWaitResult = WaitForSingleObject(gameData->gameUpdateEvent, INFINITE);
+    switch (dwWaitResult) {
+    case WAIT_OBJECT_0:
+      _tprintf(TEXT("Nice we can read data\n"));
       readDataFromSharedMemory(gameData->sharedGame, &gameData->game,
                                sizeof(Game), &gameData->hMutex);
-      current = gameData->game.num;
-
-      // system("cls");
-
-      // // Show the actual map of the game
-      // for (int y = 0; y < HEIGHT; y++) {
-      //   for (int x = 0; x < WIDTH; x++) {
-      //     _tprintf(TEXT("%c"), gameData->game.map[y][x]);
-      //   }
-      //   _tprintf(TEXT("\n"));
-      // }
+      break;
+    default:
+      Error(TEXT("Wait error"));
+      return 0;
     }
 
-    // We can send data now
-    ReleaseSemaphore(gameData->smWrite, 1, NULL);
+    // system("cls");
+
+    // // Show the actual map of the game
+    // for (int y = 0; y < HEIGHT; y++) {
+    //   for (int x = 0; x < WIDTH; x++) {
+    //     _tprintf(TEXT("%c"), gameData->game.map[y][x]);
+    //   }
+    //   _tprintf(TEXT("\n"));
+    // }
   }
   return 0;
 }

@@ -68,19 +68,6 @@ BOOL initMessageZone(MessageData *messageData) {
     return FALSE;
   }
 
-  messageData->smWrite =
-      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, MESSAGES_WRITE_SEMAPHORE_NAME);
-  if (messageData->smWrite == NULL) {
-    Error(TEXT("Initializing write semaphore"));
-    return FALSE;
-  }
-
-  messageData->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, MESSAGES_READ_SEMAPHORE_NAME);
-  if (messageData->smRead == NULL) {
-    Error(TEXT("Initializing read semaphore"));
-    return FALSE;
-  }
-
   messageData->sharedMessage = (Message *)MapViewOfFile(
       messageData->hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Message));
 
@@ -95,19 +82,6 @@ BOOL initMessageZone(MessageData *messageData) {
 BOOL initGameZone(GameData *gameData) {
   if (!initMemAndSync(&gameData->hMapFile, GAMEDATA_SHARED_MEMORY_NAME,
                       &gameData->hMutex, GAMEDATA_MUTEX_NAME)) {
-    return FALSE;
-  }
-
-  gameData->smWrite =
-      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, MESSAGES_WRITE_SEMAPHORE_NAME);
-  if (gameData->smWrite == NULL) {
-    Error(TEXT("Initializing write semaphore"));
-    return FALSE;
-  }
-
-  gameData->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, MESSAGES_READ_SEMAPHORE_NAME);
-  if (gameData->smRead == NULL) {
-    Error(TEXT("Initializing read semaphore"));
     return FALSE;
   }
 

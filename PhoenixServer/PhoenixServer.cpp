@@ -36,6 +36,13 @@ int _tmain(int argc, LPTSTR argv[]) {
     system("pause");
   }
 
+  gameData.gameUpdateEvent = CreateEvent(NULL, FALSE, FALSE, GAME_UPDATE_EVENT);
+
+  if (gameData.gameUpdateEvent == NULL) {
+    Error(TEXT("CreateEvent failed"));
+    return FALSE;
+  }
+
   if (!initMessageZone(&messageData)) {
     Error(TEXT("Can't connect message data with server. Exiting..."));
     system("pause");
@@ -66,14 +73,11 @@ int _tmain(int argc, LPTSTR argv[]) {
 
   CloseHandle(hThreadManageEnemyShips);
 
-  CloseHandle(gameData.smRead);
-  CloseHandle(gameData.smWrite);
   CloseHandle(gameData.hMutex);
   CloseHandle(gameData.hMapFile);
+  CloseHandle(gameData.gameUpdateEvent);
   UnmapViewOfFile(gameData.sharedGame);
 
-  CloseHandle(messageData.smRead);
-  CloseHandle(messageData.smWrite);
   CloseHandle(messageData.hMutex);
   CloseHandle(messageData.hMapFile);
   CloseHandle(hThreadReceiveMessagesFromGateway);

@@ -8,23 +8,18 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
   DWORD current = -1;
 
   while (messageData->STOP) {
-    // Do not get data whitout permission
-    WaitForSingleObject(messageData->smRead, INFINITE);
-
     if (peekMessageData(messageData) > current) {
-      readDataFromSharedMemory(messageData->sharedMessage, &messageData->message,
-                               sizeof(Game), &messageData->hMutex);
+      readDataFromSharedMemory(messageData->sharedMessage,
+                               &messageData->message, sizeof(Game),
+                               &messageData->hMutex);
       current = messageData->message.num;
 
       system("cls");
 
-       _tprintf(TEXT("DEBUG : %d\n"), current);
+      _tprintf(TEXT("DEBUG : %d\n"), current);
 
-       system("pause");
+      system("pause");
     }
-
-    // We can send data now
-    ReleaseSemaphore(messageData->smWrite, 1, NULL);
   }
   return 0;
 }
@@ -38,12 +33,8 @@ DWORD peekMessageData(MessageData *data) {
 }
 
 BOOL sendMessageToServer(MessageData *messageData, Message *msg) {
-  WaitForSingleObject(messageData->smWrite, INFINITE);
-
   writeDataToSharedMemory(messageData->sharedMessage, msg, sizeof(Message),
                           &messageData->hMutex);
-
-  ReleaseSemaphore(messageData->smRead, 1, NULL);
 
   return TRUE;
 }

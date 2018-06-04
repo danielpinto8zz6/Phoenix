@@ -92,8 +92,7 @@ typedef struct {
   BOOL ThreadMustConinue;
   HANDLE hMapFile;
   HANDLE hMutex;
-  HANDLE smRead;
-  HANDLE smWrite;
+  HANDLE gameUpdateEvent;
   /**
    * Hack
    */
@@ -105,11 +104,10 @@ typedef struct {
   Message message;
   HANDLE hMapFile;
   HANDLE hMutex;
-  HANDLE smRead;
-  HANDLE smWrite;
   BOOL STOP;
   DWORD currrentMessage;
   Pipes *pipes;
+  HANDLE messageUpdateEvent;
 } MessageData;
 
 typedef struct {
