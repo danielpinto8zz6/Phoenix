@@ -82,7 +82,6 @@ typedef struct {
 
 typedef struct {
   TCHAR username[50];
-  Pipes *pipes;
 } Client;
 
 typedef struct {
@@ -115,6 +114,7 @@ typedef struct {
   HANDLE smWrite;
   BOOL STOP;
   DWORD currrentMessage;
+  Pipes *pipes;
 } MessageData;
 
 typedef struct {

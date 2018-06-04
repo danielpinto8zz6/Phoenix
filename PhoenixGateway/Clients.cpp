@@ -60,7 +60,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     pipes.inboundPipe = hGatewayPipe;
     pipes.outboundPipe = clientPipe[TOTAL];
 
-    data->messageData->message.client.pipes = &pipes;
+    data->messageData->pipes = &pipes;
 
     /**
      * Client connected, create thread
@@ -100,7 +100,7 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   BOOL STOP = FALSE;
 
   do {
-    result = ReadFile(client->pipes->inboundPipe, (LPVOID)&messageData->message,
+    result = ReadFile(messageData->pipes->inboundPipe, (LPVOID)&messageData->message,
                       sizeof(Message), &nBytes, NULL);
     if (nBytes > 0) {
       messageData->message.num = messageData->currrentMessage++;
@@ -115,7 +115,7 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
          * Tell client he's logged
          */
         messageData->message.cmd = LOGGED;
-        result = WriteFile(client->pipes->outboundPipe,
+        result = WriteFile(messageData->pipes->outboundPipe,
                            (LPCVOID)&messageData->message, sizeof(Message),
                            &nBytes, NULL);
         if (!result) {
