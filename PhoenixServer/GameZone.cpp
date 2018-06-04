@@ -54,8 +54,6 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
 
-  WaitForSingleObject(gameData->smWrite, INFINITE);
-
   _tprintf(TEXT("[EnemyShip] -> %i\n"), position);
 
   // Place ship...
@@ -66,6 +64,8 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   }
 
   gameData->game.num++;
+
+  WaitForSingleObject(gameData->smWrite, INFINITE);
 
   writeDataToSharedMemory(gameData->sharedGame, &gameData->game, sizeof(Game),
                           &gameData->hMutex);

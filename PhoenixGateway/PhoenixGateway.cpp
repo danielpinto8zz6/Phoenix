@@ -15,8 +15,8 @@ int _tmain() {
   HANDLE hThreadReceiveGameDataFromServer;
   DWORD threadReceiveGameDataFromServerId;
 
-  HANDLE hThreadReceiveMessagesFromServer;
-  DWORD threadReceiveMessagesFromServerId;
+  // HANDLE hThreadReceiveMessagesFromServer;
+  // DWORD threadReceiveMessagesFromServerId;
 
   GameData gameData;
   MessageData messageData;
@@ -49,13 +49,15 @@ int _tmain() {
     system("pause");
   }
 
-  hThreadReceiveMessagesFromServer =
-      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromServer,
-                   &messageData, 0, &threadReceiveMessagesFromServerId);
-  if (hThreadReceiveMessagesFromServer == NULL) {
-    Error(TEXT("Creating thread to receive data from server"));
-    return -1;
-  }
+  messageData.currrentMessage = peekMessageData(&messageData);
+
+  // hThreadReceiveMessagesFromServer =
+  //     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromServer,
+  //                  &messageData, 0, &threadReceiveMessagesFromServerId);
+  // if (hThreadReceiveMessagesFromServer == NULL) {
+  //   Error(TEXT("Creating thread to receive data from server"));
+  //   return -1;
+  // }
 
   /**
    * Gateway thread to receive info from clients
@@ -70,13 +72,13 @@ int _tmain() {
 
   WaitForSingleObject(hThreadReceiveDataFromClient, INFINITE);
   WaitForSingleObject(hThreadReceiveGameDataFromServer, INFINITE);
-  WaitForSingleObject(hThreadReceiveMessagesFromServer, INFINITE);
+  // WaitForSingleObject(hThreadReceiveMessagesFromServer, INFINITE);
 
   CloseHandle(gameData.hMapFile);
   CloseHandle(gameData.hMutex);
   CloseHandle(gameData.smWrite);
   CloseHandle(gameData.smRead);
-  CloseHandle(hThreadReceiveGameDataFromServer);
+  // CloseHandle(hThreadReceiveGameDataFromServer);
 
   UnmapViewOfFile(gameData.sharedGame);
 
@@ -84,7 +86,7 @@ int _tmain() {
   CloseHandle(messageData.smWrite);
   CloseHandle(messageData.hMutex);
   CloseHandle(messageData.hMapFile);
-  CloseHandle(hThreadReceiveMessagesFromServer);
+  // CloseHandle(hThreadReceiveMessagesFromServer);
 
   UnmapViewOfFile(messageData.sharedMessage);
 

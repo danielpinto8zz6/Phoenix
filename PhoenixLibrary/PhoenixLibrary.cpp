@@ -69,13 +69,13 @@ BOOL initMessageZone(MessageData *messageData) {
   }
 
   messageData->smWrite =
-      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, GAMEDATA_WRITE_SEMAPHORE_NAME);
+      CreateSemaphore(NULL, MAX_SEM_COUNT, MAX_SEM_COUNT, MESSAGES_WRITE_SEMAPHORE_NAME);
   if (messageData->smWrite == NULL) {
     Error(TEXT("Initializing write semaphore"));
     return FALSE;
   }
 
-  messageData->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, GAMEDATA_READ_SEMAPHORE_NAME);
+  messageData->smRead = CreateSemaphore(NULL, 0, MAX_SEM_COUNT, MESSAGES_READ_SEMAPHORE_NAME);
   if (messageData->smRead == NULL) {
     Error(TEXT("Initializing read semaphore"));
     return FALSE;

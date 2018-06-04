@@ -60,10 +60,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     pipes.inboundPipe = hGatewayPipe;
     pipes.outboundPipe = clientPipe[TOTAL];
 
-    Client client;
-    client.pipes = &pipes;
-
-    data->messageData->message.client = &client;
+    data->messageData->message.client.pipes = &pipes;
 
     /**
      * Client connected, create thread
@@ -91,13 +88,12 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
 }
 
 DWORD WINAPI manageClient(LPVOID lpParam) {
-  int currentMsg = 0;
   Data *data = (Data *)lpParam;
 
   MessageData *messageData = data->messageData;
 
   Client *client;
-  client = messageData->message.client;
+  client = &messageData->message.client;
 
   BOOL result;
   DWORD nBytes;
@@ -107,13 +103,12 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
     result = ReadFile(client->pipes->inboundPipe, (LPVOID)&messageData->message,
                       sizeof(Message), &nBytes, NULL);
     if (nBytes > 0) {
-      messageData->message.num = data->messageData->currrentMessage++;
-      sendMessageToServer(data->messageData, &messageData->message);
+      messageData->message.num = messageData->currrentMessage++;
+      // sendMessageToServer(data->messageData, &messageData->message);
       switch (messageData->message.cmd) {
       case LOGIN:
         _tcscpy_s(client->username, _tcslen(messageData->message.text) + 1,
                   messageData->message.text);
-        clientLogged(client);
         _tprintf(TEXT("Client Login : %s\n"), client->username);
 
         /**
@@ -133,8 +128,4 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   } while (!STOP);
 
   return 0;
-}
-
-VOID clientLogged(Client *client) {
-  _tprintf(TEXT("%s logged...\n"), client->username);
 }

@@ -41,19 +41,12 @@ int _tmain(int argc, LPTSTR argv[]) {
     system("pause");
   }
 
-  /**
-   * Hack to start messages
-   */
-  Message msg;
-  msg.num = 0;
-  writeDataToSharedMemory(messageData.sharedMessage, &msg, sizeof(Message),
-                          &messageData.hMutex);
-
   hThreadReceiveMessagesFromGateway =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromGateway,
                    &messageData, 0, &threadReceiveMessagesFromServerId);
   if (hThreadReceiveMessagesFromGateway == NULL) {
     Error(TEXT("Creating thread to receive data from server"));
+    system("pause");
     return -1;
   }
 
@@ -62,6 +55,7 @@ int _tmain(int argc, LPTSTR argv[]) {
                    &gameData, 0, &threadManageEnemyShipsId);
   if (hThreadManageEnemyShips == NULL) {
     Error(TEXT("Creating thread to manage enemy ships"));
+    system("pause");
     return -1;
   }
 

@@ -87,7 +87,7 @@ typedef struct {
 
 typedef struct {
   Command cmd;
-  Client *client;
+  Client client;
   TCHAR text[50];
   DWORD num;
 } Message;
