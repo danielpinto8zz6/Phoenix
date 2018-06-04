@@ -20,7 +20,6 @@ int _tmain(int argc, LPTSTR argv[]) {
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
-  gameData.game.num = 0;
   // Temporary: map will be abandoned
   for (int y = 0; y < HEIGHT; y++) {
     for (int x = 0; x < WIDTH; x++) {
@@ -48,7 +47,21 @@ int _tmain(int argc, LPTSTR argv[]) {
     system("pause");
   }
 
-  messageData.sharedMessage->num = 0;
+  messageData.gatewayMessageUpdateEvent =
+      CreateEvent(NULL, FALSE, FALSE, MESSAGE_GATEWAY_UPDATE_EVENT);
+
+  if (messageData.gatewayMessageUpdateEvent == NULL) {
+    Error(TEXT("CreateEvent failed"));
+    return FALSE;
+  }
+
+  messageData.serverMessageUpdateEvent =
+      CreateEvent(NULL, FALSE, FALSE, MESSAGE_SERVER_UPDATE_EVENT);
+
+  if (messageData.serverMessageUpdateEvent == NULL) {
+    Error(TEXT("CreateEvent failed"));
+    return FALSE;
+  }
 
   hThreadReceiveMessagesFromGateway =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromGateway,
@@ -80,6 +93,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 
   CloseHandle(messageData.hMutex);
   CloseHandle(messageData.hMapFile);
+  CloseHandle(messageData.serverMessageUpdateEvent);
+  CloseHandle(messageData.gatewayMessageUpdateEvent);
   CloseHandle(hThreadReceiveMessagesFromGateway);
 
   UnmapViewOfFile(messageData.sharedMessage);

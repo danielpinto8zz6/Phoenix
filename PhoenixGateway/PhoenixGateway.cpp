@@ -56,6 +56,20 @@ int _tmain() {
     system("pause");
   }
 
+  messageData.serverMessageUpdateEvent =
+      OpenEvent(EVENT_ALL_ACCESS, FALSE, MESSAGE_SERVER_UPDATE_EVENT);
+  if (messageData.serverMessageUpdateEvent == NULL) {
+    Error(TEXT("OpenEvent failed"));
+    return FALSE;
+  }
+
+  messageData.gatewayMessageUpdateEvent =
+      OpenEvent(EVENT_ALL_ACCESS, FALSE, MESSAGE_GATEWAY_UPDATE_EVENT);
+  if (messageData.gatewayMessageUpdateEvent == NULL) {
+    Error(TEXT("OpenEvent failed"));
+    return FALSE;
+  }
+
   // hThreadReceiveMessagesFromServer =
   //     CreateThread(NULL, 0,
   //     (LPTHREAD_START_ROUTINE)receiveMessagesFromServer,
@@ -82,6 +96,7 @@ int _tmain() {
 
   CloseHandle(gameData.hMapFile);
   CloseHandle(gameData.hMutex);
+  CloseHandle(gameData.gameUpdateEvent);
 
   // CloseHandle(hThreadReceiveGameDataFromServer);
 
@@ -89,6 +104,8 @@ int _tmain() {
 
   CloseHandle(messageData.hMutex);
   CloseHandle(messageData.hMapFile);
+  CloseHandle(messageData.gatewayMessageUpdateEvent);
+  CloseHandle(messageData.serverMessageUpdateEvent);
   // CloseHandle(hThreadReceiveMessagesFromServer);
 
   UnmapViewOfFile(messageData.sharedMessage);

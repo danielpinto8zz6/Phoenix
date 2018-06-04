@@ -29,7 +29,10 @@
 #define PIPE_NAME_OUTBOUND TEXT("\\\\.\\pipe\\phoenix-gateway-outbound")
 
 #define GAME_UPDATE_EVENT TEXT("Global\\phoenix_game_update_event")
-#define MESSAGE_UPDATE_EVENT TEXT("Global\\phoenix_message_update_event")
+#define MESSAGE_SERVER_UPDATE_EVENT                                            \
+  TEXT("Global\\phoenix_server_message_update_event")
+#define MESSAGE_GATEWAY_UPDATE_EVENT                                           \
+  TEXT("Global\\phoenix_gateway_message_update_event")
 
 #ifdef __cplusplus
 extern "C" {

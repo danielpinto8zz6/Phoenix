@@ -68,7 +68,6 @@ typedef struct {
 
 typedef struct {
   int level;
-  DWORD num;
   Player player[PLAYERS];
   EnemyShip enemyShip[ENEMYSHIPS];
   TCHAR map[HEIGHT][WIDTH];
@@ -83,7 +82,6 @@ typedef struct {
 typedef struct {
   Command cmd;
   TCHAR text[50];
-  DWORD num;
 } Message;
 
 typedef struct {
@@ -105,9 +103,9 @@ typedef struct {
   HANDLE hMapFile;
   HANDLE hMutex;
   BOOL STOP;
-  DWORD currrentMessage;
   Pipes *pipes;
-  HANDLE messageUpdateEvent;
+  HANDLE serverMessageUpdateEvent;
+  HANDLE gatewayMessageUpdateEvent;
 } MessageData;
 
 typedef struct {

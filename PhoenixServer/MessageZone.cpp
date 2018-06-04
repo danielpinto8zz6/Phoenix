@@ -6,33 +6,21 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
   MessageData *messageData = (MessageData *)lpParam;
 
   Message msg;
+  DWORD dwWaitResult;
 
   messageData->STOP = FALSE;
 
-  DWORD current = peekMessageData(messageData);
-
   while (!messageData->STOP) {
-    // Do not get data whitout permission
-    if (peekMessageData(messageData) > current) {
+    dwWaitResult = WaitForSingleObject(messageData->serverMessageUpdateEvent, INFINITE);
+    if (dwWaitResult == WAIT_OBJECT_0) {
       readDataFromSharedMemory(messageData->sharedMessage, &msg,
                                sizeof(Message), &messageData->hMutex);
-      current = msg.num;
-
-      /**
-       * TODO: Perform actions related to info received
-       */
-      _tprintf(TEXT("DEBUG : Received -> %s\n"), msg.text);
     }
 
-    // We can send data now
+    /**
+     * TODO: Perform actions related to info received
+     */
+    _tprintf(TEXT("DEBUG : Received -> %s\n"), msg.text);
   }
   return 0;
-}
-
-DWORD peekMessageData(MessageData *data) {
-  DWORD num;
-  WaitForSingleObject(data->hMutex, INFINITE);
-  num = data->sharedMessage->num;
-  ReleaseMutex(data->hMutex);
-  return num;
 }

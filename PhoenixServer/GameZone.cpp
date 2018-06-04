@@ -61,8 +61,6 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
     gameData->game.map[c->y][c->x] = '#';
   }
 
-  gameData->game.num++;
-
   writeDataToSharedMemory(gameData->sharedGame, &gameData->game, sizeof(Game),
                           &gameData->hMutex);
   if (!SetEvent(gameData->gameUpdateEvent)) {

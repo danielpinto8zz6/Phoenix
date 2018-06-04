@@ -9,15 +9,9 @@ DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
 
   while (gameData->ThreadMustConinue) {
     dwWaitResult = WaitForSingleObject(gameData->gameUpdateEvent, INFINITE);
-    switch (dwWaitResult) {
-    case WAIT_OBJECT_0:
-      _tprintf(TEXT("Nice we can read data\n"));
+    if (dwWaitResult == WAIT_OBJECT_0) {
       readDataFromSharedMemory(gameData->sharedGame, &gameData->game,
                                sizeof(Game), &gameData->hMutex);
-      break;
-    default:
-      Error(TEXT("Wait error"));
-      return 0;
     }
 
     // system("cls");
@@ -31,12 +25,4 @@ DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
     // }
   }
   return 0;
-}
-
-DWORD peekGameData(GameData *data) {
-  DWORD num;
-  WaitForSingleObject(data->hMutex, INFINITE);
-  num = data->sharedGame->num;
-  ReleaseMutex(data->hMutex);
-  return num;
 }
