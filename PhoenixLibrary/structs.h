@@ -81,12 +81,7 @@ typedef struct {
 } Pipes;
 
 typedef struct {
-  TCHAR username[50];
-} Client;
-
-typedef struct {
   Command cmd;
-  Client client;
   TCHAR text[50];
   DWORD num;
 } Message;

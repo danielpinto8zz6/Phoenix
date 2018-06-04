@@ -92,9 +92,6 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
 
   MessageData *messageData = data->messageData;
 
-  Client *client;
-  client = &messageData->message.client;
-
   BOOL result;
   DWORD nBytes;
   BOOL STOP = FALSE;

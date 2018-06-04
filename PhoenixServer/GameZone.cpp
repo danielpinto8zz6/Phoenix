@@ -54,8 +54,6 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
 
-  _tprintf(TEXT("[EnemyShip] -> %i\n"), position);
-
   // Place ship...
   Coordinates *c = GetFirstEmptyPosition(&gameData->game);
   if (c != NULL) {
