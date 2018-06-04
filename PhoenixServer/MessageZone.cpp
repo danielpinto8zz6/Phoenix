@@ -9,8 +9,6 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
 
   messageData->STOP = FALSE;
 
-  messageData->message.num = 0;
-
   DWORD current = peekMessageData(messageData);
 
   while (!messageData->STOP) {
@@ -25,7 +23,7 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
       /**
        * TODO: Perform actions related to info received
        */
-      _tprintf(TEXT("DEBUG : Received -> %s\n"), msg.client.username);
+      _tprintf(TEXT("DEBUG : Received -> %s\n"), msg.text);
     }
 
     // We can send data now

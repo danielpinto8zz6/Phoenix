@@ -100,30 +100,11 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   BOOL STOP = FALSE;
 
   do {
-    result = ReadFile(messageData->pipes->inboundPipe, (LPVOID)&messageData->message,
-                      sizeof(Message), &nBytes, NULL);
+    result =
+        ReadFile(messageData->pipes->inboundPipe, (LPVOID)&messageData->message,
+                 sizeof(Message), &nBytes, NULL);
     if (nBytes > 0) {
-      messageData->message.num = messageData->currrentMessage++;
-      // sendMessageToServer(data->messageData, &messageData->message);
-      switch (messageData->message.cmd) {
-      case LOGIN:
-        _tcscpy_s(client->username, _tcslen(messageData->message.text) + 1,
-                  messageData->message.text);
-        _tprintf(TEXT("Client Login : %s\n"), client->username);
-
-        /**
-         * Tell client he's logged
-         */
-        messageData->message.cmd = LOGGED;
-        result = WriteFile(messageData->pipes->outboundPipe,
-                           (LPCVOID)&messageData->message, sizeof(Message),
-                           &nBytes, NULL);
-        if (!result) {
-          Error(TEXT("Failed to send data to client."));
-        }
-
-        break;
-      }
+      sendMessageToServer(data->messageData, &messageData->message);
     }
   } while (!STOP);
 

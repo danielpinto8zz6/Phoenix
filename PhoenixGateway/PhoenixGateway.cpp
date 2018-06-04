@@ -49,8 +49,6 @@ int _tmain() {
     system("pause");
   }
 
-  messageData.currrentMessage = peekMessageData(&messageData);
-
   // hThreadReceiveMessagesFromServer =
   //     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromServer,
   //                  &messageData, 0, &threadReceiveMessagesFromServerId);

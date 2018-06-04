@@ -41,6 +41,8 @@ int _tmain(int argc, LPTSTR argv[]) {
     system("pause");
   }
 
+  messageData.sharedMessage->num = 0;
+
   hThreadReceiveMessagesFromGateway =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromGateway,
                    &messageData, 0, &threadReceiveMessagesFromServerId);

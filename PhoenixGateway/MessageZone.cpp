@@ -5,7 +5,7 @@
 DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
   MessageData *messageData = (MessageData *)lpParam;
 
-  DWORD current = peekMessageData(messageData);
+  DWORD current = -1;
 
   while (messageData->STOP) {
     // Do not get data whitout permission
