@@ -20,6 +20,17 @@ int _tmain(int argc, LPTSTR argv[]) {
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
+  /**
+   * Use an event to check if the program is running
+   * Start event at instance start
+   */
+  if (isServerRunning()) {
+    Error(TEXT("There is an instance of server already running! Only 1 server "
+               "at time"));
+    system("pause");
+    return FALSE;
+  }
+
   // Temporary: map will be abandoned
   for (int y = 0; y < HEIGHT; y++) {
     for (int x = 0; x < WIDTH; x++) {
@@ -35,7 +46,8 @@ int _tmain(int argc, LPTSTR argv[]) {
     system("pause");
   }
 
-  gameData.gameUpdateEvent = CreateEvent(NULL, FALSE, FALSE, GAME_UPDATE_EVENT);
+  gameData.gameUpdateEvent =
+      CreateEventW(NULL, FALSE, FALSE, GAME_UPDATE_EVENT);
 
   if (gameData.gameUpdateEvent == NULL) {
     Error(TEXT("CreateEvent failed"));
@@ -48,7 +60,7 @@ int _tmain(int argc, LPTSTR argv[]) {
   }
 
   messageData.gatewayMessageUpdateEvent =
-      CreateEvent(NULL, FALSE, FALSE, MESSAGE_GATEWAY_UPDATE_EVENT);
+      CreateEventW(NULL, FALSE, FALSE, MESSAGE_GATEWAY_UPDATE_EVENT);
 
   if (messageData.gatewayMessageUpdateEvent == NULL) {
     Error(TEXT("CreateEvent failed"));
@@ -56,7 +68,7 @@ int _tmain(int argc, LPTSTR argv[]) {
   }
 
   messageData.serverMessageUpdateEvent =
-      CreateEvent(NULL, FALSE, FALSE, MESSAGE_SERVER_UPDATE_EVENT);
+      CreateEventW(NULL, FALSE, FALSE, MESSAGE_SERVER_UPDATE_EVENT);
 
   if (messageData.serverMessageUpdateEvent == NULL) {
     Error(TEXT("CreateEvent failed"));

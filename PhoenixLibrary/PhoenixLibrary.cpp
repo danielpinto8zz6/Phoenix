@@ -95,3 +95,39 @@ BOOL initGameZone(GameData *gameData) {
 
   return TRUE;
 }
+
+BOOL isGatewayRunning() {
+  HANDLE m_hStartEvent =
+      CreateEventW(NULL, FALSE, FALSE, GATEWAY_RUNNING_EVENT);
+
+  if (m_hStartEvent == NULL) {
+    CloseHandle(m_hStartEvent);
+    return TRUE;
+  }
+
+  if (GetLastError() == ERROR_ALREADY_EXISTS) {
+
+    CloseHandle(m_hStartEvent);
+    m_hStartEvent = NULL;
+    return TRUE;
+  }
+  return FALSE;
+}
+
+BOOL isServerRunning() {
+  HANDLE m_hStartEvent =
+      CreateEventW(NULL, FALSE, FALSE, SERVER_RUNNING_EVENT);
+
+  if (m_hStartEvent == NULL) {
+    CloseHandle(m_hStartEvent);
+    return TRUE;
+  }
+
+  if (GetLastError() == ERROR_ALREADY_EXISTS) {
+
+    CloseHandle(m_hStartEvent);
+    m_hStartEvent = NULL;
+    return TRUE;
+  }
+  return FALSE;
+}

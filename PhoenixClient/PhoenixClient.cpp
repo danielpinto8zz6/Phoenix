@@ -17,6 +17,12 @@ int _tmain() {
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
+  if (!isGatewayRunning()) {
+    Error(TEXT("There's no gateway instance running! Start gateway first!"));
+    system("pause");
+    return FALSE;
+  }
+
   _tprintf(TEXT("Client started! Establishing connection with gateway...\n"));
 
   /**

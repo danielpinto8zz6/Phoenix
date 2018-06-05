@@ -6,6 +6,7 @@
 - [ ] Handle errors (Server close, Client close, etc)
 - [x] Move gateway logic to server (gateway is just a bridge to pass data)
 - [x] Add events to know when to read and write on shared memory
-- [ ] Server only run once
-- [ ] Gateway only run once + doesn't start without server
-- [ ] Client doesn't start without gateway
+- [x] Server only run once
+- [x] Gateway only run once + doesn't start without server
+- [x] Client doesn't start without gateway
+- [ ] Add registry keys to store players points, etc...

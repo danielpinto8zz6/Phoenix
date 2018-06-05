@@ -30,13 +30,27 @@ int _tmain() {
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
+  if (isGatewayRunning()) {
+    Error(
+        TEXT("There is an instance of gateway already running! Only 1 gateway "
+             "at time"));
+    system("pause");
+    return FALSE;
+  }
+
+  if (!isServerRunning()) {
+    Error(TEXT("There's no server instance running! Start server first!"));
+    system("pause");
+    return FALSE;
+  }
+
   if (!initGameZone(&gameData)) {
     Error(TEXT("Can't connect game data with server. Exiting..."));
     system("pause");
   }
 
   gameData.gameUpdateEvent =
-      OpenEvent(EVENT_ALL_ACCESS, FALSE, GAME_UPDATE_EVENT);
+      OpenEventW(EVENT_ALL_ACCESS, FALSE, GAME_UPDATE_EVENT);
   if (gameData.gameUpdateEvent == NULL) {
     Error(TEXT("OpenEvent failed"));
     return FALSE;
@@ -57,14 +71,14 @@ int _tmain() {
   }
 
   messageData.serverMessageUpdateEvent =
-      OpenEvent(EVENT_ALL_ACCESS, FALSE, MESSAGE_SERVER_UPDATE_EVENT);
+      OpenEventW(EVENT_ALL_ACCESS, FALSE, MESSAGE_SERVER_UPDATE_EVENT);
   if (messageData.serverMessageUpdateEvent == NULL) {
     Error(TEXT("OpenEvent failed"));
     return FALSE;
   }
 
   messageData.gatewayMessageUpdateEvent =
-      OpenEvent(EVENT_ALL_ACCESS, FALSE, MESSAGE_GATEWAY_UPDATE_EVENT);
+      OpenEventW(EVENT_ALL_ACCESS, FALSE, MESSAGE_GATEWAY_UPDATE_EVENT);
   if (messageData.gatewayMessageUpdateEvent == NULL) {
     Error(TEXT("OpenEvent failed"));
     return FALSE;

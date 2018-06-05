@@ -34,6 +34,9 @@
 #define MESSAGE_GATEWAY_UPDATE_EVENT                                           \
   TEXT("Global\\phoenix_gateway_message_update_event")
 
+#define SERVER_RUNNING_EVENT TEXT("Global\\phoenix_server_running")
+#define GATEWAY_RUNNING_EVENT TEXT("Global\\phoenix_gateway_running")
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,6 +56,8 @@ PHOENIXLIBRARY_API VOID readDataFromSharedMemory(LPVOID sharedMemory,
                                                  HANDLE *hMutex);
 PHOENIXLIBRARY_API BOOL initMessageZone(MessageData *messageData);
 PHOENIXLIBRARY_API BOOL initGameZone(GameData *gameData);
+PHOENIXLIBRARY_API BOOL isGatewayRunning();
+PHOENIXLIBRARY_API BOOL isServerRunning();
 #ifdef __cplusplus
 }
 #endif
