@@ -39,7 +39,7 @@ int _tmain() {
   }
 
   if (!isServerRunning()) {
-    Error(TEXT("There's no server instance running! Start server first!"));
+    Error(TEXT("There is no server instance running! Start server first!"));
     system("pause");
     return FALSE;
   }

@@ -14,6 +14,7 @@ DWORD WINAPI dataReceiver(LPVOID lpParam) {
     result = ReadFile(clientPipes->outboundPipe, (LPVOID)&msg, sizeof(Message),
                       &nBytes, NULL);
     if (nBytes > 0) {
+      Debug(TEXT("%d Bytes received"), nBytes);
       switch (msg.cmd) {
       case LOGGED:
         _tprintf(TEXT("Succeed : %s logged\n"), msg.text);

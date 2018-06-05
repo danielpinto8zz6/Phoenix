@@ -10,16 +10,17 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
   messageData->STOP = FALSE;
 
   while (!messageData->STOP) {
-    dwWaitResult = WaitForSingleObject(messageData->gatewayMessageUpdateEvent, INFINITE);
+    dwWaitResult =
+        WaitForSingleObject(messageData->gatewayMessageUpdateEvent, INFINITE);
     if (dwWaitResult == WAIT_OBJECT_0) {
-      readDataFromSharedMemory(messageData->sharedMessage, &messageData->message,
-                               sizeof(Message), &messageData->hMutex);
+      readDataFromSharedMemory(messageData->sharedMessage,
+                               &messageData->message, sizeof(Message),
+                               &messageData->hMutex);
+      /**
+       * TODO: Perform actions related to info received
+       */
+      Debug(TEXT("%d Bytes received"), sizeof(Message));
     }
-
-    /**
-     * TODO: Perform actions related to info received
-     */
-    _tprintf(TEXT("DEBUG : Received -> %s\n"), messageData->message.text);
   }
   return 0;
 }

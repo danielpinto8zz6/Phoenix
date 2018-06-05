@@ -93,6 +93,8 @@ int _tmain(int argc, LPTSTR argv[]) {
     return -1;
   }
 
+  Debug(TEXT("Server started successfully"));
+
   WaitForSingleObject(hThreadManageEnemyShips, INFINITE);
   WaitForSingleObject(hThreadReceiveMessagesFromGateway, INFINITE);
 

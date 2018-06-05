@@ -12,7 +12,7 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
 
   HANDLE hMutexManageEnemyShips;
 
-  _tprintf(TEXT("[ManageEnemyShips] -> Thread-%d\n"), GetCurrentThreadId());
+  Debug(TEXT("[ManageEnemyShips] -> Thread-%d"), GetCurrentThreadId());
 
   // Create a mutex with no initial owner
   hMutexManageEnemyShips = CreateMutex(NULL, FALSE, ENEMYSHIPS_MUTEX);
@@ -65,9 +65,9 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
     gameData->game.map[c->y][c->x] = '#';
   }
 
-  _tprintf(TEXT("Debug (EnemyShips Coordinates): %d %d\n"),
-           gameData->game.enemyShip[position].position.x,
-           gameData->game.enemyShip[position].position.y);
+  Debug(TEXT("(EnemyShips Coordinates): %d %d"),
+        gameData->game.enemyShip[position].position.x,
+        gameData->game.enemyShip[position].position.y);
 
   sendGameToGateway(gameData, &gameData->game);
 
@@ -82,6 +82,6 @@ BOOL sendGameToGateway(GameData *gameData, Game *game) {
   if (!SetEvent(gameData->gameUpdateEvent)) {
     Error(TEXT("SetEvent failed"));
   }
-
+  Debug(TEXT("%d Bytes sent to gateway"), sizeof(Game));
   return TRUE;
 }

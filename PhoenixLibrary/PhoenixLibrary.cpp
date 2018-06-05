@@ -5,8 +5,23 @@
 
 #include "PhoenixLibrary.h"
 
-VOID Error(CONST TCHAR *text) {
-  _tprintf(TEXT("[ERROR] %s. (%d)\n"), text, GetLastError());
+VOID Error(LPCWSTR text, ...) {
+  TCHAR msg[1024];
+  va_list argptr;
+  va_start(argptr, text);
+  _stprintf_s(msg, TEXT("[ERROR] %s (%d)\n"), text, GetLastError());
+  _vftprintf(stderr, msg, argptr);
+  va_end(argptr);
+}
+
+VOID Debug(LPCWSTR text, ...) {
+  TCHAR msg[1024];
+
+  va_list argptr;
+  va_start(argptr, text);
+  _stprintf_s (msg, TEXT("[DEBUG] %s\n"), text);
+  _vftprintf(stdout, msg, argptr);
+  va_end(argptr);
 }
 
 BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes) {
@@ -115,8 +130,7 @@ BOOL isGatewayRunning() {
 }
 
 BOOL isServerRunning() {
-  HANDLE m_hStartEvent =
-      CreateEventW(NULL, FALSE, FALSE, SERVER_RUNNING_EVENT);
+  HANDLE m_hStartEvent = CreateEventW(NULL, FALSE, FALSE, SERVER_RUNNING_EVENT);
 
   if (m_hStartEvent == NULL) {
     CloseHandle(m_hStartEvent);

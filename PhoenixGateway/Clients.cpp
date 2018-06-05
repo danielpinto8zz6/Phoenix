@@ -15,7 +15,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
 
   while (!STOP && data->totalClients < PLAYERS) {
 
-    _tprintf(TEXT("Creating an instance of a named pipe...\n"));
+    Debug(TEXT("Creating an instance of a named pipe..."));
     // outbound server->client
     data->hClientPipe[data->totalClients] = CreateNamedPipe(
         PIPE_NAME_INBOUND, PIPE_ACCESS_OUTBOUND,
@@ -42,7 +42,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
       return -1;
     }
 
-    _tprintf(TEXT("Waiting for a client to connect...\n"));
+    Debug(TEXT("Waiting for a client to connect..."));
 
     // This call blocks until a client process connects to the pipe
     result = ConnectNamedPipe(data->hClientPipe[data->totalClients], NULL);
@@ -72,7 +72,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
   // Shutdown each named pipe
   for (int i = 0; i < data->totalClients; i++) {
     DisconnectNamedPipe(data->hClientPipe[i]);
-    _tprintf(TEXT("Closing pipe (CloseHandle)\n"));
+    Debug(TEXT("Closing client %d pipe"), i);
     CloseHandle(data->hClientPipe[i]);
   }
 
@@ -119,5 +119,6 @@ BOOL sendMessageToClient(HANDLE hClientPipe, Message *message) {
     Error(TEXT("Failed to send data to client."));
     return FALSE;
   }
+  Debug(TEXT("%d Bytes sent to client"), nBytes);
   return TRUE;
 }
