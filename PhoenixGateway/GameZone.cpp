@@ -1,11 +1,18 @@
 #include "stdafx.h"
 
+#include "Clients.h"
 #include "GameZone.h"
 
 DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
-  GameData *gameData = (GameData *)lpParam;
+  Data *data = (Data *)lpParam;
+
+  GameData *gameData = data->gameData;
+  MessageData *messageData = data->messageData;
 
   DWORD dwWaitResult;
+
+  Message message;
+  message.cmd = UPDATE_GAME;
 
   while (gameData->ThreadMustConinue) {
     dwWaitResult = WaitForSingleObject(gameData->gameUpdateEvent, INFINITE);
@@ -13,16 +20,11 @@ DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
       readDataFromSharedMemory(gameData->sharedGame, &gameData->game,
                                sizeof(Game), &gameData->hMutex);
     }
-
-    // system("cls");
-
-    // // Show the actual map of the game
-    // for (int y = 0; y < HEIGHT; y++) {
-    //   for (int x = 0; x < WIDTH; x++) {
-    //     _tprintf(TEXT("%c"), gameData->game.map[y][x]);
-    //   }
-    //   _tprintf(TEXT("\n"));
-    // }
+    /**
+     * Game update received, send to clients
+     */
+    _tprintf(TEXT("Debug: Received\n"));
+    sendMessageToAllClients(data, &message);
   }
   return 0;
 }

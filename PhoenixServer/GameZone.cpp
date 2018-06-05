@@ -4,18 +4,18 @@
 #include "GameZone.h"
 #include "PhoenixServer.h"
 
-HANDLE hMutexManageEnemyShips;
-
 DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
   GameData *gameData = (GameData *)lpParam;
 
   HANDLE aThread[ENEMYSHIPS];
   DWORD ThreadID = 0;
 
+  HANDLE hMutexManageEnemyShips;
+
   _tprintf(TEXT("[ManageEnemyShips] -> Thread-%d\n"), GetCurrentThreadId());
 
   // Create a mutex with no initial owner
-  hMutexManageEnemyShips = CreateMutex(NULL, FALSE, NULL);
+  hMutexManageEnemyShips = CreateMutex(NULL, FALSE, ENEMYSHIPS_MUTEX);
 
   if (hMutexManageEnemyShips == NULL) {
     Error(TEXT("Creating enemy ships mutex"));
@@ -50,6 +50,10 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
 DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   GameData *gameData = (GameData *)lpParam;
 
+  HANDLE hMutexManageEnemyShips;
+
+  hMutexManageEnemyShips = OpenMutex(MUTEX_ALL_ACCESS, FALSE, ENEMYSHIPS_MUTEX);
+
   int position = gameData->position;
 
   WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
@@ -61,13 +65,23 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
     gameData->game.map[c->y][c->x] = '#';
   }
 
-  writeDataToSharedMemory(gameData->sharedGame, &gameData->game, sizeof(Game),
+  _tprintf(TEXT("Debug (EnemyShips Coordinates): %d %d\n"),
+           gameData->game.enemyShip[position].position.x,
+           gameData->game.enemyShip[position].position.y);
+
+  sendGameToGateway(gameData, &gameData->game);
+
+  ReleaseMutex(hMutexManageEnemyShips);
+
+  return TRUE;
+}
+
+BOOL sendGameToGateway(GameData *gameData, Game *game) {
+  writeDataToSharedMemory(gameData->sharedGame, game, sizeof(Game),
                           &gameData->hMutex);
   if (!SetEvent(gameData->gameUpdateEvent)) {
     Error(TEXT("SetEvent failed"));
   }
-
-  ReleaseMutex(hMutexManageEnemyShips);
 
   return TRUE;
 }

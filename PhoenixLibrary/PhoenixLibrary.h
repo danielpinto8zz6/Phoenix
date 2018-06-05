@@ -37,6 +37,8 @@
 #define SERVER_RUNNING_EVENT TEXT("Global\\phoenix_server_running")
 #define GATEWAY_RUNNING_EVENT TEXT("Global\\phoenix_gateway_running")
 
+#define ENEMYSHIPS_MUTEX TEXT("phoenix_enemyships_mutex")
+
 #ifdef __cplusplus
 extern "C" {
 #endif

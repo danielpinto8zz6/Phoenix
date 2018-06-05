@@ -58,7 +58,7 @@ int _tmain() {
 
   hThreadReceiveGameDataFromServer =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveGameDataFromServer,
-                   &gameData, 0, &threadReceiveGameDataFromServerId);
+                   &data, 0, &threadReceiveGameDataFromServerId);
   if (hThreadReceiveGameDataFromServer == NULL) {
     Error(TEXT("Creating shared memory thread"));
     system("pause");

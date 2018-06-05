@@ -11,12 +11,15 @@ DWORD WINAPI dataReceiver(LPVOID lpParam) {
   BOOL result;
   DWORD nBytes;
   while (TRUE) {
-    result = ReadFile(clientPipes->outboundPipe, (LPVOID)&msg, sizeof(msg),
+    result = ReadFile(clientPipes->outboundPipe, (LPVOID)&msg, sizeof(Message),
                       &nBytes, NULL);
     if (nBytes > 0) {
       switch (msg.cmd) {
       case LOGGED:
         _tprintf(TEXT("Succeed : %s logged\n"), msg.text);
+        break;
+      case UPDATE_GAME:
+        _tprintf(TEXT("Game update\n"));
         break;
       }
     }

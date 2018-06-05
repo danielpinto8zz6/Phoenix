@@ -16,7 +16,7 @@ typedef enum { BASIC, DODGE } EnemyType;
 
 typedef enum { NONE } PowerupEffect;
 
-typedef enum { LOGIN, SUCCESS, LOGGED } Command;
+typedef enum { LOGIN, SUCCESS, LOGGED, UPDATE_GAME } Command;
 
 typedef struct {
   int x;
@@ -103,7 +103,6 @@ typedef struct {
   HANDLE hMapFile;
   HANDLE hMutex;
   BOOL STOP;
-  Pipes *pipes;
   HANDLE serverMessageUpdateEvent;
   HANDLE gatewayMessageUpdateEvent;
 } MessageData;
@@ -111,4 +110,7 @@ typedef struct {
 typedef struct {
   MessageData *messageData;
   GameData *gameData;
+  HANDLE hClientPipe[PLAYERS];
+  HANDLE hGatewayPipe;
+  int totalClients;
 } Data;

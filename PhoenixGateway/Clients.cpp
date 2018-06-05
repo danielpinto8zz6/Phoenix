@@ -3,32 +3,27 @@
 #include "Clients.h"
 #include "MessageZone.h"
 
-#define MAXPLAYERS 10
-
 DWORD WINAPI manageClients(LPVOID lpParam) {
   Data *data = (Data *)lpParam;
   /**
    * TOTAL : total of clients connected
    */
-  int TOTAL = 0;
   BOOL STOP = FALSE;
   BOOL result;
-  HANDLE hGatewayPipe;
-  HANDLE clientPipe[MAXPLAYERS];
-  HANDLE hThreadManageClient[MAXPLAYERS];
-  Pipes pipes;
+  HANDLE hThreadManageClient[PLAYERS];
+  data->totalClients = 0;
 
-  while (!STOP && TOTAL < MAXPLAYERS) {
+  while (!STOP && data->totalClients < PLAYERS) {
 
     _tprintf(TEXT("Creating an instance of a named pipe...\n"));
     // outbound server->client
-    clientPipe[TOTAL] = CreateNamedPipe(
+    data->hClientPipe[data->totalClients] = CreateNamedPipe(
         PIPE_NAME_INBOUND, PIPE_ACCESS_OUTBOUND,
-        PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, MAXPLAYERS,
+        PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, PLAYERS,
         50 * sizeof(TCHAR), 50 * sizeof(TCHAR), 1000, NULL);
 
-    if (clientPipe[TOTAL] == NULL ||
-        clientPipe[TOTAL] == INVALID_HANDLE_VALUE) {
+    if (data->hClientPipe[data->totalClients] == NULL ||
+        data->hClientPipe[data->totalClients] == INVALID_HANDLE_VALUE) {
       Error(TEXT("Failed to create outbound pipe instance.\n"));
       // look up error code here using GetLastError()
       system("pause");
@@ -36,11 +31,12 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     }
 
     // inbound server<-client
-    hGatewayPipe = CreateNamedPipe(
+    data->hGatewayPipe = CreateNamedPipe(
         PIPE_NAME_OUTBOUND, PIPE_ACCESS_INBOUND,
-        PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, MAXPLAYERS,
+        PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, PLAYERS,
         50 * sizeof(TCHAR), 50 * sizeof(TCHAR), 1000, NULL);
-    if (hGatewayPipe == NULL || hGatewayPipe == INVALID_HANDLE_VALUE) {
+    if (data->hGatewayPipe == NULL ||
+        data->hGatewayPipe == INVALID_HANDLE_VALUE) {
       Error(TEXT("Failed to create inbound pipe instance.\n"));
       system("pause");
       return -1;
@@ -49,39 +45,35 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     _tprintf(TEXT("Waiting for a client to connect...\n"));
 
     // This call blocks until a client process connects to the pipe
-    result = ConnectNamedPipe(clientPipe[TOTAL], NULL);
+    result = ConnectNamedPipe(data->hClientPipe[data->totalClients], NULL);
     if (!result) {
       Error(TEXT("Failed to make connection on named pipe.\n"));
-      CloseHandle(clientPipe[TOTAL]); // close the pipe
+      CloseHandle(data->hClientPipe[data->totalClients]); // close the pipe
       system("pause");
       return -1;
     }
-
-    pipes.inboundPipe = hGatewayPipe;
-    pipes.outboundPipe = clientPipe[TOTAL];
-
-    data->messageData->pipes = &pipes;
 
     /**
      * Client connected, create thread
      */
-    hThreadManageClient[TOTAL] = CreateThread(
+    hThreadManageClient[data->totalClients] = CreateThread(
         NULL, 0, (LPTHREAD_START_ROUTINE)manageClient, (LPVOID)data, 0, NULL);
-    if (hThreadManageClient[TOTAL] == NULL) {
+    if (hThreadManageClient[data->totalClients] == NULL) {
       Error(TEXT("Creating client thread"));
       system("pause");
       return -1;
     }
-    TOTAL++;
+    data->totalClients++;
   }
 
-  WaitForMultipleObjects(TOTAL, hThreadManageClient, TRUE, INFINITE);
+  WaitForMultipleObjects(data->totalClients, hThreadManageClient, TRUE,
+                         INFINITE);
 
   // Shutdown each named pipe
-  for (int i = 0; i < TOTAL; i++) {
-    DisconnectNamedPipe(clientPipe[i]);
+  for (int i = 0; i < data->totalClients; i++) {
+    DisconnectNamedPipe(data->hClientPipe[i]);
     _tprintf(TEXT("Closing pipe (CloseHandle)\n"));
-    CloseHandle(clientPipe[i]);
+    CloseHandle(data->hClientPipe[i]);
   }
 
   return 0;
@@ -97,13 +89,35 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   BOOL STOP = FALSE;
 
   do {
-    result =
-        ReadFile(messageData->pipes->inboundPipe, (LPVOID)&messageData->message,
-                 sizeof(Message), &nBytes, NULL);
+    result = ReadFile(data->hGatewayPipe, (LPVOID)&messageData->message,
+                      sizeof(Message), &nBytes, NULL);
     if (nBytes > 0) {
       sendMessageToServer(data->messageData, &messageData->message);
     }
   } while (!STOP);
 
   return 0;
+}
+
+BOOL sendMessageToAllClients(Data *data, Message *message) {
+  BOOL result = FALSE;
+
+  for (int i = 0; i < data->totalClients; i++) {
+    if (data->hClientPipe[i] != NULL)
+      result = sendMessageToClient(data->hClientPipe[i], message);
+  }
+  return result;
+}
+
+BOOL sendMessageToClient(HANDLE hClientPipe, Message *message) {
+  BOOL result;
+  DWORD nBytes;
+
+  result =
+      WriteFile(hClientPipe, (LPCVOID)message, sizeof(Message), &nBytes, NULL);
+  if (!result) {
+    Error(TEXT("Failed to send data to client."));
+    return FALSE;
+  }
+  return TRUE;
 }
