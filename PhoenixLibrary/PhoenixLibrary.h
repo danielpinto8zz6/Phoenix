@@ -25,8 +25,8 @@
 #define MESSAGES_MUTEX_NAME TEXT("phoenix_messages_mutex")
 #define MESSAGES_SHARED_MEMORY_NAME TEXT("phoenix_messages_shared_memory")
 
-#define PIPE_NAME_INBOUND TEXT("\\\\.\\pipe\\phoenix-gateway-inbountd")
-#define PIPE_NAME_OUTBOUND TEXT("\\\\.\\pipe\\phoenix-gateway-outbound")
+#define PIPE_NAME_INBOUND TEXT("\\\\.\\pipe\\phoenix_inbound_pipe")
+#define PIPE_NAME_OUTBOUND TEXT("\\\\.\\pipe\\phoenix_outbound_pipe")
 
 #define GAME_UPDATE_EVENT TEXT("Global\\phoenix_game_update_event")
 #define MESSAGE_SERVER_UPDATE_EVENT                                            \

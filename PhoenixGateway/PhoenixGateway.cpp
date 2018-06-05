@@ -103,6 +103,11 @@ int _tmain() {
     return -1;
   }
 
+  /**
+   * Now that everything is set up, set control handler
+   */
+  SetConsoleCtrlHandler(CtrlHandler, TRUE);
+
   WaitForSingleObject(hThreadReceiveDataFromClient, INFINITE);
   WaitForSingleObject(hThreadReceiveGameDataFromServer, INFINITE);
   WaitForSingleObject(hThreadReceiveMessagesFromServer, INFINITE);
@@ -126,4 +131,24 @@ int _tmain() {
   system("pause");
 
   return 0;
+}
+
+/**
+ * Used before app close
+ */
+BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
+  switch (dwCtrlType) {
+  case CTRL_SHUTDOWN_EVENT:
+  case CTRL_CLOSE_EVENT:
+  case CTRL_LOGOFF_EVENT:
+  case CTRL_C_EVENT:
+  case CTRL_BREAK_EVENT:
+    // TODO
+    return TRUE;
+  default:
+    // We don't care about this event
+    // Default handler is used
+    return FALSE;
+  }
+  return FALSE;
 }

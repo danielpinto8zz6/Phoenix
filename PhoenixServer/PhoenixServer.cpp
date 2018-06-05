@@ -88,6 +88,11 @@ int _tmain(int argc, LPTSTR argv[]) {
 
   debug(TEXT("Server started successfully"));
 
+  /**
+   * Now that everything is set up, set control handler
+   */
+  SetConsoleCtrlHandler(CtrlHandler, TRUE);
+
   WaitForSingleObject(hThreadManageEnemyShips, INFINITE);
   WaitForSingleObject(hThreadReceiveMessagesFromGateway, INFINITE);
 
@@ -109,4 +114,24 @@ int _tmain(int argc, LPTSTR argv[]) {
   system("pause");
 
   return 0;
+}
+
+/**
+ * Used before app close
+ */
+BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
+  switch (dwCtrlType) {
+  case CTRL_SHUTDOWN_EVENT:
+  case CTRL_CLOSE_EVENT:
+  case CTRL_LOGOFF_EVENT:
+  case CTRL_C_EVENT: 
+  case CTRL_BREAK_EVENT:
+    // TODO
+    return TRUE;
+  default:
+    // We don't care about this event
+    // Default handler is used
+    return FALSE;
+  }
+  return FALSE;
 }
