@@ -42,8 +42,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-PHOENIXLIBRARY_API VOID Error(LPCWSTR text, ...);
-PHOENIXLIBRARY_API VOID Debug(LPCWSTR text, ...);
+PHOENIXLIBRARY_API VOID error(LPCWSTR text, ...);
+PHOENIXLIBRARY_API VOID debug(LPCWSTR text, ...);
 PHOENIXLIBRARY_API BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe,
                                         LPDWORD nBytes);
 PHOENIXLIBRARY_API BOOL receiveDataFromPipe(LPVOID data, SIZE_T size,

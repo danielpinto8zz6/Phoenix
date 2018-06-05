@@ -15,7 +15,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
 
   while (!STOP && data->totalClients < PLAYERS) {
 
-    Debug(TEXT("Creating an instance of a named pipe..."));
+    debug(TEXT("Creating an instance of a named pipe..."));
     // outbound server->client
     data->hClientPipe[data->totalClients] = CreateNamedPipe(
         PIPE_NAME_INBOUND, PIPE_ACCESS_OUTBOUND,
@@ -24,8 +24,8 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
 
     if (data->hClientPipe[data->totalClients] == NULL ||
         data->hClientPipe[data->totalClients] == INVALID_HANDLE_VALUE) {
-      Error(TEXT("Failed to create outbound pipe instance.\n"));
-      // look up error code here using GetLastError()
+      error(TEXT("Failed to create outbound pipe instance.\n"));
+      // look up error code here using GetLasterror()
       system("pause");
       return -1;
     }
@@ -37,17 +37,17 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
         50 * sizeof(TCHAR), 50 * sizeof(TCHAR), 1000, NULL);
     if (data->hGatewayPipe == NULL ||
         data->hGatewayPipe == INVALID_HANDLE_VALUE) {
-      Error(TEXT("Failed to create inbound pipe instance.\n"));
+      error(TEXT("Failed to create inbound pipe instance.\n"));
       system("pause");
       return -1;
     }
 
-    Debug(TEXT("Waiting for a client to connect..."));
+    debug(TEXT("Waiting for a client to connect..."));
 
     // This call blocks until a client process connects to the pipe
     result = ConnectNamedPipe(data->hClientPipe[data->totalClients], NULL);
     if (!result) {
-      Error(TEXT("Failed to make connection on named pipe.\n"));
+      error(TEXT("Failed to make connection on named pipe.\n"));
       CloseHandle(data->hClientPipe[data->totalClients]); // close the pipe
       system("pause");
       return -1;
@@ -59,7 +59,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     hThreadManageClient[data->totalClients] = CreateThread(
         NULL, 0, (LPTHREAD_START_ROUTINE)manageClient, (LPVOID)data, 0, NULL);
     if (hThreadManageClient[data->totalClients] == NULL) {
-      Error(TEXT("Creating client thread"));
+      error(TEXT("Creating client thread"));
       system("pause");
       return -1;
     }
@@ -72,7 +72,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
   // Shutdown each named pipe
   for (int i = 0; i < data->totalClients; i++) {
     DisconnectNamedPipe(data->hClientPipe[i]);
-    Debug(TEXT("Closing client %d pipe"), i);
+    debug(TEXT("Closing client %d pipe"), i);
     CloseHandle(data->hClientPipe[i]);
   }
 
@@ -116,9 +116,9 @@ BOOL sendMessageToClient(HANDLE hClientPipe, Message *message) {
   result =
       WriteFile(hClientPipe, (LPCVOID)message, sizeof(Message), &nBytes, NULL);
   if (!result) {
-    Error(TEXT("Failed to send data to client."));
+    error(TEXT("Failed to send data to client."));
     return FALSE;
   }
-  Debug(TEXT("%d Bytes sent to client"), nBytes);
+  debug(TEXT("%d Bytes sent to client"), nBytes);
   return TRUE;
 }

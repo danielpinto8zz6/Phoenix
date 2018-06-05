@@ -25,7 +25,7 @@ int _tmain(int argc, LPTSTR argv[]) {
    * Start event at instance start
    */
   if (isServerRunning()) {
-    Error(TEXT("There is an instance of server already running! Only 1 server "
+    error(TEXT("There is an instance of server already running! Only 1 server "
                "at time"));
     system("pause");
     return FALSE;
@@ -35,7 +35,7 @@ int _tmain(int argc, LPTSTR argv[]) {
   HANDLE hThreadManageEnemyShips;
 
   if (!initGameZone(&gameData)) {
-    Error(TEXT("Can't connect game data with server. Exiting..."));
+    error(TEXT("Can't connect game data with server. Exiting..."));
     system("pause");
   }
 
@@ -43,12 +43,12 @@ int _tmain(int argc, LPTSTR argv[]) {
       CreateEventW(NULL, FALSE, FALSE, GAME_UPDATE_EVENT);
 
   if (gameData.gameUpdateEvent == NULL) {
-    Error(TEXT("CreateEvent failed"));
+    error(TEXT("CreateEvent failed"));
     return FALSE;
   }
 
   if (!initMessageZone(&messageData)) {
-    Error(TEXT("Can't connect message data with server. Exiting..."));
+    error(TEXT("Can't connect message data with server. Exiting..."));
     system("pause");
   }
 
@@ -56,7 +56,7 @@ int _tmain(int argc, LPTSTR argv[]) {
       CreateEventW(NULL, FALSE, FALSE, MESSAGE_GATEWAY_UPDATE_EVENT);
 
   if (messageData.gatewayMessageUpdateEvent == NULL) {
-    Error(TEXT("CreateEvent failed"));
+    error(TEXT("CreateEvent failed"));
     return FALSE;
   }
 
@@ -64,7 +64,7 @@ int _tmain(int argc, LPTSTR argv[]) {
       CreateEventW(NULL, FALSE, FALSE, MESSAGE_SERVER_UPDATE_EVENT);
 
   if (messageData.serverMessageUpdateEvent == NULL) {
-    Error(TEXT("CreateEvent failed"));
+    error(TEXT("CreateEvent failed"));
     return FALSE;
   }
 
@@ -72,7 +72,7 @@ int _tmain(int argc, LPTSTR argv[]) {
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromGateway,
                    &messageData, 0, &threadReceiveMessagesFromServerId);
   if (hThreadReceiveMessagesFromGateway == NULL) {
-    Error(TEXT("Creating thread to receive data from server"));
+    error(TEXT("Creating thread to receive data from server"));
     system("pause");
     return -1;
   }
@@ -81,12 +81,12 @@ int _tmain(int argc, LPTSTR argv[]) {
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadManageEnemyShips,
                    &gameData, 0, &threadManageEnemyShipsId);
   if (hThreadManageEnemyShips == NULL) {
-    Error(TEXT("Creating thread to manage enemy ships"));
+    error(TEXT("Creating thread to manage enemy ships"));
     system("pause");
     return -1;
   }
 
-  Debug(TEXT("Server started successfully"));
+  debug(TEXT("Server started successfully"));
 
   WaitForSingleObject(hThreadManageEnemyShips, INFINITE);
   WaitForSingleObject(hThreadReceiveMessagesFromGateway, INFINITE);

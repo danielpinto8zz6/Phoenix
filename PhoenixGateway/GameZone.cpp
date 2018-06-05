@@ -19,7 +19,7 @@ DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
     if (dwWaitResult == WAIT_OBJECT_0) {
       readDataFromSharedMemory(gameData->sharedGame, &gameData->game,
                                sizeof(Game), &gameData->hMutex);
-      Debug(TEXT("%d Bytes received\n"), sizeof(Game));
+      debug(TEXT("%d Bytes received\n"), sizeof(Game));
       sendMessageToAllClients(data, &message);
     }
   }

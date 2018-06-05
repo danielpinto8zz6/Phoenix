@@ -18,7 +18,7 @@ int _tmain() {
 #endif
 
   if (!isGatewayRunning()) {
-    Error(TEXT("There's no gateway instance running! Start gateway first!"));
+    error(TEXT("There's no gateway instance running! Start gateway first!"));
     system("pause");
     return FALSE;
   }
@@ -34,7 +34,7 @@ int _tmain() {
      * Keep trying to connect every 5 seconds
      */
     if (!success) {
-      Error(TEXT("Connection to gateway failed! Trying again in 5 sec"));
+      error(TEXT("Connection to gateway failed! Trying again in 5 sec"));
       Sleep(5000);
     }
   }
@@ -46,7 +46,7 @@ int _tmain() {
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)dataReceiver,
                    (LPVOID)&clientPipes, 0, &threadDataReceiverId);
   if (hThreadDataReceiver == NULL) {
-    Error(TEXT("Creating data receiver thread"));
+    error(TEXT("Creating data receiver thread"));
     return -1;
   }
 

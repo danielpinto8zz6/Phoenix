@@ -31,7 +31,7 @@ int _tmain() {
 #endif
 
   if (isGatewayRunning()) {
-    Error(
+    error(
         TEXT("There is an instance of gateway already running! Only 1 gateway "
              "at time"));
     system("pause");
@@ -39,20 +39,20 @@ int _tmain() {
   }
 
   if (!isServerRunning()) {
-    Error(TEXT("There is no server instance running! Start server first!"));
+    error(TEXT("There is no server instance running! Start server first!"));
     system("pause");
     return FALSE;
   }
 
   if (!initGameZone(&gameData)) {
-    Error(TEXT("Can't connect game data with server. Exiting..."));
+    error(TEXT("Can't connect game data with server. Exiting..."));
     system("pause");
   }
 
   gameData.gameUpdateEvent =
       OpenEventW(EVENT_ALL_ACCESS, FALSE, GAME_UPDATE_EVENT);
   if (gameData.gameUpdateEvent == NULL) {
-    Error(TEXT("OpenEvent failed"));
+    error(TEXT("OpenEvent failed"));
     return FALSE;
   }
 
@@ -60,27 +60,27 @@ int _tmain() {
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveGameDataFromServer,
                    &data, 0, &threadReceiveGameDataFromServerId);
   if (hThreadReceiveGameDataFromServer == NULL) {
-    Error(TEXT("Creating shared memory thread"));
+    error(TEXT("Creating shared memory thread"));
     system("pause");
     return -1;
   }
 
   if (!initMessageZone(&messageData)) {
-    Error(TEXT("Can't connect message data with server. Exiting..."));
+    error(TEXT("Can't connect message data with server. Exiting..."));
     system("pause");
   }
 
   messageData.serverMessageUpdateEvent =
       OpenEventW(EVENT_ALL_ACCESS, FALSE, MESSAGE_SERVER_UPDATE_EVENT);
   if (messageData.serverMessageUpdateEvent == NULL) {
-    Error(TEXT("OpenEvent failed"));
+    error(TEXT("OpenEvent failed"));
     return FALSE;
   }
 
   messageData.gatewayMessageUpdateEvent =
       OpenEventW(EVENT_ALL_ACCESS, FALSE, MESSAGE_GATEWAY_UPDATE_EVENT);
   if (messageData.gatewayMessageUpdateEvent == NULL) {
-    Error(TEXT("OpenEvent failed"));
+    error(TEXT("OpenEvent failed"));
     return FALSE;
   }
 
@@ -88,7 +88,7 @@ int _tmain() {
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromServer,
                    &messageData, 0, &threadReceiveMessagesFromServerId);
   if (hThreadReceiveMessagesFromServer == NULL) {
-    Error(TEXT("Creating thread to receive data from server"));
+    error(TEXT("Creating thread to receive data from server"));
     return -1;
   }
 
@@ -99,7 +99,7 @@ int _tmain() {
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)manageClients, &data, 0,
                    &threadReceiveDataFromClientId);
   if (hThreadReceiveDataFromClient == NULL) {
-    Error(TEXT("Creating thread to manage clients"));
+    error(TEXT("Creating thread to manage clients"));
     return -1;
   }
 

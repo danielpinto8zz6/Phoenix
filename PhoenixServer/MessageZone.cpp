@@ -16,7 +16,7 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
     if (dwWaitResult == WAIT_OBJECT_0) {
       readDataFromSharedMemory(messageData->sharedMessage, &msg,
                                sizeof(Message), &messageData->hMutex);
-      Debug(TEXT("%d Bytes received"), sizeof(Message));
+      debug(TEXT("%d Bytes received"), sizeof(Message));
       sendMessageToGateway(messageData, &msg);
     }
   }
@@ -27,7 +27,7 @@ BOOL sendMessageToGateway(MessageData *messageData, Message *msg) {
   writeDataToSharedMemory(messageData->sharedMessage, msg, sizeof(Message),
                           &messageData->hMutex);
   if (!SetEvent(messageData->gatewayMessageUpdateEvent)) {
-    Error(TEXT("SetEvent failed"));
+    error(TEXT("SetEvent failed"));
   }
 
   return TRUE;

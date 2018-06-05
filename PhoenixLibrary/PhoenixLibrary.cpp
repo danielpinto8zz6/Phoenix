@@ -5,7 +5,7 @@
 
 #include "PhoenixLibrary.h"
 
-VOID Error(LPCWSTR text, ...) {
+VOID error(LPCWSTR text, ...) {
   TCHAR msg[1024];
   va_list argptr;
   va_start(argptr, text);
@@ -14,7 +14,7 @@ VOID Error(LPCWSTR text, ...) {
   va_end(argptr);
 }
 
-VOID Debug(LPCWSTR text, ...) {
+VOID debug(LPCWSTR text, ...) {
   TCHAR msg[1024];
 
   va_list argptr;
@@ -29,7 +29,7 @@ BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes) {
 
   success = WriteFile(hPipe, data, size, nBytes, NULL);
   if (!success) {
-    Error(TEXT("Sending data"));
+    error(TEXT("Sending data"));
   }
   return success;
 }
@@ -40,7 +40,7 @@ BOOL receiveDataFromPipe(LPVOID data, SIZE_T size, HANDLE hPipe,
 
   success = ReadFile(hPipe, data, size, nBytes, NULL);
   if (!success) {
-    Error(TEXT("Receiving data"));
+    error(TEXT("Receiving data"));
   }
   return success;
 }
@@ -50,13 +50,13 @@ BOOL initMemAndSync(HANDLE *hMapFile, const TCHAR *sharedMemoryName,
   *hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0,
                                 sizeof(Game), sharedMemoryName);
   if (*hMapFile == NULL) {
-    Error(TEXT("Inicializing shared memory"));
+    error(TEXT("Initializing shared memory"));
     return FALSE;
   }
 
   *hMutex = CreateMutex(NULL, FALSE, mutexName);
   if (*hMutex == NULL) {
-    Error(TEXT("Creating phoenix mutex"));
+    error(TEXT("Creating phoenix mutex"));
     return FALSE;
   }
 
@@ -87,7 +87,7 @@ BOOL initMessageZone(MessageData *messageData) {
       messageData->hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Message));
 
   if (messageData->sharedMessage == NULL) {
-    Error(TEXT("Mapping shared memory"));
+    error(TEXT("Mapping shared memory"));
     return FALSE;
   }
 
@@ -104,7 +104,7 @@ BOOL initGameZone(GameData *gameData) {
       gameData->hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Game));
 
   if (gameData->sharedGame == NULL) {
-    Error(TEXT("Mapping shared memory"));
+    error(TEXT("Mapping shared memory"));
     return FALSE;
   }
 

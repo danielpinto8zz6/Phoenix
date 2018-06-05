@@ -14,7 +14,7 @@ DWORD WINAPI dataReceiver(LPVOID lpParam) {
     result = ReadFile(clientPipes->outboundPipe, (LPVOID)&msg, sizeof(Message),
                       &nBytes, NULL);
     if (nBytes > 0) {
-      Debug(TEXT("%d Bytes received"), nBytes);
+      debug(TEXT("%d Bytes received"), nBytes);
       switch (msg.cmd) {
       case LOGGED:
         _tprintf(TEXT("Succeed : %s logged\n"), msg.text);
@@ -31,7 +31,7 @@ DWORD WINAPI dataReceiver(LPVOID lpParam) {
 
 BOOL connectPipes(Pipes *clientPipes) {
   if (!WaitNamedPipe(PIPE_NAME_INBOUND, NMPWAIT_WAIT_FOREVER)) {
-    Error(TEXT("Connecting to inbound pipe"));
+    error(TEXT("Connecting to inbound pipe"));
     return FALSE;
   }
 
@@ -40,7 +40,7 @@ BOOL connectPipes(Pipes *clientPipes) {
                  FILE_ATTRIBUTE_NORMAL, NULL);
   if (clientPipes->outboundPipe == NULL ||
       clientPipes->outboundPipe == INVALID_HANDLE_VALUE) {
-    Error(TEXT("Connecting to outbound pipe"));
+    error(TEXT("Connecting to outbound pipe"));
     return FALSE;
   }
   clientPipes->inboundPipe =
@@ -48,7 +48,7 @@ BOOL connectPipes(Pipes *clientPipes) {
                  FILE_ATTRIBUTE_NORMAL, NULL);
   if (clientPipes->inboundPipe == NULL ||
       clientPipes->inboundPipe == INVALID_HANDLE_VALUE) {
-    Error(TEXT("Connecting to inbound pipe"));
+    error(TEXT("Connecting to inbound pipe"));
     return FALSE;
   }
   return TRUE;

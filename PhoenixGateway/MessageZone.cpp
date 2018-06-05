@@ -19,7 +19,7 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
       /**
        * TODO: Perform actions related to info received
        */
-      Debug(TEXT("%d Bytes received"), sizeof(Message));
+      debug(TEXT("%d Bytes received"), sizeof(Message));
     }
   }
   return 0;
@@ -29,7 +29,7 @@ BOOL sendMessageToServer(MessageData *messageData, Message *msg) {
   writeDataToSharedMemory(messageData->sharedMessage, msg, sizeof(Message),
                           &messageData->hMutex);
   if (!SetEvent(messageData->serverMessageUpdateEvent)) {
-    Error(TEXT("SetEvent failed"));
+    error(TEXT("SetEvent failed"));
   }
 
   return TRUE;
