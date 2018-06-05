@@ -31,13 +31,6 @@ int _tmain(int argc, LPTSTR argv[]) {
     return FALSE;
   }
 
-  // Temporary: map will be abandoned
-  for (int y = 0; y < HEIGHT; y++) {
-    for (int x = 0; x < WIDTH; x++) {
-      gameData.game.map[y][x] = ' ';
-    }
-  }
-
   DWORD threadManageEnemyShipsId;
   HANDLE hThreadManageEnemyShips;
 

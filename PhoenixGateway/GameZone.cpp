@@ -14,7 +14,7 @@ DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
   Message message;
   message.cmd = UPDATE_GAME;
 
-  while (gameData->ThreadMustConinue) {
+  while (!gameData->STOP) {
     dwWaitResult = WaitForSingleObject(gameData->gameUpdateEvent, INFINITE);
     if (dwWaitResult == WAIT_OBJECT_0) {
       readDataFromSharedMemory(gameData->sharedGame, &gameData->game,

@@ -59,11 +59,13 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
 
   // Place ship...
-  Coordinates *c = GetFirstEmptyPosition(&gameData->game);
-  if (c != NULL) {
-    gameData->game.enemyShip[position].position = *c;
-    gameData->game.map[c->y][c->x] = '#';
+  Coordinates c = GetFirstEmptyPosition(&gameData->game);
+  if (!isCoordinatesValid(c)) {
+    Error(TEXT("Can't find an empty position"));
+    return FALSE;
   }
+
+  gameData->game.enemyShip[position].position = c;
 
   Debug(TEXT("(EnemyShips Coordinates): %d %d"),
         gameData->game.enemyShip[position].position.x,
@@ -82,6 +84,6 @@ BOOL sendGameToGateway(GameData *gameData, Game *game) {
   if (!SetEvent(gameData->gameUpdateEvent)) {
     Error(TEXT("SetEvent failed"));
   }
-  Debug(TEXT("%d Bytes sent to gateway"), sizeof(Game));
+  Debug(TEXT("%d Bytes written in shared memory"), sizeof(Game));
   return TRUE;
 }

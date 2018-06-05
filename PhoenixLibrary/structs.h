@@ -70,7 +70,6 @@ typedef struct {
   int level;
   Player player[PLAYERS];
   EnemyShip enemyShip[ENEMYSHIPS];
-  TCHAR map[HEIGHT][WIDTH];
   int totalEnemyShips;
 } Game;
 
@@ -87,7 +86,7 @@ typedef struct {
 typedef struct {
   Game *sharedGame;
   Game game;
-  BOOL ThreadMustConinue;
+  BOOL STOP;
   HANDLE hMapFile;
   HANDLE hMutex;
   HANDLE gameUpdateEvent;
