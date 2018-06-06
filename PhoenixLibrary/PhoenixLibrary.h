@@ -39,6 +39,8 @@
 
 #define SERVER_CLOSE_EVENT TEXT("phoenix_server_close_event")
 
+#define CLIENT_CLOSE_EVENT TEXT("phoenix_clinet_close_event")
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -92,6 +92,9 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
     result = ReadFile(data->hGatewayPipe, (LPVOID)&messageData->message,
                       sizeof(Message), &nBytes, NULL);
     if (nBytes > 0) {
+      if (messageData->message.cmd == CLOSING){
+        debug(TEXT("Client %s leaving"), messageData->message.text);
+      }
       sendMessageToServer(data->messageData, &messageData->message);
     }
   } while (!STOP);

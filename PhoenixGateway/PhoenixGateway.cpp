@@ -88,7 +88,7 @@ int _tmain() {
 
   hThreadReceiveMessagesFromServer =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromServer,
-                   &messageData, 0, &threadReceiveMessagesFromServerId);
+                   &data, 0, &threadReceiveMessagesFromServerId);
   if (hThreadReceiveMessagesFromServer == NULL) {
     error(TEXT("Creating thread to receive data from server"));
     return -1;
@@ -122,7 +122,7 @@ int _tmain() {
    * If we got here, runningEvent is released
    * Handle close
    */
-  handleClose(&messageData);
+  handleClose(&data);
 
   CloseHandle(gameData.hMapFile);
   CloseHandle(gameData.hMutex);
@@ -146,7 +146,8 @@ int _tmain() {
 BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
   HANDLE serverRunningEvent;
 
-  serverRunningEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, GATEWAY_RUNNING_EVENT);
+  serverRunningEvent =
+      OpenEvent(EVENT_ALL_ACCESS, FALSE, GATEWAY_RUNNING_EVENT);
   if (serverRunningEvent == NULL) {
     error(TEXT("Can't set up close event! Gateway will not exit "
                "properly"));
@@ -160,7 +161,7 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
   case CTRL_C_EVENT:
   case CTRL_BREAK_EVENT:
     if (!SetEvent(serverRunningEvent)) {
-      error(TEXT("Sending close event! Gateway will not exit "
+      error(TEXT("Can't close event! Gateway will not exit "
                  "properly"));
     }
     /**
@@ -174,10 +175,11 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
   return FALSE;
 }
 
-VOID handleClose(MessageData *messageData) {
+VOID handleClose(Data *data) {
   Message msg;
   msg.cmd = CLOSING;
-  writeDataToSharedMemory(messageData->sharedMessage, &msg, sizeof(Message),
-                          messageData->hMutex,
-                          messageData->serverMessageUpdateEvent);
+  writeDataToSharedMemory(data->messageData->sharedMessage, &msg, sizeof(Message),
+                          data->messageData->hMutex,
+                          data->messageData->serverMessageUpdateEvent);
+  sendMessageToAllClients(data, &msg);
 }

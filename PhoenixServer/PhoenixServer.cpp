@@ -149,7 +149,7 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
   case CTRL_C_EVENT:
   case CTRL_BREAK_EVENT:
     if (!SetEvent(serverRunningEvent)) {
-      error(TEXT("Sending close event! Server will not exit "
+      error(TEXT("Can't close event! Server will not exit "
                  "properly"));
     }
     /**

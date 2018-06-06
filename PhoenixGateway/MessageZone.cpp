@@ -1,9 +1,11 @@
 #include "stdafx.h"
 
 #include "MessageZone.h"
+#include "Clients.h"
 
 DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
-  MessageData *messageData = (MessageData *)lpParam;
+  Data *data = (Data *)lpParam;
+  MessageData *messageData = data->messageData;
 
   DWORD dwWaitResult;
 
@@ -22,6 +24,7 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
       debug(TEXT("%d Bytes received"), sizeof(Message));
       if (messageData->message.cmd == CLOSING){
         debug(TEXT("Server is closing..."));
+        sendMessageToAllClients(data, &messageData->message);
       }
     }
   }

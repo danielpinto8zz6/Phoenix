@@ -17,11 +17,13 @@ DWORD WINAPI dataReceiver(LPVOID lpParam) {
       debug(TEXT("%d Bytes received"), nBytes);
       switch (msg.cmd) {
       case LOGGED:
-        _tprintf(TEXT("Succeed : %s logged\n"), msg.text);
+        debug(TEXT("%s logged"), msg.text);
         break;
       case UPDATE_GAME:
-        _tprintf(TEXT("Game update\n"));
+        debug(TEXT("Game update"));
         break;
+      case CLOSING:
+        debug(TEXT("Gateway is closing..."));
       }
     }
   };
@@ -64,5 +66,17 @@ BOOL clientLogin(LPCWSTR username, HANDLE hPipe) {
   _tcscpy_s(msg.text, _tcslen(text) + 1, text);
 
   success = writeDataToPipe(&msg, sizeof(msg), hPipe, &nBytes);
+  return success;
+}
+
+BOOL sendMessageToGateway(HANDLE hPipe, Message *message) {
+  BOOL success;
+  DWORD nBytes;
+
+  if (hPipe == NULL) {
+    return FALSE;
+  }
+
+  success = writeDataToPipe(message, sizeof(Message), hPipe, &nBytes);
   return success;
 }
