@@ -17,10 +17,10 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
 
     debug(TEXT("Creating an instance of a named pipe..."));
     // outbound server->client
-    data->hClientPipe[data->totalClients] = CreateNamedPipe(
-        PIPE_NAME_INBOUND, PIPE_ACCESS_OUTBOUND,
-        PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, PLAYERS,
-        sizeof(Message), sizeof(Message), 1000, NULL);
+    data->hClientPipe[data->totalClients] =
+        CreateNamedPipe(PIPE_NAME_INBOUND, PIPE_ACCESS_OUTBOUND,
+                        PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                        PLAYERS, sizeof(Message), sizeof(Message), 1000, NULL);
 
     if (data->hClientPipe[data->totalClients] == NULL ||
         data->hClientPipe[data->totalClients] == INVALID_HANDLE_VALUE) {
@@ -31,10 +31,10 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     }
 
     // inbound server<-client
-    data->hGatewayPipe = CreateNamedPipe(
-        PIPE_NAME_OUTBOUND, PIPE_ACCESS_INBOUND,
-        PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, PLAYERS,
-        sizeof(Message), sizeof(Message), 1000, NULL);
+    data->hGatewayPipe =
+        CreateNamedPipe(PIPE_NAME_OUTBOUND, PIPE_ACCESS_INBOUND,
+                        PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                        PLAYERS, sizeof(Message), sizeof(Message), 1000, NULL);
     if (data->hGatewayPipe == NULL ||
         data->hGatewayPipe == INVALID_HANDLE_VALUE) {
       error(TEXT("Failed to create inbound pipe instance.\n"));
@@ -92,10 +92,16 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
     result = ReadFile(data->hGatewayPipe, (LPVOID)&messageData->message,
                       sizeof(Message), &nBytes, NULL);
     if (nBytes > 0) {
-      if (messageData->message.cmd == CLOSING){
-        debug(TEXT("Client %s leaving"), messageData->message.text);
-      }
-      sendMessageToServer(data->messageData, &messageData->message);
+        writeDataToSharedMemory(messageData->sharedMessage, &messageData->message, sizeof(Message),
+                          &messageData->hMutex,
+                          messageData->serverMessageUpdateEvent);
+                          if (messageData->message.cmd == CLIENT_CLOSING) {
+                            debug(TEXT(
+                                "Client %s closing! Closing Pipe & thread"), messageData->message.text);
+
+                            // TODO delete client from array & close named pipe
+                            ExitThread(0);
+                          }
     }
   } while (!STOP);
 

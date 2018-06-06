@@ -10,3 +10,4 @@
 - [x] Gateway only run once + doesn't start without server
 - [x] Client doesn't start without gateway
 - [ ] Add registry keys to store players points, etc...
+- [ ] Close client pipe when he exists

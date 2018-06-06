@@ -22,8 +22,12 @@ DWORD WINAPI dataReceiver(LPVOID lpParam) {
       case UPDATE_GAME:
         debug(TEXT("Game update"));
         break;
-      case CLOSING:
+      case GATEWAY_CLOSING:
         debug(TEXT("Gateway is closing..."));
+        break;
+      case SERVER_CLOSING:
+        debug(TEXT("Server is closing..."));
+        break;
       }
     }
   };

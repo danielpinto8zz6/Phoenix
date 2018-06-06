@@ -116,7 +116,7 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
 
 VOID handleClose(HANDLE hPipe) {
   Message msg;
-  msg.cmd = CLOSING;
+  msg.cmd = CLIENT_CLOSING;
   _stprintf_s(msg.text, TEXT("%d"), _getpid());
   sendMessageToGateway(hPipe, &msg);
 }
