@@ -45,8 +45,8 @@ BOOL receiveDataFromPipe(LPVOID data, SIZE_T size, HANDLE hPipe,
   return success;
 }
 
-BOOL initMemAndSync(HANDLE *hMapFile, const TCHAR *sharedMemoryName,
-                    HANDLE *hMutex, const TCHAR *mutexName) {
+BOOL initMemAndSync(HANDLE *hMapFile, const LPCWSTR sharedMemoryName,
+                    HANDLE *hMutex, LPCWSTR mutexName) {
   *hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0,
                                 sizeof(Game), sharedMemoryName);
   if (*hMapFile == NULL) {

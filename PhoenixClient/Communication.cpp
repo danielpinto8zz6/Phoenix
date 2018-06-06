@@ -54,7 +54,7 @@ BOOL connectPipes(Pipes *clientPipes) {
   return TRUE;
 }
 
-BOOL clientLogin(CONST TCHAR username[], HANDLE hPipe) {
+BOOL clientLogin(LPCWSTR username, HANDLE hPipe) {
   BOOL success;
   DWORD nBytes;
   Message msg;

@@ -11,6 +11,8 @@ DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
 
   DWORD dwWaitResult;
 
+  gameData->STOP = FALSE;
+  
   Message message;
   message.cmd = UPDATE_GAME;
 

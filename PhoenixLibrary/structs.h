@@ -80,7 +80,7 @@ typedef struct {
 
 typedef struct {
   Command cmd;
-  TCHAR text[50];
+  TCHAR text[80];
 } Message;
 
 typedef struct {

@@ -49,8 +49,8 @@ PHOENIXLIBRARY_API BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe,
 PHOENIXLIBRARY_API BOOL receiveDataFromPipe(LPVOID data, SIZE_T size,
                                             HANDLE hPipe, LPDWORD nBytes);
 PHOENIXLIBRARY_API BOOL initMemAndSync(HANDLE *hMapFile,
-                                       const TCHAR *sharedMemoryName,
-                                       HANDLE *hMutex, const TCHAR *mutexName);
+                                       LPCWSTR sharedMemoryName,
+                                       HANDLE *hMutex, LPCWSTR mutexName);
 PHOENIXLIBRARY_API VOID writeDataToSharedMemory(LPVOID sharedMemory,
                                                 LPVOID data, SIZE_T size,
                                                 HANDLE *hMutex);

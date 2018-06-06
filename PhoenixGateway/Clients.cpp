@@ -20,7 +20,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     data->hClientPipe[data->totalClients] = CreateNamedPipe(
         PIPE_NAME_INBOUND, PIPE_ACCESS_OUTBOUND,
         PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, PLAYERS,
-        50 * sizeof(TCHAR), 50 * sizeof(TCHAR), 1000, NULL);
+        sizeof(Message), sizeof(Message), 1000, NULL);
 
     if (data->hClientPipe[data->totalClients] == NULL ||
         data->hClientPipe[data->totalClients] == INVALID_HANDLE_VALUE) {
@@ -34,7 +34,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     data->hGatewayPipe = CreateNamedPipe(
         PIPE_NAME_OUTBOUND, PIPE_ACCESS_INBOUND,
         PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, PLAYERS,
-        50 * sizeof(TCHAR), 50 * sizeof(TCHAR), 1000, NULL);
+        sizeof(Message), sizeof(Message), 1000, NULL);
     if (data->hGatewayPipe == NULL ||
         data->hGatewayPipe == INVALID_HANDLE_VALUE) {
       error(TEXT("Failed to create inbound pipe instance.\n"));
