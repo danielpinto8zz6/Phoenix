@@ -20,6 +20,9 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
        * TODO: Perform actions related to info received
        */
       debug(TEXT("%d Bytes received"), sizeof(Message));
+      if (messageData->message.cmd == CLOSING){
+        debug(TEXT("Server is closing..."));
+      }
     }
   }
   return 0;
@@ -27,10 +30,7 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
 
 BOOL sendMessageToServer(MessageData *messageData, Message *msg) {
   writeDataToSharedMemory(messageData->sharedMessage, msg, sizeof(Message),
-                          &messageData->hMutex);
-  if (!SetEvent(messageData->serverMessageUpdateEvent)) {
-    error(TEXT("SetEvent failed"));
-  }
+                          &messageData->hMutex, messageData->serverMessageUpdateEvent);
 
   return TRUE;
 }

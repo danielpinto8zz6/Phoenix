@@ -16,7 +16,7 @@ typedef enum { BASIC, DODGE } EnemyType;
 
 typedef enum { NONE } PowerupEffect;
 
-typedef enum { LOGIN, SUCCESS, LOGGED, UPDATE_GAME } Command;
+typedef enum { LOGIN, SUCCESS, LOGGED, UPDATE_GAME, CLOSING } Command;
 
 typedef struct {
   int x;
@@ -71,6 +71,7 @@ typedef struct {
   Player player[PLAYERS];
   EnemyShip enemyShip[ENEMYSHIPS];
   int totalEnemyShips;
+  BOOL started;
 } Game;
 
 typedef struct {

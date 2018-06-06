@@ -8,10 +8,8 @@
 #define PHOENIXLIBRARY_API __declspec(dllimport)
 #endif
 
-#define MAX_SEM_COUNT 10
-#define Buffers 10
-
-#define ENEMYSHIPS 20
+#define MAX_ENEMY_SHIPS 50
+#define MAX_PLAYERS 20
 
 #define GAMEDATA_READ_SEMAPHORE_NAME TEXT("phoenix_gamedata_read_semaphore")
 #define GAMEDATA_WRITE_SEMAPHORE_NAME TEXT("phoenix_gamedata_write_semaphore")
@@ -39,6 +37,8 @@
 
 #define ENEMYSHIPS_MUTEX TEXT("phoenix_enemyships_mutex")
 
+#define SERVER_CLOSE_EVENT TEXT("phoenix_server_close_event")
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,7 +53,7 @@ PHOENIXLIBRARY_API BOOL initMemAndSync(HANDLE *hMapFile,
                                        HANDLE *hMutex, LPCWSTR mutexName);
 PHOENIXLIBRARY_API VOID writeDataToSharedMemory(LPVOID sharedMemory,
                                                 LPVOID data, SIZE_T size,
-                                                HANDLE *hMutex);
+                                                HANDLE hMutex, HANDLE hEvent);
 PHOENIXLIBRARY_API VOID readDataFromSharedMemory(LPVOID sharedMemory,
                                                  LPVOID data, SIZE_T size,
                                                  HANDLE *hMutex);

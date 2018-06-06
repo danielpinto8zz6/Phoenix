@@ -32,7 +32,7 @@ BOOL coordinatesEqual(Coordinates c1, Coordinates c2) {
   return c1.x == c2.x && c1.y == c2.y ? TRUE : FALSE;
 }
 
-BOOL isCoordinatesValid (Coordinates coordinates){
+BOOL isCoordinatesValid(Coordinates coordinates) {
   return coordinates.x == -1 || coordinates.y == -1 ? FALSE : TRUE;
 }
 
@@ -99,9 +99,9 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   gameData->game.enemyShip[position].position = c;
 
-  debug(TEXT("(EnemyShips Coordinates): %d %d"),
-        gameData->game.enemyShip[position].position.x,
-        gameData->game.enemyShip[position].position.y);
+  // debug(TEXT("(EnemyShips Coordinates): %d %d"),
+  //       gameData->game.enemyShip[position].position.x,
+  //       gameData->game.enemyShip[position].position.y);
 
   sendGameToGateway(gameData, &gameData->game);
 

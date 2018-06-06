@@ -5,7 +5,6 @@
 DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
   MessageData *messageData = (MessageData *)lpParam;
 
-  Message msg;
   DWORD dwWaitResult;
 
   messageData->STOP = FALSE;
@@ -14,10 +13,12 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
     dwWaitResult =
         WaitForSingleObject(messageData->serverMessageUpdateEvent, INFINITE);
     if (dwWaitResult == WAIT_OBJECT_0) {
-      readDataFromSharedMemory(messageData->sharedMessage, &msg,
+      readDataFromSharedMemory(messageData->sharedMessage, &messageData->message,
                                sizeof(Message), &messageData->hMutex);
       debug(TEXT("%d Bytes received"), sizeof(Message));
-      sendMessageToGateway(messageData, &msg);
+      if (messageData->message.cmd == CLOSING) {
+        debug(TEXT("Gateway is closing..."));
+      }
     }
   }
   return 0;
@@ -25,10 +26,7 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
 
 BOOL sendMessageToGateway(MessageData *messageData, Message *msg) {
   writeDataToSharedMemory(messageData->sharedMessage, msg, sizeof(Message),
-                          &messageData->hMutex);
-  if (!SetEvent(messageData->gatewayMessageUpdateEvent)) {
-    error(TEXT("SetEvent failed"));
-  }
-
+                          messageData->hMutex,
+                          messageData->gatewayMessageUpdateEvent);
   return TRUE;
 }

@@ -19,7 +19,7 @@ VOID debug(LPCWSTR text, ...) {
 
   va_list argptr;
   va_start(argptr, text);
-  _stprintf_s (msg, TEXT("[DEBUG] %s\n"), text);
+  _stprintf_s(msg, TEXT("[DEBUG] %s\n"), text);
   _vftprintf(stdout, msg, argptr);
   va_end(argptr);
 }
@@ -64,10 +64,13 @@ BOOL initMemAndSync(HANDLE *hMapFile, const LPCWSTR sharedMemoryName,
 }
 
 VOID writeDataToSharedMemory(LPVOID sharedMemory, LPVOID data, SIZE_T size,
-                             HANDLE *hMutex) {
-  WaitForSingleObject(*hMutex, INFINITE);
+                             HANDLE hMutex, HANDLE hEvent) {
+  WaitForSingleObject(hMutex, INFINITE);
   CopyMemory(sharedMemory, data, size);
-  ReleaseMutex(*hMutex);
+  ReleaseMutex(hMutex);
+  if (!SetEvent(hEvent)) {
+    error(TEXT("Failed to notify about data sent"));
+  }
 }
 
 VOID readDataFromSharedMemory(LPVOID sharedMemory, LPVOID data, SIZE_T size,

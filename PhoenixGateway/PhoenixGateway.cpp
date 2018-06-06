@@ -18,6 +18,8 @@ int _tmain() {
   HANDLE hThreadReceiveMessagesFromServer;
   DWORD threadReceiveMessagesFromServerId;
 
+  HANDLE runningEvent;
+
   GameData gameData;
   MessageData messageData;
 
@@ -108,9 +110,19 @@ int _tmain() {
    */
   SetConsoleCtrlHandler(CtrlHandler, TRUE);
 
-  WaitForSingleObject(hThreadReceiveDataFromClient, INFINITE);
-  WaitForSingleObject(hThreadReceiveGameDataFromServer, INFINITE);
-  WaitForSingleObject(hThreadReceiveMessagesFromServer, INFINITE);
+  /**
+   * Wait running event to be released to proceed
+   */
+  runningEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, GATEWAY_RUNNING_EVENT);
+  if (runningEvent != NULL) {
+    WaitForSingleObject(runningEvent, INFINITE);
+  }
+
+  /**
+   * If we got here, runningEvent is released
+   * Handle close
+   */
+  handleClose(&messageData);
 
   CloseHandle(gameData.hMapFile);
   CloseHandle(gameData.hMutex);
@@ -128,27 +140,44 @@ int _tmain() {
 
   UnmapViewOfFile(messageData.sharedMessage);
 
-  system("pause");
-
   return 0;
 }
 
-/**
- * Used before app close
- */
 BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
+  HANDLE serverRunningEvent;
+
+  serverRunningEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, GATEWAY_RUNNING_EVENT);
+  if (serverRunningEvent == NULL) {
+    error(TEXT("Can't set up close event! Gateway will not exit "
+               "properly"));
+    ExitThread(0);
+  }
+
   switch (dwCtrlType) {
   case CTRL_SHUTDOWN_EVENT:
   case CTRL_CLOSE_EVENT:
   case CTRL_LOGOFF_EVENT:
   case CTRL_C_EVENT:
   case CTRL_BREAK_EVENT:
-    // TODO
+    if (!SetEvent(serverRunningEvent)) {
+      error(TEXT("Sending close event! Gateway will not exit "
+                 "properly"));
+    }
+    /**
+     * Force exit after 10 sec
+     */
+    Sleep(10000);
     return TRUE;
   default:
-    // We don't care about this event
-    // Default handler is used
     return FALSE;
   }
   return FALSE;
+}
+
+VOID handleClose(MessageData *messageData) {
+  Message msg;
+  msg.cmd = CLOSING;
+  writeDataToSharedMemory(messageData->sharedMessage, &msg, sizeof(Message),
+                          messageData->hMutex,
+                          messageData->serverMessageUpdateEvent);
 }

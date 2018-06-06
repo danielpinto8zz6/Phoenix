@@ -8,12 +8,16 @@
 #include "MessageZone.h"
 #include "PhoenixServer.h"
 
+BOOL done;
+
 int _tmain(int argc, LPTSTR argv[]) {
   MessageData messageData;
   GameData gameData;
 
   DWORD threadReceiveMessagesFromServerId;
   HANDLE hThreadReceiveMessagesFromGateway;
+
+  HANDLE runningEvent;
 
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
@@ -93,8 +97,19 @@ int _tmain(int argc, LPTSTR argv[]) {
    */
   SetConsoleCtrlHandler(CtrlHandler, TRUE);
 
-  WaitForSingleObject(hThreadManageEnemyShips, INFINITE);
-  WaitForSingleObject(hThreadReceiveMessagesFromGateway, INFINITE);
+  /**
+   * Wait running event to be released to proceed
+   */
+  runningEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, SERVER_RUNNING_EVENT);
+  if (runningEvent != NULL) {
+    WaitForSingleObject(runningEvent, INFINITE);
+  }
+
+  /**
+   * If we got here, runningEvent is released
+   * Handle close
+   */
+  handleClose(&messageData);
 
   CloseHandle(hThreadManageEnemyShips);
 
@@ -111,8 +126,6 @@ int _tmain(int argc, LPTSTR argv[]) {
 
   UnmapViewOfFile(messageData.sharedMessage);
 
-  system("pause");
-
   return 0;
 }
 
@@ -120,18 +133,40 @@ int _tmain(int argc, LPTSTR argv[]) {
  * Used before app close
  */
 BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
+  HANDLE serverRunningEvent;
+
+  serverRunningEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, SERVER_RUNNING_EVENT);
+  if (serverRunningEvent == NULL) {
+    error(TEXT("Can't set up close event! Server will not exit "
+               "properly"));
+    ExitThread(0);
+  }
+
   switch (dwCtrlType) {
   case CTRL_SHUTDOWN_EVENT:
   case CTRL_CLOSE_EVENT:
   case CTRL_LOGOFF_EVENT:
-  case CTRL_C_EVENT: 
+  case CTRL_C_EVENT:
   case CTRL_BREAK_EVENT:
-    // TODO
+    if (!SetEvent(serverRunningEvent)) {
+      error(TEXT("Sending close event! Server will not exit "
+                 "properly"));
+    }
+    /**
+     * Force exit after 10 sec
+     */
+    Sleep(10000);
     return TRUE;
   default:
-    // We don't care about this event
-    // Default handler is used
     return FALSE;
   }
   return FALSE;
+}
+
+VOID handleClose(MessageData *messageData) {
+  Message msg;
+  msg.cmd = CLOSING;
+  writeDataToSharedMemory(messageData->sharedMessage, &msg, sizeof(Message),
+                          messageData->hMutex,
+                          messageData->gatewayMessageUpdateEvent);
 }
