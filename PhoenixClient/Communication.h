@@ -1,6 +1,6 @@
 #pragma once
 
+BOOL clientLogin(Client *client);
 DWORD WINAPI dataReceiver(LPVOID lpParam);
-BOOL connectPipes(Pipes *clientPipes);
-BOOL clientLogin(LPCWSTR username, HANDLE hPipe);
-BOOL sendMessageToGateway(HANDLE hPipe, Message *message);
+BOOL makeConnection(Client *client);
+BOOL writeGatewayAsync(Client *client, Message message);

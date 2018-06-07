@@ -23,8 +23,7 @@
 #define MESSAGES_MUTEX_NAME TEXT("phoenix_messages_mutex")
 #define MESSAGES_SHARED_MEMORY_NAME TEXT("phoenix_messages_shared_memory")
 
-#define PIPE_NAME_INBOUND TEXT("\\\\.\\pipe\\phoenix_inbound_pipe")
-#define PIPE_NAME_OUTBOUND TEXT("\\\\.\\pipe\\phoenix_outbound_pipe")
+#define PIPE_NAME TEXT("\\\\.\\pipe\\phoenix_pipe")
 
 #define GAME_UPDATE_EVENT TEXT("Global\\phoenix_game_update_event")
 #define MESSAGE_SERVER_UPDATE_EVENT                                            \
@@ -40,6 +39,8 @@
 #define SERVER_CLOSE_EVENT TEXT("phoenix_server_close_event")
 
 #define CLIENT_CLOSE_EVENT TEXT("phoenix_clinet_close_event")
+
+#define BUFSIZE sizeof(Message)
 
 #ifdef __cplusplus
 extern "C" {

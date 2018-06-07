@@ -103,6 +103,8 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   //       gameData->game.enemyShip[position].position.x,
   //       gameData->game.enemyShip[position].position.y);
 
+  gameData->game.level = 5;
+
   sendGameToGateway(gameData, &gameData->game);
 
   ReleaseMutex(hMutexManageEnemyShips);

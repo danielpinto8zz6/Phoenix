@@ -2,5 +2,5 @@
 
 int _tmain();
 BOOL WINAPI CtrlHandler(DWORD dwCtrlType);
-VOID handleClose(HANDLE hPipe);
+VOID handleClose(Client *client);
 BOOL WINAPI CtrlHandler(DWORD dwCtrlType);

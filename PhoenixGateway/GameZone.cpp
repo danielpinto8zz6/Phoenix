@@ -7,14 +7,10 @@ DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
   Data *data = (Data *)lpParam;
 
   GameData *gameData = data->gameData;
-  MessageData *messageData = data->messageData;
 
   DWORD dwWaitResult;
 
   gameData->STOP = FALSE;
-  
-  Message message;
-  message.cmd = UPDATE_GAME;
 
   while (!gameData->STOP) {
     dwWaitResult = WaitForSingleObject(gameData->gameUpdateEvent, INFINITE);
@@ -22,7 +18,7 @@ DWORD WINAPI receiveGameDataFromServer(LPVOID lpParam) {
       readDataFromSharedMemory(gameData->sharedGame, &gameData->game,
                                sizeof(Game), &gameData->hMutex);
       debug(TEXT("%d Bytes received"), sizeof(Game));
-      sendMessageToAllClients(data, &message);
+      broadcastClients(data->clients, &gameData->game, data->writeReady);
     }
   }
   return 0;

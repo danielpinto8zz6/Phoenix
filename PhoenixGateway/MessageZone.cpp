@@ -6,6 +6,7 @@
 DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
   Data *data = (Data *)lpParam;
   MessageData *messageData = data->messageData;
+  Message message;
 
   DWORD dwWaitResult;
 
@@ -16,14 +17,14 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
         WaitForSingleObject(messageData->gatewayMessageUpdateEvent, INFINITE);
     if (dwWaitResult == WAIT_OBJECT_0) {
       readDataFromSharedMemory(messageData->sharedMessage,
-                               &messageData->message, sizeof(Message),
+                               &message, sizeof(Message),
                                &messageData->hMutex);
       /**
        * TODO: Perform actions related to info received
        */
       debug(TEXT("%d Bytes received"), sizeof(Message));
 
-      sendMessageToAllClients(data, &messageData->message);
+      // broadcastClients(data->clients, &message, data->writeReady);
     }
   }
   return 0;

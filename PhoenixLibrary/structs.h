@@ -10,13 +10,23 @@
 #define WIDTH 10
 #define HEIGHT 15
 
+#define MAXCLIENTS 20
+
 typedef enum { SHIELD, ICE, BATTERY, PLUS, ALCOOL } PowerupType;
 
 typedef enum { BASIC, DODGE } EnemyType;
 
 typedef enum { NONE } PowerupEffect;
 
-typedef enum { LOGIN, SUCCESS, LOGGED, UPDATE_GAME, SERVER_CLOSING, CLIENT_CLOSING, GATEWAY_CLOSING } Command;
+typedef enum {
+  LOGIN,
+  SUCCESS,
+  LOGGED,
+  UPDATE_GAME,
+  SERVER_CLOSING,
+  CLIENT_CLOSING,
+  GATEWAY_CLOSING
+} Command;
 
 typedef struct {
   int x;
@@ -112,5 +122,17 @@ typedef struct {
   GameData *gameData;
   HANDLE hClientPipe[PLAYERS];
   HANDLE hGatewayPipe;
-  int totalClients;
+  HANDLE clients[MAXCLIENTS];
+  HANDLE writeReady;
+  HANDLE tmpPipe;
 } Data;
+
+typedef struct {
+  HANDLE hPipe;
+  HANDLE writeReady;
+  BOOL readerAlive;
+  TCHAR username[50];
+  BOOL threadContinue;
+  OVERLAPPED OverlWr;
+
+} Client;

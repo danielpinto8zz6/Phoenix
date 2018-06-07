@@ -178,8 +178,8 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
 VOID handleClose(Data *data) {
   Message msg;
   msg.cmd = GATEWAY_CLOSING;
-  writeDataToSharedMemory(data->messageData->sharedMessage, &msg, sizeof(Message),
-                          data->messageData->hMutex,
+  writeDataToSharedMemory(data->messageData->sharedMessage, &msg,
+                          sizeof(Message), data->messageData->hMutex,
                           data->messageData->serverMessageUpdateEvent);
-  sendMessageToAllClients(data, &msg);
+  // broadcastClients(data->clients, &msg, data->writeReady);
 }
