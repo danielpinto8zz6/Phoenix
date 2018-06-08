@@ -7,6 +7,7 @@
 #include "GameZone.h"
 #include "MessageZone.h"
 #include "PhoenixServer.h"
+#include "Registry.h"
 
 BOOL done;
 
@@ -91,6 +92,8 @@ int _tmain(int argc, LPTSTR argv[]) {
   }
 
   debug(TEXT("Server started successfully"));
+
+  Registry();
 
   /**
    * Now that everything is set up, set control handler
