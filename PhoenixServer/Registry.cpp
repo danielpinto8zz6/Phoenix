@@ -8,6 +8,11 @@
 
 #define TAM 200
 
+typedef struct {
+  int score;
+  TCHAR username[50];
+} Punctuation;
+
 void Registry() {
 
   HKEY key;

@@ -134,5 +134,4 @@ typedef struct {
   TCHAR username[50];
   BOOL threadContinue;
   OVERLAPPED OverlWr;
-
 } Client;

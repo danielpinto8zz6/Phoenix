@@ -9,5 +9,8 @@
 - [x] Server only run once
 - [x] Gateway only run once + doesn't start without server
 - [x] Client doesn't start without gateway
-- [ ] Add registry keys to store players points, etc...
-- [ ] Close client pipe when he exists
+- [x] Add registry keys to store players points, etc...
+- [x] Close client pipe when he exists
+- [ ] Add Gui to server
+- [ ] Store needed keys in registry
+- [ ] Finish login

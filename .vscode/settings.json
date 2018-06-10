@@ -28,5 +28,6 @@
     "cSpell.enabledLanguageIds": [
         "c",
         "cpp"
-    ]
+    ],
+    "C_Cpp.errorSquiggles": "Disabled"
 }
