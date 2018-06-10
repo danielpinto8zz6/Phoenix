@@ -92,6 +92,8 @@ typedef struct {
 typedef struct {
   Command cmd;
   TCHAR text[80];
+  int number;
+  BOOL sendToAllClients;
 } Message;
 
 typedef struct {

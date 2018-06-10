@@ -12,7 +12,8 @@
         "tchar.h": "c",
         "phoenixgateway.h": "c",
         "phoenixserver.h": "c",
-        "messagezone.h": "c"
+        "messagezone.h": "c",
+        "communication.h": "c"
     },
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {

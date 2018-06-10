@@ -64,6 +64,7 @@ PHOENIXLIBRARY_API BOOL initMessageZone(MessageData *messageData);
 PHOENIXLIBRARY_API BOOL initGameZone(GameData *gameData);
 PHOENIXLIBRARY_API BOOL isGatewayRunning();
 PHOENIXLIBRARY_API BOOL isServerRunning();
+PHOENIXLIBRARY_API VOID errorGui(LPCWSTR text);
 #ifdef __cplusplus
 }
 #endif

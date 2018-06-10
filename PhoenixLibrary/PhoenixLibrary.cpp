@@ -148,3 +148,8 @@ BOOL isServerRunning() {
   }
   return FALSE;
 }
+
+VOID errorGui(LPCWSTR text) {
+  MessageBox(NULL, text,
+             TEXT("Error"), MB_OK | MB_ICONERROR);
+}

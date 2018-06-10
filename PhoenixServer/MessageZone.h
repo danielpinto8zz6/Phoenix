@@ -1,3 +1,3 @@
-#pragma once
+﻿#pragma once
 
 DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam);
