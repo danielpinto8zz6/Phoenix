@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Clients.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameZone.h" />
     <ClInclude Include="MessageZone.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Clients.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameZone.cpp" />
     <ClCompile Include="MessageZone.cpp" />

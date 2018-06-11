@@ -1,9 +1,12 @@
 ﻿#include "stdafx.h"
 
+#include "Clients.h"
 #include "MessageZone.h"
 
 DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
-  MessageData *messageData = (MessageData *)lpParam;
+  Data *data = (Data *)lpParam;
+
+  MessageData *messageData = data->messageData;
 
   DWORD dwWaitResult;
 
@@ -17,6 +20,11 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
                                &messageData->message, sizeof(Message),
                                &messageData->hMutex);
       debug(TEXT("%d Bytes received"), sizeof(Message));
+      switch (messageData->message.cmd) {
+      case LOGIN:
+        clientLogin(data, messageData->message);
+        break;
+      }
     }
   }
   return 0;

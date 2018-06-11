@@ -1,6 +1,9 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "Communication.h"
+#include "Game.h"
+#include "PhoenixClient.h"
+#include "resource.h"
 #include <process.h>
 
 BOOL connectPipes(Client *client) {
@@ -162,7 +165,7 @@ DWORD WINAPI dataReceiver(LPVOID lpParam) {
   return FALSE;
 }
 
-BOOL initClient(Client *client) {
+BOOL initClient(HINSTANCE hInstance, HWND hWnd, Client *client) {
   HANDLE hThreadDataReceiver;
   DWORD threadDataReceiverId = 0;
   HANDLE runningEvent;
@@ -183,6 +186,8 @@ BOOL initClient(Client *client) {
     errorGui(TEXT("Can't create write event. Exiting..."));
     return FALSE;
   }
+
+  DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG_MENU), hWnd, Menu);
 
   /**
    * Now that everything is set up, set control handler
@@ -232,7 +237,7 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
   serverRunningEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, eventName);
   if (serverRunningEvent == NULL) {
     errorGui(TEXT("Can't set up close event! Client will not exit "
-               "properly"));
+                  "properly"));
     ExitThread(0);
   }
 
@@ -244,7 +249,7 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
   case CTRL_BREAK_EVENT:
     if (!SetEvent(serverRunningEvent)) {
       errorGui(TEXT("Can't send close event! Client will not exit "
-                 "properly"));
+                    "properly"));
     }
     /**
      * Force exit after 10 sec

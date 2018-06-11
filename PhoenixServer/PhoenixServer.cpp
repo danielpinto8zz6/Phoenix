@@ -14,6 +14,7 @@ BOOL done;
 int _tmain(int argc, LPTSTR argv[]) {
   MessageData messageData;
   GameData gameData;
+  Data data;
 
   DWORD threadReceiveMessagesFromServerId;
   HANDLE hThreadReceiveMessagesFromGateway;
@@ -24,6 +25,9 @@ int _tmain(int argc, LPTSTR argv[]) {
   _setmode(_fileno(stdin), _O_WTEXT);
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
+
+  data.gameData = &gameData;
+  data.messageData = &messageData;
 
   /**
    * Use an event to check if the program is running
@@ -75,7 +79,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 
   hThreadReceiveMessagesFromGateway =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromGateway,
-                   &messageData, 0, &threadReceiveMessagesFromServerId);
+                   &data, 0, &threadReceiveMessagesFromServerId);
   if (hThreadReceiveMessagesFromGateway == NULL) {
     error(TEXT("Creating thread to receive data from server"));
     system("pause");
