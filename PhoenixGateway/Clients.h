@@ -1,10 +1,9 @@
 ﻿#pragma once
 
-BOOL addClient(HANDLE listClients[MAXCLIENTS], HANDLE client);
-int broadcastGameToClients(HANDLE clients[MAXCLIENTS], Game *game,
-                           HANDLE writeReady);
+BOOL addClient(Data *data, HANDLE client);
+int broadcastGameToClients(Data *data, Game *game, HANDLE writeReady);
+int getClientIndex(Data *data, HANDLE client);
 DWORD WINAPI manageClient(LPVOID lpParam);
 DWORD WINAPI manageClients(LPVOID lpParam);
-BOOL removeClient(HANDLE clients[MAXCLIENTS], HANDLE client);
-VOID startClients(HANDLE listClients[MAXCLIENTS]);
+BOOL removeClient(Data *data, HANDLE client);
 BOOL writeGameToClientAsync(HANDLE hPipe, Game *game, HANDLE writeReady);

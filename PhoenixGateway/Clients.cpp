@@ -3,30 +3,45 @@
 #include "Clients.h"
 #include "MessageZone.h"
 
-VOID startClients(HANDLE listClients[MAXCLIENTS]) {
-  for (int i = 0; i < MAXCLIENTS; i++) {
-    listClients[i] = NULL;
-  }
-}
-
-BOOL addClient(HANDLE listClients[MAXCLIENTS], HANDLE client) {
-  for (int i = 0; i < MAXCLIENTS; i++) {
-    if (listClients[i] == NULL) {
-      listClients[i] = client;
-      return TRUE;
+int getClientIndex(Data *data, HANDLE client) {
+  for (int i = 0; i < data->totalClients; i++) {
+    if (data->client[i].hPipe == client) {
+      return i;
     }
   }
-  return FALSE;
+  return -1;
 }
 
-BOOL removeClient(HANDLE clients[MAXCLIENTS], HANDLE client) {
-  for (int i = 0; i < MAXCLIENTS; i++) {
-    if (clients[i] == client) {
-      clients[i] = NULL;
-      return TRUE;
-    }
+BOOL removeClient(Data *data, HANDLE client) {
+  int n = getClientIndex(data, client);
+
+  if (n == -1) {
+    return FALSE;
   }
-  return FALSE;
+
+  ZeroMemory(&data->client[n], sizeof(Client));
+
+  for (int i = n; i < data->totalClients; i++) {
+    data->client[i] = data->client[i + 1];
+  }
+
+  data->totalClients--;
+
+  return TRUE;
+}
+
+BOOL addClient(Data *data, HANDLE client) {
+  if (data->totalClients >= MAXCLIENTS - 1) {
+    error(TEXT("Can't add more clients. Max exceed!"));
+    return FALSE;
+  }
+
+  int n = data->totalClients;
+
+  data->client[n].hPipe = client;
+  data->totalClients++;
+
+  return TRUE;
 }
 
 BOOL writeGameToClientAsync(HANDLE hPipe, Game *game, HANDLE writeReady) {
@@ -65,14 +80,11 @@ BOOL writeGameToClientAsync(HANDLE hPipe, Game *game, HANDLE writeReady) {
   return TRUE;
 }
 
-int broadcastGameToClients(HANDLE clients[MAXCLIENTS], Game *game,
-                           HANDLE writeReady) {
+int broadcastGameToClients(Data *data, Game *game, HANDLE writeReady) {
   int nWrites = 0;
-  for (int i = 0; i < MAXCLIENTS; i++) {
-    if (clients[i] != 0) {
-      if (writeGameToClientAsync(clients[i], game, writeReady))
-        nWrites++;
-    }
+  for (int i = 0; i < data->totalClients; i++) {
+    if (writeGameToClientAsync(data->client[i].hPipe, game, writeReady))
+      nWrites++;
   }
   return nWrites;
 }
@@ -95,8 +107,6 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     error(TEXT("Can't create write event"));
     return FALSE;
   }
-
-  startClients(data->clients);
 
   while (TRUE) {
     hPipe = CreateNamedPipe(
@@ -160,6 +170,8 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   HANDLE readReady;
   OVERLAPPED OverlRd = {0};
 
+  int clientId = GetCurrentThreadId();
+
   if (hPipe == NULL) {
     error(TEXT("Can't access client pipe"));
     return FALSE;
@@ -172,7 +184,11 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
     return FALSE;
   }
 
-  addClient(data->clients, hPipe);
+  fSuccess = addClient(data, hPipe);
+
+  if (!fSuccess) {
+    error(TEXT("Can't add client to gateway client list"));
+  }
 
   while (TRUE) {
     ZeroMemory(&OverlRd, sizeof(OverlRd));
@@ -188,16 +204,19 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
     if (nBytes < sizeof(Message)) {
       error(TEXT("ReadFile can't read all data"));
     } else {
+      message.clientId = clientId;
       writeDataToSharedMemory(data->messageData->sharedMessage, &message,
                               sizeof(Message), &data->messageData->hMutex,
                               data->messageData->serverMessageUpdateEvent);
+
+      debug(TEXT("%d"), message.clientId);
       if (message.cmd == CLIENT_CLOSING) {
         break;
       }
     }
   }
 
-  removeClient(data->clients, hPipe);
+  removeClient(data, hPipe);
 
   FlushFileBuffers(hPipe);
   DisconnectNamedPipe(hPipe);

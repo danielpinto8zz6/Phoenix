@@ -33,7 +33,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
-  HWND hInstanceLogin;
+  // HWND hInstanceLogin;
 
   client.threadContinue = TRUE;
   client.readerAlive = FALSE;
@@ -55,29 +55,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   LoadStringW(hInstance, IDC_PHOENIXCLIENT, szWindowClass, MAX_LOADSTRING);
   MyRegisterClass(hInstance);
 
-  //   // Perform application initialization:
-  //   if (!InitInstance(hInstance, nCmdShow)) {
-  //     return FALSE;
-  //   }
+  // Perform application initialization:
+  if (!InitInstance(hInstance, nCmdShow)) {
+    return FALSE;
+  }
 
-  //   HACCEL hAccelTable =
-  //       LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_PHOENIXCLIENT));
+  HACCEL hAccelTable =
+      LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_PHOENIXCLIENT));
 
-  hInstanceLogin =
-      CreateDialog(hInst, MAKEINTATOM(IDD_DIALOG_LOGIN), HWND_DESKTOP, Login);
-
-  ShowWindow(hInstanceLogin, nCmdShow);
-
-  UpdateWindow(hInstanceLogin);
+  // hInstanceLogin =
+  //     CreateDialog(hInst, MAKEINTATOM(IDD_DIALOG_LOGIN), HWND_DESKTOP,
+  //     Login);
 
   MSG msg;
 
   // Main message loop:
   while (GetMessage(&msg, nullptr, 0, 0)) {
-    // if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
-    //}
+    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+      TranslateMessage(&msg);
+      DispatchMessage(&msg);
+    }
   }
 
   return (int)msg.wParam;
@@ -152,6 +149,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     int wmId = LOWORD(wParam);
     // Parse the menu selections:
     switch (wmId) {
+    case ID_FILE_LOGIN:
+      DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_LOGIN), hWnd, Login);
+      break;
     case IDM_ABOUT:
       DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
       break;

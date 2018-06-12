@@ -89,6 +89,7 @@ typedef struct {
   TCHAR text[80];
   int number;
   BOOL sendToAllClients;
+  int clientId;
 } Message;
 
 typedef struct {
@@ -125,16 +126,6 @@ typedef struct {
 } MessageData;
 
 typedef struct {
-  MessageData *messageData;
-  GameData *gameData;
-  HANDLE hClientPipe[PLAYERS];
-  HANDLE hGatewayPipe;
-  HANDLE clients[MAXCLIENTS];
-  HANDLE writeReady;
-  HANDLE tmpPipe;
-} Data;
-
-typedef struct {
   TCHAR username[50];
   int id;
   HANDLE hPipe;
@@ -143,3 +134,14 @@ typedef struct {
   BOOL threadContinue;
   OVERLAPPED OverlWr;
 } Client;
+
+typedef struct {
+  MessageData *messageData;
+  GameData *gameData;
+  HANDLE hClientPipe[PLAYERS];
+  HANDLE hGatewayPipe;
+  HANDLE writeReady;
+  HANDLE tmpPipe;
+  Client client[MAXCLIENTS];
+  int totalClients;
+} Data;
