@@ -29,7 +29,7 @@ BOOL removeClient(HANDLE clients[MAXCLIENTS], HANDLE client) {
   return FALSE;
 }
 
-BOOL writeClientAsync(HANDLE hPipe, Game *game, HANDLE writeReady) {
+BOOL writeGameToClientAsync(HANDLE hPipe, Game *game, HANDLE writeReady) {
   DWORD nBytes;
   BOOL fSuccess = FALSE;
 
@@ -65,12 +65,12 @@ BOOL writeClientAsync(HANDLE hPipe, Game *game, HANDLE writeReady) {
   return TRUE;
 }
 
-int broadcastClients(HANDLE clients[MAXCLIENTS], Game *game,
-                     HANDLE writeReady) {
+int broadcastGameToClients(HANDLE clients[MAXCLIENTS], Game *game,
+                           HANDLE writeReady) {
   int nWrites = 0;
   for (int i = 0; i < MAXCLIENTS; i++) {
     if (clients[i] != 0) {
-      if (writeClientAsync(clients[i], game, writeReady))
+      if (writeGameToClientAsync(clients[i], game, writeReady))
         nWrites++;
     }
   }

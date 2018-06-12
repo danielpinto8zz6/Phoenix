@@ -209,11 +209,24 @@ BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
       }
       message.cmd = LOGIN;
       message.number = GetCurrentProcessId();
+      _tcscpy_s(client.username, message.text);
+      client.id = GetCurrentProcessId();
       if (!writeGatewayAsync(&client, message)) {
         MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         break;
       }
+      // if (!readMessage(&client, &game)) {
+      //   MessageBox(NULL, TEXT("Can't read message!"), TEXT("Error"),
+      //              MB_OK | MB_ICONINFORMATION);
+      //   exit(0);
+      // }
+
+      // if (!checkLogin(&client, result)) {
+      //   MessageBox(NULL, TEXT("Can't login!"), TEXT("Error"),
+      //              MB_OK | MB_ICONINFORMATION);
+      //   exit(0);
+      // }
       /**
        * Login ok, init client
        */

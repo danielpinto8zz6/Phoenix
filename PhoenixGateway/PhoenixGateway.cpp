@@ -9,6 +9,12 @@
 #include "PhoenixGateway.h"
 
 int _tmain() {
+
+#ifdef UNICODE
+  _setmode(_fileno(stdin), _O_WTEXT);
+  _setmode(_fileno(stdout), _O_WTEXT);
+#endif
+
   DWORD threadReceiveDataFromClientId;
   HANDLE hThreadReceiveDataFromClient;
 
@@ -26,11 +32,6 @@ int _tmain() {
   Data data;
   data.gameData = &gameData;
   data.messageData = &messageData;
-
-#ifdef UNICODE
-  _setmode(_fileno(stdin), _O_WTEXT);
-  _setmode(_fileno(stdout), _O_WTEXT);
-#endif
 
   if (isGatewayRunning()) {
     error(

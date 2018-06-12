@@ -16,9 +16,8 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
     dwWaitResult =
         WaitForSingleObject(messageData->gatewayMessageUpdateEvent, INFINITE);
     if (dwWaitResult == WAIT_OBJECT_0) {
-      readDataFromSharedMemory(messageData->sharedMessage,
-                               &message, sizeof(Message),
-                               &messageData->hMutex);
+      readDataFromSharedMemory(messageData->sharedMessage, &message,
+                               sizeof(Message), &messageData->hMutex);
       /**
        * TODO: Perform actions related to info received
        */

@@ -29,6 +29,8 @@ int _tmain(int argc, LPTSTR argv[]) {
   data.gameData = &gameData;
   data.messageData = &messageData;
 
+  initGameVariables(&data.gameData->game);
+
   /**
    * Use an event to check if the program is running
    * Start event at instance start
@@ -176,4 +178,14 @@ VOID handleClose(MessageData *messageData) {
   writeDataToSharedMemory(messageData->sharedMessage, &msg, sizeof(Message),
                           messageData->hMutex,
                           messageData->gatewayMessageUpdateEvent);
+}
+
+VOID initGameVariables(Game *game) {
+  game->level = 1;
+
+  game->totalPlayers = 0;
+
+  game->totalEnemyShips = 0;
+
+  game->started = FALSE;
 }

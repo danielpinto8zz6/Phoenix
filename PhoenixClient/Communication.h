@@ -8,3 +8,4 @@ VOID handleClose(Client *client);
 BOOL initClient(HINSTANCE hInstance, HWND hWnd, Client *client);
 BOOL makeConnection(Client *client);
 BOOL writeGatewayAsync(Client *client, Message message);
+BOOL checkLogin(Client *client, Message message);

@@ -25,7 +25,8 @@ typedef enum {
   UPDATE_GAME,
   SERVER_CLOSING,
   CLIENT_CLOSING,
-  GATEWAY_CLOSING
+  GATEWAY_CLOSING,
+  PLAYER_ADDED
 } Command;
 
 typedef struct {
@@ -46,6 +47,8 @@ typedef struct {
 } DefenderShip;
 
 typedef struct {
+  TCHAR username[50];
+  int id;
   DefenderShip ship;
   int lifes;
   int points;
@@ -77,14 +80,6 @@ typedef struct {
 } Powerup;
 
 typedef struct {
-  int level;
-  Player player[PLAYERS];
-  EnemyShip enemyShip[ENEMYSHIPS];
-  int totalEnemyShips;
-  BOOL started;
-} Game;
-
-typedef struct {
   HANDLE inboundPipe;
   HANDLE outboundPipe;
 } Pipes;
@@ -95,6 +90,16 @@ typedef struct {
   int number;
   BOOL sendToAllClients;
 } Message;
+
+typedef struct {
+  int level;
+  Player player[PLAYERS];
+  int totalPlayers;
+  EnemyShip enemyShip[ENEMYSHIPS];
+  int totalEnemyShips;
+  BOOL started;
+  Message message;
+} Game;
 
 typedef struct {
   Game *sharedGame;
@@ -130,10 +135,11 @@ typedef struct {
 } Data;
 
 typedef struct {
+  TCHAR username[50];
+  int id;
   HANDLE hPipe;
   HANDLE writeReady;
   BOOL readerAlive;
-  TCHAR username[50];
   BOOL threadContinue;
   OVERLAPPED OverlWr;
 } Client;

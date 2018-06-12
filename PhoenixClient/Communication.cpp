@@ -261,3 +261,11 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
   }
   return FALSE;
 }
+
+BOOL checkLogin(Client *client, Message message) {
+  if ((_tcscmp(message.text, client->username) == 0) &&
+      message.number == GetCurrentProcessId()) {
+    return TRUE;
+  }
+  return FALSE;
+}
