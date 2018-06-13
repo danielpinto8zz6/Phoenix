@@ -36,8 +36,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   // HWND hInstanceLogin;
 
   client.threadContinue = TRUE;
-  client.readerAlive = FALSE;
-  client.OverlWr = {0};
 
   if (!isGatewayRunning()) {
     errorGui(TEXT("There's no gateway instance running! Start gateway first!"));
@@ -211,12 +209,12 @@ BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
       message.number = GetCurrentProcessId();
       _tcscpy_s(client.username, message.text);
       client.id = GetCurrentProcessId();
-      if (!writeGatewayAsync(&client, message)) {
+      if (!writeDataToPipe(client.hPipeMessage, (LPVOID)&message, sizeof(Message))) {
         MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         break;
       }
-      // if (!readMessage(&client, &game)) {
+      // if (!readMessage(&client, &result)) {
       //   MessageBox(NULL, TEXT("Can't read message!"), TEXT("Error"),
       //              MB_OK | MB_ICONINFORMATION);
       //   exit(0);
@@ -227,17 +225,17 @@ BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
       //              MB_OK | MB_ICONINFORMATION);
       //   exit(0);
       // }
+
       /**
        * Login ok, init client
        */
       EndDialog(hWnd, 0);
-      initClient(hInst, hWnd, &client);
+      // initClient(hInst, hWnd, &client);
     case IDCANCEL:
     case WM_CLOSE:
       if (MessageBox(hWnd, TEXT("Are you sure?"), TEXT("Close"), MB_YESNO) ==
           IDYES) {
-        CloseHandle(client.writeReady);
-        CloseHandle(client.hPipe);
+        CloseHandle(client.hPipeGame);
         exit(0);
       }
     }

@@ -15,7 +15,8 @@
         "messagezone.h": "c",
         "communication.h": "c",
         "game.h": "c",
-        "phoenixclient.h": "c"
+        "phoenixclient.h": "c",
+        "clients.h": "c"
     },
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {

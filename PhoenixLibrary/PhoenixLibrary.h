@@ -23,7 +23,8 @@
 #define MESSAGES_MUTEX_NAME TEXT("phoenix_messages_mutex")
 #define MESSAGES_SHARED_MEMORY_NAME TEXT("phoenix_messages_shared_memory")
 
-#define PIPE_NAME TEXT("\\\\.\\pipe\\phoenix_pipe")
+#define PIPE_GAME_NAME TEXT("\\\\.\\pipe\\phoenix_pipe_game")
+#define PIPE_MESSAGE_NAME TEXT("\\\\.\\pipe\\phoenix_pipe_message")
 
 #define GAME_UPDATE_EVENT TEXT("Global\\phoenix_game_update_event")
 #define MESSAGE_SERVER_UPDATE_EVENT                                            \
@@ -47,13 +48,9 @@ extern "C" {
 #endif
 PHOENIXLIBRARY_API VOID error(LPCWSTR text, ...);
 PHOENIXLIBRARY_API VOID debug(LPCWSTR text, ...);
-PHOENIXLIBRARY_API BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe,
-                                        LPDWORD nBytes);
-PHOENIXLIBRARY_API BOOL receiveDataFromPipe(LPVOID data, SIZE_T size,
-                                            HANDLE hPipe, LPDWORD nBytes);
 PHOENIXLIBRARY_API BOOL initMemAndSync(HANDLE *hMapFile,
-                                       LPCWSTR sharedMemoryName,
-                                       HANDLE *hMutex, LPCWSTR mutexName);
+                                       LPCWSTR sharedMemoryName, HANDLE *hMutex,
+                                       LPCWSTR mutexName);
 PHOENIXLIBRARY_API VOID writeDataToSharedMemory(LPVOID sharedMemory,
                                                 LPVOID data, SIZE_T size,
                                                 HANDLE hMutex, HANDLE hEvent);
@@ -65,6 +62,9 @@ PHOENIXLIBRARY_API BOOL initGameZone(GameData *gameData);
 PHOENIXLIBRARY_API BOOL isGatewayRunning();
 PHOENIXLIBRARY_API BOOL isServerRunning();
 PHOENIXLIBRARY_API VOID errorGui(LPCWSTR text);
+PHOENIXLIBRARY_API BOOL readDataFromPipe(HANDLE hPipe, LPVOID data,
+                                         SIZE_T size);
+PHOENIXLIBRARY_API BOOL writeDataToPipe(HANDLE hPipe, LPVOID data, SIZE_T size);
 #ifdef __cplusplus
 }
 #endif

@@ -24,27 +24,6 @@ VOID debug(LPCWSTR text, ...) {
   va_end(argptr);
 }
 
-BOOL writeDataToPipe(LPVOID data, SIZE_T size, HANDLE hPipe, LPDWORD nBytes) {
-  BOOL success;
-
-  success = WriteFile(hPipe, data, size, nBytes, NULL);
-  if (!success) {
-    error(TEXT("Sending data"));
-  }
-  return success;
-}
-
-BOOL receiveDataFromPipe(LPVOID data, SIZE_T size, HANDLE hPipe,
-                         LPDWORD nBytes) {
-  BOOL success;
-
-  success = ReadFile(hPipe, data, size, nBytes, NULL);
-  if (!success) {
-    error(TEXT("Receiving data"));
-  }
-  return success;
-}
-
 BOOL initMemAndSync(HANDLE *hMapFile, const LPCWSTR sharedMemoryName,
                     HANDLE *hMutex, LPCWSTR mutexName) {
   *hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0,
@@ -150,6 +129,44 @@ BOOL isServerRunning() {
 }
 
 VOID errorGui(LPCWSTR text) {
-  MessageBox(NULL, text,
-             TEXT("Error"), MB_OK | MB_ICONERROR);
+  MessageBox(NULL, text, TEXT("Error"), MB_OK | MB_ICONERROR);
+}
+
+BOOL readDataFromPipe(HANDLE hPipe, LPVOID data, SIZE_T size) {
+  DWORD nBytes;
+  BOOL fSuccess;
+
+  if (hPipe == NULL){
+    return FALSE;
+  }
+
+  fSuccess = ReadFile(hPipe, data, size, &nBytes, NULL);
+  if (!fSuccess || !nBytes) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+BOOL writeDataToPipe(HANDLE hPipe, LPVOID data, SIZE_T size) {
+  DWORD nBytes;
+  BOOL fSuccess;
+
+  if (hPipe == NULL) {
+    return FALSE;
+  }
+
+  if (data == NULL) {
+    return FALSE;
+  }
+
+  // while (TRUE) {
+  fSuccess = WriteFile(hPipe, data, size, &nBytes, NULL);
+  if (!fSuccess || !nBytes) {
+    // break;
+    return FALSE;
+  }
+  // }
+
+  return TRUE;
 }

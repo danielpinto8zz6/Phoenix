@@ -49,6 +49,7 @@ typedef struct {
 typedef struct {
   TCHAR username[50];
   int id;
+  int clientGatewayId;
   DefenderShip ship;
   int lifes;
   int points;
@@ -128,20 +129,16 @@ typedef struct {
 typedef struct {
   TCHAR username[50];
   int id;
-  HANDLE hPipe;
-  HANDLE writeReady;
-  BOOL readerAlive;
   BOOL threadContinue;
-  OVERLAPPED OverlWr;
+  HANDLE hPipeGame;
+  HANDLE hPipeMessage;
 } Client;
 
 typedef struct {
   MessageData *messageData;
   GameData *gameData;
-  HANDLE hClientPipe[PLAYERS];
-  HANDLE hGatewayPipe;
-  HANDLE writeReady;
-  HANDLE tmpPipe;
   Client client[MAXCLIENTS];
   int totalClients;
+  HANDLE tmpPipeMessage;
+  HANDLE tmpPipeGame;
 } Data;
