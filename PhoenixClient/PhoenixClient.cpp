@@ -28,6 +28,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);
 
+  HANDLE hThreadMessageReceiver;
+  DWORD threadMessageReceiverId = 0;
+  HANDLE hThreadGameReceiver;
+  DWORD threadGameReceiverId = 0;
+
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
   _setmode(_fileno(stdout), _O_WTEXT);
@@ -43,6 +48,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   }
 
   if (!connectPipes(&client)) {
+    return FALSE;
+  }
+
+  /**
+   * Create thread to receive info from gateway
+   */
+  // hThreadMessageReceiver = CreateThread(
+  //     NULL, 0, messageReceiver, &client, 0, &threadMessageReceiverId);
+  // if (hThreadMessageReceiver == NULL) {
+  //   errorGui(TEXT("Creating data receiver thread"));
+  //   return FALSE;
+  // }
+
+  hThreadGameReceiver =
+      CreateThread(NULL, 0, gameReceiver, &client, 0, &threadGameReceiverId);
+  if (hThreadGameReceiver == NULL) {
+    errorGui(TEXT("Creating data receiver thread"));
     return FALSE;
   }
 

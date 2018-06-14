@@ -2,6 +2,6 @@
 
 BOOL connectPipes(Client *client);
 BOOL WINAPI CtrlHandler(DWORD dwCtrlType);
-DWORD WINAPI dataReceiver(LPVOID lpParam);
+DWORD WINAPI gameReceiver(LPVOID lpParam);
+DWORD WINAPI messageReceiver(LPVOID lpParam);
 VOID handleClose(Client *client);
-BOOL initClient(HINSTANCE hInstance, HWND hWnd, Client *client);
