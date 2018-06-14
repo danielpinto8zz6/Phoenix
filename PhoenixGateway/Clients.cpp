@@ -13,17 +13,29 @@ int getClientIndex(Data *data, int clientId) {
 }
 
 BOOL removeClient(Data *data, int clientId) {
+  Message message;
+
   int n = getClientIndex(data, clientId);
 
   if (n == -1) {
     return FALSE;
   }
 
+  message.cmd = CLIENT_DISCONNECTED;
+  message.clientId = clientId;
+
   for (int i = n; i < data->totalClients; i++) {
     data->client[i] = data->client[i + 1];
   }
 
   data->totalClients--;
+
+  /**
+   * Inform server
+   */
+  writeDataToSharedMemory(data->messageData->sharedMessage, &message,
+                          sizeof(Message), data->messageData->hMutex,
+                          data->messageData->serverMessageUpdateEvent);
 
   return TRUE;
 }
@@ -170,10 +182,14 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
       break;
     }
 
+    /**
+     * We identify each client with unique id, to generate that id we use the
+     * gateway client thread id. Each client thread has different thread id
+     */
     message.clientId = client->id;
 
     writeDataToSharedMemory(data->messageData->sharedMessage, &message,
-                            sizeof(Message), &data->messageData->hMutex,
+                            sizeof(Message), data->messageData->hMutex,
                             data->messageData->serverMessageUpdateEvent);
 
     if (message.cmd == CLIENT_CLOSING) {

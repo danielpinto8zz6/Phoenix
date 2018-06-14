@@ -26,7 +26,8 @@ typedef enum {
   SERVER_CLOSING,
   CLIENT_CLOSING,
   GATEWAY_CLOSING,
-  PLAYER_ADDED
+  PLAYER_ADDED,
+  CLIENT_DISCONNECTED
 } Command;
 
 typedef struct {

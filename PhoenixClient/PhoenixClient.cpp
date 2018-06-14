@@ -54,18 +54,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   client.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
   /**
-   * Create thread to receive info from gateway
+   * Create threads to receive info from gateway
    */
-  hThreadMessageReceiver = CreateThread(NULL, 0, messageReceiver, &client, 0,
-                                        &threadMessageReceiverId);
-  if (hThreadMessageReceiver == NULL) {
+  hThreadGameReceiver =
+      CreateThread(NULL, 0, gameReceiver, &client, 0, &threadGameReceiverId);
+  if (hThreadGameReceiver == NULL) {
     errorGui(TEXT("Creating data receiver thread"));
     return FALSE;
   }
 
-  hThreadGameReceiver =
-      CreateThread(NULL, 0, gameReceiver, &client, 0, &threadGameReceiverId);
-  if (hThreadGameReceiver == NULL) {
+  hThreadMessageReceiver = CreateThread(NULL, 0, messageReceiver, &client, 0,
+                                        &threadMessageReceiverId);
+  if (hThreadMessageReceiver == NULL) {
     errorGui(TEXT("Creating data receiver thread"));
     return FALSE;
   }

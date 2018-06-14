@@ -24,6 +24,9 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
       case LOGIN:
         clientLogin(data, messageData->message);
         break;
+      case CLIENT_DISCONNECTED:
+        debug(TEXT("%d disconnected"), messageData->message.clientId);
+        break;
       }
     }
   }
