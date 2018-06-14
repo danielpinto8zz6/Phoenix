@@ -131,6 +131,10 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
     }
 
     // TODO
+    if (message.cmd == LOGGED) {
+      MessageBox(NULL, message.text, TEXT("Login succeed"),
+                 MB_OK | MB_ICONINFORMATION);
+    }
   }
 
   client->readerAlive;

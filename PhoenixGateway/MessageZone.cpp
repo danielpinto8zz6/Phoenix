@@ -23,13 +23,14 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
        */
       debug(TEXT("%d Bytes received"), sizeof(Message));
 
-      // if (message.cmd == LOGGED) {
-      //   int x = getClientById(data, message.clientId);
-      //   if (x != -1) {
-      //     writeGameToClientAsync(data->client[x].hPipe, &game,
-      //                            data->writeReady);
-      //   }
-      // }
+      if (message.cmd == LOGGED) {
+        int x = getClientIndex(data, message.clientId);
+        if (x != -1) {
+          writeDataToPipeAsync(data->client[x].hPipeMessage, data->hEvent, &message,
+                               sizeof(Message));
+          debug(TEXT("%s logged"), message.text);
+        }
+      }
       // broadcastGameToClients(data, &game, data->writeReady);
     }
   }
