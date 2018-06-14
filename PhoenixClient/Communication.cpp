@@ -24,19 +24,6 @@ BOOL connectPipes(Client *client) {
       return FALSE;
     }
 
-    // client->hPipeGame = CreateFile(
-    //     PIPE_GAME_NAME, GENERIC_READ, 0 | FILE_SHARE_READ | FILE_SHARE_WRITE,
-    //     NULL, OPEN_EXISTING, 0 | FILE_FLAG_OVERLAPPED, NULL);
-
-    // if (client->hPipeGame != INVALID_HANDLE_VALUE) {
-    //   break;
-    // }
-
-    if (GetLastError() != ERROR_PIPE_BUSY) {
-      errorGui(TEXT("Can't create file"));
-      return FALSE;
-    }
-
     /**
      * Wait 30 sec
      */
@@ -44,13 +31,29 @@ BOOL connectPipes(Client *client) {
       errorGui(TEXT("Timeout! Exiting..."));
       return FALSE;
     }
-    // if (!WaitNamedPipe(PIPE_GAME_NAME, 30000)) {
-    //   errorGui(TEXT("Timeout! Exiting..."));
-    //   return FALSE;
-    // }
   }
 
-  debug(TEXT("Pipe connected!"));
+  while (TRUE) {
+    client->hPipeGame = CreateFile(
+        PIPE_GAME_NAME, GENERIC_READ, 0 | FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL, OPEN_EXISTING, 0, NULL);
+
+    if (client->hPipeGame != INVALID_HANDLE_VALUE) {
+      break;
+    }
+
+    if (GetLastError() != ERROR_PIPE_BUSY) {
+      errorGui(TEXT("Can't create file"));
+      return FALSE;
+    }
+
+    if (!WaitNamedPipe(PIPE_GAME_NAME, 30000)) {
+      errorGui(TEXT("Timeout! Exiting..."));
+      return FALSE;
+    }
+  }
+
+  debug(TEXT("Pipes connected!"));
 
   /**
    * Connected! Change pipe mode to read
@@ -59,9 +62,10 @@ BOOL connectPipes(Client *client) {
   fSuccess = SetNamedPipeHandleState(client->hPipeMessage, &dwMode, NULL, NULL);
 
   if (!fSuccess) {
-    errorGui(TEXT("Can't set named pipe handle state"));
+    errorGui(TEXT("Can't set message named pipe handle state"));
     return FALSE;
   }
+
   return TRUE;
 }
 
@@ -79,8 +83,7 @@ DWORD WINAPI gameReceiver(LPVOID lpParam) {
   }
 
   while (client->threadContinue) {
-    fSuccess =
-        readDataFromPipe(client->hPipeGame, &game, sizeof(Game));
+    fSuccess = readDataFromPipe(client->hPipeGame, &game, sizeof(Game));
 
     if (!fSuccess) {
       error(TEXT("Can't read message data"));

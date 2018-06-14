@@ -60,24 +60,24 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
   BOOL fConnectedGame = FALSE;
   BOOL fConnectedMessage = FALSE;
   DWORD dwThreadId = 0;
-  // HANDLE hPipeGame = INVALID_HANDLE_VALUE;
+  HANDLE hPipeGame = INVALID_HANDLE_VALUE;
   HANDLE hPipeMessage = INVALID_HANDLE_VALUE;
 
   HANDLE hThread = NULL;
 
   while (TRUE) {
     hPipeMessage = CreateNamedPipe(
-        PIPE_MESSAGE_NAME, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
+        PIPE_MESSAGE_NAME, PIPE_ACCESS_DUPLEX,
         PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
         PIPE_UNLIMITED_INSTANCES, sizeof(Message), sizeof(Message), 5000, NULL);
 
-    // hPipeGame = CreateNamedPipe(
-    //     PIPE_GAME_NAME, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
-    //     PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
-    //     PIPE_UNLIMITED_INSTANCES, sizeof(Game), sizeof(Game), 5000, NULL);
+    hPipeGame = CreateNamedPipe(
+        PIPE_GAME_NAME, PIPE_ACCESS_DUPLEX,
+        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+        PIPE_UNLIMITED_INSTANCES, sizeof(Game), sizeof(Game), 5000, NULL);
 
-    if (hPipeMessage == INVALID_HANDLE_VALUE /**||
-        hPipeGame == INVALID_HANDLE_VALUE*/) {
+    if (hPipeMessage == INVALID_HANDLE_VALUE ||
+        hPipeGame == INVALID_HANDLE_VALUE) {
       error(TEXT("Failed creating named pipe"));
       return FALSE;
     }
@@ -92,15 +92,15 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
                             ? TRUE
                             : (GetLastError() == ERROR_PIPE_CONNECTED);
 
-    // fConnectedGame = ConnectNamedPipe(hPipeGame, NULL)
-    //                      ? TRUE
-    //                      : (GetLastError() == ERROR_PIPE_CONNECTED);
+    fConnectedGame = ConnectNamedPipe(hPipeGame, NULL)
+                         ? TRUE
+                         : (GetLastError() == ERROR_PIPE_CONNECTED);
 
-    if (/**fConnectedGame && */ fConnectedMessage) {
+    if (fConnectedGame && fConnectedMessage) {
       data->tmpPipeMessage = hPipeMessage;
-      // data->tmpPipeGame = hPipeGame;
-      hThread =
-          CreateThread(NULL, 0, manageClient, (LPVOID)data, 0, &dwThreadId);
+      data->tmpPipeGame = hPipeGame;
+
+      hThread = CreateThread(NULL, 0, manageClient, data, 0, &dwThreadId);
 
       if (hThread == NULL) {
         error(TEXT("Failed to create thread for client"));
@@ -110,7 +110,7 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
       }
     } else {
       CloseHandle(hPipeMessage);
-      // CloseHandle(hPipeGame);
+      CloseHandle(hPipeGame);
     }
   }
   return TRUE;
@@ -144,8 +144,8 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   }
 
   while (TRUE) {
-    fSuccess =
-        readDataFromPipe(client->hPipeMessage, (LPVOID)&message, sizeof(Message));
+    fSuccess = readDataFromPipe(client->hPipeMessage, (LPVOID)&message,
+                                sizeof(Message));
 
     if (!fSuccess) {
       error(TEXT("Can't read message data"));
@@ -167,9 +167,9 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   FlushFileBuffers(client->hPipeMessage);
   DisconnectNamedPipe(client->hPipeMessage);
   CloseHandle(client->hPipeMessage);
-  // FlushFileBuffers(hPipeGame);
-  // DisconnectNamedPipe(hPipeGame);
-  // CloseHandle(hPipeGame);
+  FlushFileBuffers(client->hPipeGame);
+  DisconnectNamedPipe(client->hPipeGame);
+  CloseHandle(client->hPipeGame);
 
   return TRUE;
 }
