@@ -3,7 +3,7 @@
 #include "Clients.h"
 #include "MessageZone.h"
 
-BOOL addClient(Data *data, TCHAR username[50], int n, int x) {
+BOOL addClient(Data *data, TCHAR username[50], int id) {
   Game *game = &data->gameData->game;
 
   if (game->totalPlayers >= MAX_PLAYERS) {
@@ -11,8 +11,7 @@ BOOL addClient(Data *data, TCHAR username[50], int n, int x) {
   }
 
   _tcscpy_s(game->player[game->totalPlayers].username, username);
-  game->player[game->totalPlayers].id = n;
-  game->player[game->totalPlayers].clientGatewayId = x;
+  game->player[game->totalPlayers].id = id;
 
   game->totalPlayers++;
 
@@ -20,8 +19,8 @@ BOOL addClient(Data *data, TCHAR username[50], int n, int x) {
 }
 
 void clientLogin(Data *data, Message message) {
-  debug(TEXT("Login : %s %d"), message.text, message.number);
-  if (!addClient(data, message.text, message.number, message.clientId)) {
+  debug(TEXT("Login : %s %d"), message.text, message.clientId);
+  if (!addClient(data, message.text, message.clientId)) {
     error(TEXT("Can't add client"));
   }
 

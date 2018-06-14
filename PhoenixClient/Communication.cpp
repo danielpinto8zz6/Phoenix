@@ -11,10 +11,9 @@ BOOL connectPipes(Client *client) {
   BOOL fSuccess;
 
   while (TRUE) {
-    client->hPipeMessage =
-        CreateFile(PIPE_MESSAGE_NAME, GENERIC_READ | GENERIC_WRITE,
-                   0 | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
-                   0 | FILE_FLAG_OVERLAPPED, NULL);
+    client->hPipeMessage = CreateFile(PIPE_MESSAGE_NAME, GENERIC_READ | GENERIC_WRITE,
+                       0 | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                       OPEN_EXISTING, 0, NULL);
 
     if (client->hPipeMessage != INVALID_HANDLE_VALUE) {
       break;
@@ -108,7 +107,6 @@ BOOL initClient(HINSTANCE hInstance, HWND hWnd, Client *client) {
     return FALSE;
   }
 
-
   // /**
   //  * Now that everything is set up, set control handler
   //  */
@@ -144,7 +142,6 @@ BOOL initClient(HINSTANCE hInstance, HWND hWnd, Client *client) {
 VOID handleClose(Client *client) {
   Message msg;
   msg.cmd = CLIENT_CLOSING;
-  msg.number = _getpid();
   _tcscpy_s(msg.text, client->username);
   writeDataToPipe(client->hPipeMessage, (LPVOID)&msg, sizeof(Message));
 }
@@ -178,14 +175,6 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType) {
     return TRUE;
   default:
     return FALSE;
-  }
-  return FALSE;
-}
-
-BOOL checkLogin(Client *client, Message message) {
-  if ((_tcscmp(message.text, client->username) == 0) &&
-      message.number == GetCurrentProcessId()) {
-    return TRUE;
   }
   return FALSE;
 }

@@ -125,35 +125,34 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   }
 
   int i = data->totalClients;
+  Client *client = &data->client[i];
   data->totalClients++;
 
-  int clientId;
-  clientId = GetCurrentThreadId();
-  data->client[i].id = clientId;
+  client->id = GetCurrentThreadId();
 
-  HANDLE hPipeGame = data->tmpPipeGame;
-  HANDLE hPipeMessage = data->tmpPipeMessage;
+  client->hPipeGame = data->tmpPipeGame;
+  client->hPipeMessage = data->tmpPipeMessage;
 
   DWORD nBytes = 0;
   BOOL fSuccess = FALSE;
 
   Message message;
 
-  if (hPipeGame == NULL || hPipeMessage == NULL) {
+  if (client->hPipeGame == NULL || client->hPipeMessage == NULL) {
     error(TEXT("Can't access client pipe"));
     return FALSE;
   }
 
   while (TRUE) {
     fSuccess =
-        readDataFromPipe(hPipeMessage, (LPVOID)&message, sizeof(Message));
+        readDataFromPipe(client->hPipeMessage, (LPVOID)&message, sizeof(Message));
 
     if (!fSuccess) {
       error(TEXT("Can't read message data"));
       break;
     }
 
-    message.clientId = clientId;
+    message.clientId = client->id;
 
     writeDataToSharedMemory(data->messageData->sharedMessage, &message,
                             sizeof(Message), &data->messageData->hMutex,
@@ -164,16 +163,13 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
     }
   }
 
-  removeClient(data, clientId);
-  FlushFileBuffers(hPipeGame);
-  DisconnectNamedPipe(hPipeGame);
-  CloseHandle(hPipeGame);
-  FlushFileBuffers(hPipeMessage);
-  DisconnectNamedPipe(hPipeMessage);
+  removeClient(data, client->id);
+  FlushFileBuffers(client->hPipeMessage);
+  DisconnectNamedPipe(client->hPipeMessage);
+  CloseHandle(client->hPipeMessage);
   // FlushFileBuffers(hPipeGame);
   // DisconnectNamedPipe(hPipeGame);
   // CloseHandle(hPipeGame);
 
   return TRUE;
-  CloseHandle(hPipeMessage);
 }

@@ -47,9 +47,8 @@ typedef struct {
 } DefenderShip;
 
 typedef struct {
-  TCHAR username[50];
   int id;
-  int clientGatewayId;
+  TCHAR username[50];
   DefenderShip ship;
   int lifes;
   int points;
@@ -88,7 +87,6 @@ typedef struct {
 typedef struct {
   Command cmd;
   TCHAR text[80];
-  int number;
   BOOL sendToAllClients;
   int clientId;
 } Message;
@@ -127,8 +125,8 @@ typedef struct {
 } MessageData;
 
 typedef struct {
-  TCHAR username[50];
   int id;
+  TCHAR username[50];
   BOOL threadContinue;
   HANDLE hPipeGame;
   HANDLE hPipeMessage;

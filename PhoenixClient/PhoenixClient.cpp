@@ -61,10 +61,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   HACCEL hAccelTable =
       LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_PHOENIXCLIENT));
 
-  // hInstanceLogin =
-  //     CreateDialog(hInst, MAKEINTATOM(IDD_DIALOG_LOGIN), HWND_DESKTOP,
-  //     Login);
-
   MSG msg;
 
   // Main message loop:
@@ -205,39 +201,20 @@ BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
                    TEXT("Missing fields"), MB_OK | MB_ICONINFORMATION);
         break;
       }
+
       message.cmd = LOGIN;
-      message.number = GetCurrentProcessId();
       _tcscpy_s(client.username, message.text);
-      client.id = GetCurrentProcessId();
-      if (!writeDataToPipe(client.hPipeMessage, (LPVOID)&message, sizeof(Message))) {
+
+      if (!writeDataToPipe(client.hPipeMessage, (LPVOID)&message,
+                           sizeof(Message))) {
         MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         break;
       }
-      // if (!readMessage(&client, &result)) {
-      //   MessageBox(NULL, TEXT("Can't read message!"), TEXT("Error"),
-      //              MB_OK | MB_ICONINFORMATION);
-      //   exit(0);
-      // }
-
-      // if (!checkLogin(&client, result)) {
-      //   MessageBox(NULL, TEXT("Can't login!"), TEXT("Error"),
-      //              MB_OK | MB_ICONINFORMATION);
-      //   exit(0);
-      // }
-
-      /**
-       * Login ok, init client
-       */
-      EndDialog(hWnd, 0);
-      // initClient(hInst, hWnd, &client);
+      EndDialog(hWnd, IDOK);
     case IDCANCEL:
     case WM_CLOSE:
-      if (MessageBox(hWnd, TEXT("Are you sure?"), TEXT("Close"), MB_YESNO) ==
-          IDYES) {
-        CloseHandle(client.hPipeGame);
-        exit(0);
-      }
+      EndDialog(hWnd, IDCLOSE);
     }
     break;
   }
