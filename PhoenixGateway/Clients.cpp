@@ -65,9 +65,14 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
 
   HANDLE hThread = NULL;
 
+  data->hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+  if (data->hEvent == NULL) {
+    error(TEXT("Can't create write event"));
+  }
+
   while (TRUE) {
     hPipeMessage = CreateNamedPipe(
-        PIPE_MESSAGE_NAME, PIPE_ACCESS_DUPLEX,
+        PIPE_MESSAGE_NAME, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
         PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
         PIPE_UNLIMITED_INSTANCES, sizeof(Message), sizeof(Message), 5000, NULL);
 
@@ -119,6 +124,9 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
 DWORD WINAPI manageClient(LPVOID lpParam) {
   Data *data = (Data *)lpParam;
 
+  HANDLE readReady;
+  OVERLAPPED OverlRd = {0};
+
   if (data == NULL) {
     error(TEXT("Can't receive data"));
     return FALSE;
@@ -143,9 +151,15 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
     return FALSE;
   }
 
+  readReady = CreateEvent(NULL, TRUE, FALSE, NULL);
+  if (readReady == NULL) {
+    error(TEXT("Can't create read event!"));
+    return FALSE;
+  }
+
   while (TRUE) {
-    fSuccess = readDataFromPipe(client->hPipeMessage, (LPVOID)&message,
-                                sizeof(Message));
+    fSuccess = readDataFromPipeAsync(client->hPipeMessage, readReady, &message,
+                                     sizeof(Message));
 
     if (!fSuccess) {
       error(TEXT("Can't read message data"));

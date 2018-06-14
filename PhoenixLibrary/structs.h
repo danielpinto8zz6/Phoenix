@@ -130,6 +130,8 @@ typedef struct {
   BOOL threadContinue;
   HANDLE hPipeGame;
   HANDLE hPipeMessage;
+  HANDLE hEvent;
+  BOOL readerAlive;
 } Client;
 
 typedef struct {
@@ -139,4 +141,5 @@ typedef struct {
   int totalClients;
   HANDLE tmpPipeMessage;
   HANDLE tmpPipeGame;
+  HANDLE hEvent;
 } Data;

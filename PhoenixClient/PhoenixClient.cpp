@@ -51,15 +51,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return FALSE;
   }
 
+  client.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
   /**
    * Create thread to receive info from gateway
    */
-  // hThreadMessageReceiver = CreateThread(
-  //     NULL, 0, messageReceiver, &client, 0, &threadMessageReceiverId);
-  // if (hThreadMessageReceiver == NULL) {
-  //   errorGui(TEXT("Creating data receiver thread"));
-  //   return FALSE;
-  // }
+  hThreadMessageReceiver = CreateThread(NULL, 0, messageReceiver, &client, 0,
+                                        &threadMessageReceiverId);
+  if (hThreadMessageReceiver == NULL) {
+    errorGui(TEXT("Creating data receiver thread"));
+    return FALSE;
+  }
 
   hThreadGameReceiver =
       CreateThread(NULL, 0, gameReceiver, &client, 0, &threadGameReceiverId);
@@ -227,8 +229,8 @@ BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
       message.cmd = LOGIN;
       _tcscpy_s(client.username, message.text);
 
-      if (!writeDataToPipe(client.hPipeMessage, (LPVOID)&message,
-                           sizeof(Message))) {
+      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &message,
+                                sizeof(Message))) {
         MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         break;

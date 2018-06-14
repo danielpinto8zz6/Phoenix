@@ -136,7 +136,7 @@ BOOL readDataFromPipe(HANDLE hPipe, LPVOID data, SIZE_T size) {
   DWORD nBytes;
   BOOL fSuccess;
 
-  if (hPipe == NULL){
+  if (hPipe == NULL) {
     return FALSE;
   }
 
@@ -160,13 +160,69 @@ BOOL writeDataToPipe(HANDLE hPipe, LPVOID data, SIZE_T size) {
     return FALSE;
   }
 
-  // while (TRUE) {
   fSuccess = WriteFile(hPipe, data, size, &nBytes, NULL);
   if (!fSuccess || !nBytes) {
-    // break;
     return FALSE;
   }
-  // }
 
+  return TRUE;
+}
+
+BOOL writeDataToPipeAsync(HANDLE hPipe, HANDLE hEvent, LPVOID data,
+                          SIZE_T size) {
+  OVERLAPPED OverlWr = {0};
+  DWORD nBytes;
+
+  if (hEvent == NULL) {
+    errorGui(TEXT("Write event is NULL!"));
+    return FALSE;
+  }
+
+  if (hPipe == NULL) {
+    errorGui(TEXT("Pipe is NULL!"));
+    return FALSE;
+  }
+
+  if (data == NULL) {
+    errorGui(TEXT("Data is NULL"));
+  }
+
+  ZeroMemory(&OverlWr, sizeof(OverlWr));
+  ResetEvent(hEvent);
+  OverlWr.hEvent = hEvent;
+
+  WriteFile(hPipe, data, size, &nBytes, &OverlWr);
+
+  WaitForSingleObject(hEvent, INFINITE);
+
+  GetOverlappedResult(hPipe, &OverlWr, &nBytes, FALSE);
+
+  if (nBytes < size) {
+    errorGui(TEXT("Can't write file!"));
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+BOOL readDataFromPipeAsync(HANDLE hPipe, HANDLE hEvent, LPVOID data,
+                           SIZE_T size) {
+  OVERLAPPED OverlRd = {0};
+  DWORD nBytes = 0;
+
+  ZeroMemory(&OverlRd, sizeof(OverlRd));
+  ResetEvent(hEvent);
+  OverlRd.hEvent = hEvent;
+
+  ReadFile(hPipe, data, size, &nBytes,
+                      &OverlRd);
+
+  WaitForSingleObject(hEvent, INFINITE);
+
+  GetOverlappedResult(hPipe, &OverlRd, &nBytes, FALSE);
+  if (nBytes < size) {
+    return FALSE;
+  }
+  
   return TRUE;
 }

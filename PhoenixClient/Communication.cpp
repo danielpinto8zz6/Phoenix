@@ -11,9 +11,10 @@ BOOL connectPipes(Client *client) {
   BOOL fSuccess;
 
   while (TRUE) {
-    client->hPipeMessage = CreateFile(
-        PIPE_MESSAGE_NAME, GENERIC_READ | GENERIC_WRITE,
-        0 | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    client->hPipeMessage =
+        CreateFile(PIPE_MESSAGE_NAME, GENERIC_READ | GENERIC_WRITE,
+                   0 | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
+                   0 | FILE_FLAG_OVERLAPPED, NULL);
 
     if (client->hPipeMessage != INVALID_HANDLE_VALUE) {
       break;
@@ -34,9 +35,9 @@ BOOL connectPipes(Client *client) {
   }
 
   while (TRUE) {
-    client->hPipeGame = CreateFile(
-        PIPE_GAME_NAME, GENERIC_READ, 0 | FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL, OPEN_EXISTING, 0, NULL);
+    client->hPipeGame = CreateFile(PIPE_GAME_NAME, GENERIC_READ,
+                                   0 | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                                   OPEN_EXISTING, 0, NULL);
 
     if (client->hPipeGame != INVALID_HANDLE_VALUE) {
       break;
@@ -104,14 +105,25 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
 
   Message message;
 
+  HANDLE readReady;
+  OVERLAPPED OverlRr = {0};
+
   if (client->hPipeMessage == NULL) {
     errorGui(TEXT("Message pipe is NULL"));
     return FALSE;
   }
 
+  readReady = CreateEvent(NULL, TRUE, FALSE, NULL);
+  if (readReady == NULL) {
+    errorGui(TEXT("Can't create reader event!"));
+    return FALSE;
+  }
+
+  client->readerAlive = TRUE;
+
   while (client->threadContinue) {
-    fSuccess =
-        readDataFromPipe(client->hPipeMessage, &message, sizeof(Message));
+    fSuccess = readDataFromPipeAsync(client->hPipeMessage, readReady, &message,
+                                     sizeof(Message));
 
     if (!fSuccess) {
       error(TEXT("Can't read message data"));
@@ -121,5 +133,7 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
     // TODO
   }
 
-  return FALSE;
+  client->readerAlive;
+
+  return TRUE;
 }

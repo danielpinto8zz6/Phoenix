@@ -65,6 +65,10 @@ PHOENIXLIBRARY_API VOID errorGui(LPCWSTR text);
 PHOENIXLIBRARY_API BOOL readDataFromPipe(HANDLE hPipe, LPVOID data,
                                          SIZE_T size);
 PHOENIXLIBRARY_API BOOL writeDataToPipe(HANDLE hPipe, LPVOID data, SIZE_T size);
+PHOENIXLIBRARY_API BOOL writeDataToPipeAsync(HANDLE hPipe, HANDLE hEvent,
+                                             LPVOID data, SIZE_T size);
+PHOENIXLIBRARY_API BOOL readDataFromPipeAsync(HANDLE hPipe, HANDLE hEvent,
+                                              LPVOID data, SIZE_T size);
 #ifdef __cplusplus
 }
 #endif
