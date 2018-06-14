@@ -162,7 +162,11 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
                                      sizeof(Message));
 
     if (!fSuccess) {
-      error(TEXT("Can't read message data"));
+      if (GetLastError() == ERROR_BROKEN_PIPE) {
+        error(TEXT("Client %d disconnected! Removing him..."), client->id);
+      } else {
+        error(TEXT("Can't read message data"));
+      }
       break;
     }
 

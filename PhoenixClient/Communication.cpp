@@ -87,7 +87,12 @@ DWORD WINAPI gameReceiver(LPVOID lpParam) {
     fSuccess = readDataFromPipe(client->hPipeGame, &game, sizeof(Game));
 
     if (!fSuccess) {
-      error(TEXT("Can't read message data"));
+      // Ignore it because messagereceiver already handles broken pipe error...
+      // if (GetLastError() == ERROR_BROKEN_PIPE) {
+      //   errorGui(TEXT("Gateway disconnected! Can't obtain data!"));
+      // }
+
+      errorGui(TEXT("Can't read message data"));
       break;
     }
 
@@ -126,7 +131,11 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
                                      sizeof(Message));
 
     if (!fSuccess) {
-      error(TEXT("Can't read message data"));
+      if (GetLastError() == ERROR_BROKEN_PIPE) {
+        errorGui(TEXT("Gateway disconnected! Can't obtain data!"));
+      } else {
+        errorGui(TEXT("Can't read message data"));
+      }
       break;
     }
 
@@ -137,7 +146,7 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
     }
   }
 
-  client->readerAlive;
+  client->readerAlive = FALSE;
 
   return TRUE;
 }
