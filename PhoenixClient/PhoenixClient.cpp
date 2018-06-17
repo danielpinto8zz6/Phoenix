@@ -38,10 +38,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
-  // HWND hInstanceLogin;
-
-  client.threadContinue = TRUE;
-
   if (!isGatewayRunning()) {
     errorGui(TEXT("There's no gateway instance running! Start gateway first!"));
     return FALSE;
@@ -52,6 +48,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   }
 
   client.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+  client.threadContinue = TRUE;
 
   /**
    * Create threads to receive info from gateway
@@ -235,10 +233,12 @@ BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
                    MB_OK | MB_ICONINFORMATION);
         break;
       }
-      EndDialog(hWnd, IDOK);
+
+      EndDialog(hWnd, LOWORD(wParam));
+      return (INT_PTR)TRUE;
     case IDCANCEL:
-    case WM_CLOSE:
-      EndDialog(hWnd, IDCLOSE);
+      EndDialog(hWnd, LOWORD(wParam));
+      return (INT_PTR)TRUE;
     }
     break;
   }
