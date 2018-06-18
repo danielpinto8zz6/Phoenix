@@ -60,5 +60,11 @@
     <Image Include="PhoenixClient.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Ship.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -172,7 +172,9 @@
     <ResourceCompile Include="PhoenixClient.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="bitmap1.bmp" />
     <Image Include="PhoenixClient.ico" />
+    <Image Include="Ship.bmp" />
     <Image Include="small.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

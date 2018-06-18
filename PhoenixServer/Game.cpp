@@ -111,3 +111,16 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   return TRUE;
 }
+
+BOOL isRectangleOverlapping(Coordinates rect1Coord, Size rect1Sz,
+                            Coordinates rect2Coord, Size rect2Sz) {
+  Coordinates totalRect1, totalRect2;
+
+  totalRect1.x = rect1Coord.x + rect1Sz.width;
+  totalRect1.y = rect1Coord.y + rect1Sz.height;
+
+  totalRect2.x = rect2Coord.x + rect2Sz.width;
+  totalRect2.y = rect2Coord.y + rect2Sz.height;
+
+  return TRUE;
+}

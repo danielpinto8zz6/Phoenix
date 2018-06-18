@@ -6,6 +6,7 @@
 #include "Communication.h"
 #include "PhoenixClient.h"
 #include <process.h>
+#include <windowsx.h>
 
 #define MAX_LOADSTRING 100
 
@@ -13,6 +14,17 @@
 HINSTANCE hInst;                     // current instance
 WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
+
+HBITMAP hNave = NULL;
+
+int x, y;
+HDC hdc = NULL, auxDC = NULL;
+HBRUSH bg = NULL;
+HBITMAP auxBM = NULL;
+int nX = 0, nY = 0;
+
+TCHAR login[40] = TEXT("\0");
+TCHAR key[10] = TEXT("\0");
 
 Client client;
 
@@ -160,7 +172,36 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                          LPARAM lParam) {
+  static BITMAP bmNave;
+  static HDC hdcNave;
+
   switch (message) {
+  case WM_CREATE:
+
+    hNave =
+        (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP1),
+                           IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+    hdc = GetDC(hWnd);
+    GetObject(hNave, sizeof(bmNave), &bmNave);
+    hdcNave = CreateCompatibleDC(hdc);
+    SelectObject(hdcNave, hNave);
+    ReleaseDC(hWnd, hdc);
+
+    // OBTEM AS DIMENSOES DO DISPLAY...
+    bg = CreateSolidBrush(RGB(255, 128, 128));
+    nX = GetSystemMetrics(SM_CXSCREEN);
+    nY = GetSystemMetrics(SM_CYSCREEN);
+
+    // PREPARA 'BITMAP' E ASSOCIA A UM 'DC' EM MEMORIA...
+    hdc = GetDC(hWnd);
+    auxDC = CreateCompatibleDC(hdc);
+    auxBM = CreateCompatibleBitmap(hdc, nX, nY);
+    SelectObject(auxDC, auxBM);
+    SelectObject(auxDC, GetStockObject(GRAY_BRUSH));
+    PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
+    ReleaseDC(hWnd, hdc);
+
+    break;
   case WM_COMMAND: {
     int wmId = LOWORD(wParam);
     // Parse the menu selections:
@@ -178,14 +219,66 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       return DefWindowProc(hWnd, message, wParam, lParam);
     }
   } break;
+  case WM_CHAR:
+    key[0] = wParam;
+    InvalidateRect(hWnd, NULL, FALSE);
+    break;
+  case WM_KEYDOWN:
+    if (wParam == VK_RIGHT) {
+      x++;
+      InvalidateRect(hWnd, NULL, FALSE);
+    }
+    if (wParam == VK_LEFT) {
+      x--;
+      InvalidateRect(hWnd, NULL, FALSE);
+    }
+    if (wParam == VK_UP) {
+      y--;
+      InvalidateRect(hWnd, NULL, FALSE);
+    }
+    if (wParam == VK_DOWN) {
+      y++;
+      InvalidateRect(hWnd, NULL, FALSE);
+    }
+    break;
+  case WM_LBUTTONDOWN: {
+    x = GET_X_LPARAM(lParam);
+    y = GET_Y_LPARAM(lParam);
+
+    InvalidateRect(hWnd, NULL, FALSE);
+    break;
+  }
+
+  case WM_CLOSE:
+    if (MessageBox(hWnd, TEXT("Exit?"), TEXT("Exit"),
+                   MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES)
+      DestroyWindow(hWnd);
+
+    break;
   case WM_PAINT: {
     PAINTSTRUCT ps;
-    HDC hdc = BeginPaint(hWnd, &ps);
-    // TODO: Add any drawing code that uses hdc here...
+    PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
+
+    SetStretchBltMode(auxDC, BLACKONWHITE);
+    StretchBlt(auxDC, x, y, 100, 60, hdcNave, 0, 0, bmNave.bmWidth,
+               bmNave.bmHeight, SRCCOPY);
+
+    // COPIA INFORMACAO DO 'DC' EM MEMORIA PARA O DISPLAY...
+    hdc = BeginPaint(hWnd, &ps);
+    BitBlt(hdc, 0, 0, nX, nY, auxDC, 0, 0, SRCCOPY);
     EndPaint(hWnd, &ps);
   } break;
   case WM_DESTROY:
     PostQuitMessage(0);
+    DeleteObject(hNave);
+    DeleteDC(hdcNave);
+
+    /**
+     * Release resources in memory
+     */
+    DeleteObject(bg);
+    DeleteObject(auxBM);
+    DeleteDC(auxDC);
     break;
   default:
     return DefWindowProc(hWnd, message, wParam, lParam);
