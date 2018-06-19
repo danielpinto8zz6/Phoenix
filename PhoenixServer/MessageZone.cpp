@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 
 #include "Clients.h"
-#include "MessageZone.h"
 #include "Game.h"
+#include "MessageZone.h"
 
 DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
   Data *data = (Data *)lpParam;
@@ -37,6 +37,9 @@ void handleCommand(Data *data, Message message) {
     break;
   case JOIN_GAME:
     joinGame(data, message.clientId);
+    break;
+  case PLAYER_LOST:
+    removePlayer(data, message.clientId);
     break;
   case GATEWAY_DISCONNECTED:
     break;

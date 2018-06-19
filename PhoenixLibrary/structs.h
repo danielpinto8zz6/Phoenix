@@ -35,7 +35,8 @@ typedef enum {
   GAME_STARTED,
   JOIN_GAME,
   IN_GAME,
-  CANT_JOIN
+  CANT_JOIN,
+  PLAYER_LOST
 } Command;
 
 typedef struct {
