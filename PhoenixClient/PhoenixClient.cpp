@@ -42,8 +42,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   HANDLE hThreadMessageReceiver;
   DWORD threadMessageReceiverId = 0;
-  HANDLE hThreadGameReceiver;
-  DWORD threadGameReceiverId = 0;
 
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
@@ -62,16 +60,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   client.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
   client.threadContinue = TRUE;
-
-  /**
-   * Create threads to receive info from gateway
-   */
-  hThreadGameReceiver =
-      CreateThread(NULL, 0, gameReceiver, &client, 0, &threadGameReceiverId);
-  if (hThreadGameReceiver == NULL) {
-    errorGui(TEXT("Creating data receiver thread"));
-    return FALSE;
-  }
 
   hThreadMessageReceiver = CreateThread(NULL, 0, messageReceiver, &client, 0,
                                         &threadMessageReceiverId);
@@ -219,81 +207,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       return DefWindowProc(hWnd, message, wParam, lParam);
     }
   } break;
-  case WM_CHAR:
-    Message msg;
-    key[0] = wParam;
-    InvalidateRect(hWnd, NULL, FALSE);
-    break;
   case WM_KEYDOWN:
-    if (wParam == VK_RIGHT) {
-      msg.cmd = KEYRIGHT;
-      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                                sizeof(Message))) {
-        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
-                   MB_OK | MB_ICONINFORMATION);
-        break;
+    Message msg;
+
+    if (client.gameStarted) {
+      if (wParam == VK_RIGHT) {
+        msg.cmd = KEYRIGHT;
+        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                             sizeof(Message));
       }
-      x++;
-      InvalidateRect(hWnd, NULL, FALSE);
-    }
-    if (wParam == VK_LEFT) {
-      msg.cmd = KEYLEFT;
-      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                                sizeof(Message))) {
-        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
-                   MB_OK | MB_ICONINFORMATION);
-        break;
+      if (wParam == VK_LEFT) {
+        msg.cmd = KEYLEFT;
+        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                             sizeof(Message));
       }
-      x--;
-      InvalidateRect(hWnd, NULL, FALSE);
-    }
-    if (wParam == VK_UP) {
-      msg.cmd = KEYUP;
-      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                                sizeof(Message))) {
-        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
-                   MB_OK | MB_ICONINFORMATION);
-        break;
+      if (wParam == VK_UP) {
+        msg.cmd = KEYUP;
+        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                             sizeof(Message));
       }
-      y--;
-      InvalidateRect(hWnd, NULL, FALSE);
-    }
-    if (wParam == VK_DOWN) {
-      msg.cmd = KEYDOWN;
-      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                                sizeof(Message))) {
-        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
-                   MB_OK | MB_ICONINFORMATION);
-        break;
+      if (wParam == VK_DOWN) {
+        msg.cmd = KEYDOWN;
+        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                             sizeof(Message));
       }
-      y++;
-      InvalidateRect(hWnd, NULL, FALSE);
-    }
-    if (wParam == VK_SPACE) {
-      msg.cmd = KEYSPACE;
-      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                                sizeof(Message))) {
-        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
-                   MB_OK | MB_ICONINFORMATION);
-        break;
+      if (wParam == VK_SPACE) {
+        msg.cmd = KEYSPACE;
+        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                             sizeof(Message));
       }
-      y++;
-      InvalidateRect(hWnd, NULL, FALSE);
     }
     break;
-  case WM_LBUTTONDOWN: {
-    x = GET_X_LPARAM(lParam);
-    y = GET_Y_LPARAM(lParam);
-
-    InvalidateRect(hWnd, NULL, FALSE);
-    break;
-  }
-
   case WM_CLOSE:
     if (MessageBox(hWnd, TEXT("Exit?"), TEXT("Exit"),
                    MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES)
       DestroyWindow(hWnd);
-
     break;
   case WM_PAINT: {
     PAINTSTRUCT ps;

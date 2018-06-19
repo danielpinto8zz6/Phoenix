@@ -220,6 +220,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     // TODO: Add any drawing code that uses hdc here...
     EndPaint(hWnd, &ps);
   } break;
+  case WM_CLOSE:
+    if (MessageBox(hWnd, TEXT("Exit?"), TEXT("Exit"),
+                   MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES)
+      DestroyWindow(hWnd);
+    break;
   case WM_DESTROY:
     PostQuitMessage(0);
     break;
