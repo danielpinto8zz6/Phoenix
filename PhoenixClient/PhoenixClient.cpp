@@ -227,26 +227,56 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_KEYDOWN:
     if (wParam == VK_RIGHT) {
       msg.cmd = KEYRIGHT;
+      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                                sizeof(Message))) {
+        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
+                   MB_OK | MB_ICONINFORMATION);
+        break;
+      }
       x++;
       InvalidateRect(hWnd, NULL, FALSE);
     }
     if (wParam == VK_LEFT) {
       msg.cmd = KEYLEFT;
+      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                                sizeof(Message))) {
+        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
+                   MB_OK | MB_ICONINFORMATION);
+        break;
+      }
       x--;
       InvalidateRect(hWnd, NULL, FALSE);
     }
     if (wParam == VK_UP) {
       msg.cmd = KEYUP;
+      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                                sizeof(Message))) {
+        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
+                   MB_OK | MB_ICONINFORMATION);
+        break;
+      }
       y--;
       InvalidateRect(hWnd, NULL, FALSE);
     }
     if (wParam == VK_DOWN) {
       msg.cmd = KEYDOWN;
+      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                                sizeof(Message))) {
+        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
+                   MB_OK | MB_ICONINFORMATION);
+        break;
+      }
       y++;
       InvalidateRect(hWnd, NULL, FALSE);
     }
     if (wParam == VK_SPACE) {
       msg.cmd = KEYSPACE;
+      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                                sizeof(Message))) {
+        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
+                   MB_OK | MB_ICONINFORMATION);
+        break;
+      }
       y++;
       InvalidateRect(hWnd, NULL, FALSE);
     }

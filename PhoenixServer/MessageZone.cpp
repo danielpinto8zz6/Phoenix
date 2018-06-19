@@ -36,24 +36,14 @@ void handleCommand(Data *data, Message message) {
   case GATEWAY_DISCONNECTED:
     break;
   case KEYDOWN:
-    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYDOWN"),
-               MB_OK | MB_ICONINFORMATION);
     break;
   case KEYUP:
-    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYUP"),
-               MB_OK | MB_ICONINFORMATION);
     break;
   case KEYLEFT:
-    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYLEFT"),
-               MB_OK | MB_ICONINFORMATION);
     break;
   case KEYRIGHT:
-    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYRIGHT"),
-               MB_OK | MB_ICONINFORMATION);
     break;
   case KEYSPACE:
-    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYSPACE"),
-               MB_OK | MB_ICONINFORMATION);
     break;
   }
 }
