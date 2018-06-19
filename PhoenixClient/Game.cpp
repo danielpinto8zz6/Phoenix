@@ -28,5 +28,3 @@ BOOL startGame(Client *client) {
 
   return TRUE;
 }
-
-void drawGame(RECT r, Game *game) {}

@@ -167,7 +167,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_CREATE:
 
     hNave =
-        (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP1),
+        (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_BOMBS),
                            IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
     hdc = GetDC(hWnd);
     GetObject(hNave, sizeof(bmNave), &bmNave);
@@ -248,7 +248,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
 
     SetStretchBltMode(auxDC, BLACKONWHITE);
-    StretchBlt(auxDC, x, y, 100, 60, hdcNave, 0, 0, bmNave.bmWidth,
+    StretchBlt(auxDC, 25, 80, 100, 60, hdcNave, 0, 0, bmNave.bmWidth,
                bmNave.bmHeight, SRCCOPY);
 
     // COPIA INFORMACAO DO 'DC' EM MEMORIA PARA O DISPLAY...
