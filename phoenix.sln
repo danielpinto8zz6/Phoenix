@@ -5,13 +5,11 @@ VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixLibrary", "PhoenixLibrary\PhoenixLibrary.vcxproj", "{148C77B0-5C3A-4F4C-87CC-46E6A06C0976}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixServer", "PhoenixServer\PhoenixServer.vcxproj", "{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixGateway", "PhoenixGateway\PhoenixGateway.vcxproj", "{51AE7049-E8BB-4DAD-AA8C-F1EC61797EDB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixClient", "PhoenixClient\PhoenixClient.vcxproj", "{87EAC784-5C11-4757-8F25-6C8CB7B882BE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixServerGui", "PhoenixServerGui\PhoenixServerGui.vcxproj", "{CAFA7471-C2E1-475B-A444-85F0A66190E2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhoenixServer", "PhoenixServer\PhoenixServer.vcxproj", "{B4F8DA60-2CB9-4414-A1F7-81A772E5388D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,14 +27,6 @@ Global
 		{148C77B0-5C3A-4F4C-87CC-46E6A06C0976}.Release|x64.Build.0 = Release|x64
 		{148C77B0-5C3A-4F4C-87CC-46E6A06C0976}.Release|x86.ActiveCfg = Release|Win32
 		{148C77B0-5C3A-4F4C-87CC-46E6A06C0976}.Release|x86.Build.0 = Release|Win32
-		{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}.Debug|x64.ActiveCfg = Debug|x64
-		{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}.Debug|x64.Build.0 = Debug|x64
-		{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}.Debug|x86.ActiveCfg = Debug|Win32
-		{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}.Debug|x86.Build.0 = Debug|Win32
-		{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}.Release|x64.ActiveCfg = Release|x64
-		{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}.Release|x64.Build.0 = Release|x64
-		{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}.Release|x86.ActiveCfg = Release|Win32
-		{D96A2DE5-FF6F-4F96-A114-FC6572CF2751}.Release|x86.Build.0 = Release|Win32
 		{51AE7049-E8BB-4DAD-AA8C-F1EC61797EDB}.Debug|x64.ActiveCfg = Debug|x64
 		{51AE7049-E8BB-4DAD-AA8C-F1EC61797EDB}.Debug|x64.Build.0 = Debug|x64
 		{51AE7049-E8BB-4DAD-AA8C-F1EC61797EDB}.Debug|x86.ActiveCfg = Debug|Win32
@@ -53,14 +43,14 @@ Global
 		{87EAC784-5C11-4757-8F25-6C8CB7B882BE}.Release|x64.Build.0 = Release|x64
 		{87EAC784-5C11-4757-8F25-6C8CB7B882BE}.Release|x86.ActiveCfg = Release|Win32
 		{87EAC784-5C11-4757-8F25-6C8CB7B882BE}.Release|x86.Build.0 = Release|Win32
-		{CAFA7471-C2E1-475B-A444-85F0A66190E2}.Debug|x64.ActiveCfg = Debug|x64
-		{CAFA7471-C2E1-475B-A444-85F0A66190E2}.Debug|x64.Build.0 = Debug|x64
-		{CAFA7471-C2E1-475B-A444-85F0A66190E2}.Debug|x86.ActiveCfg = Debug|Win32
-		{CAFA7471-C2E1-475B-A444-85F0A66190E2}.Debug|x86.Build.0 = Debug|Win32
-		{CAFA7471-C2E1-475B-A444-85F0A66190E2}.Release|x64.ActiveCfg = Release|x64
-		{CAFA7471-C2E1-475B-A444-85F0A66190E2}.Release|x64.Build.0 = Release|x64
-		{CAFA7471-C2E1-475B-A444-85F0A66190E2}.Release|x86.ActiveCfg = Release|Win32
-		{CAFA7471-C2E1-475B-A444-85F0A66190E2}.Release|x86.Build.0 = Release|Win32
+		{B4F8DA60-2CB9-4414-A1F7-81A772E5388D}.Debug|x64.ActiveCfg = Debug|x64
+		{B4F8DA60-2CB9-4414-A1F7-81A772E5388D}.Debug|x64.Build.0 = Debug|x64
+		{B4F8DA60-2CB9-4414-A1F7-81A772E5388D}.Debug|x86.ActiveCfg = Debug|Win32
+		{B4F8DA60-2CB9-4414-A1F7-81A772E5388D}.Debug|x86.Build.0 = Debug|Win32
+		{B4F8DA60-2CB9-4414-A1F7-81A772E5388D}.Release|x64.ActiveCfg = Release|x64
+		{B4F8DA60-2CB9-4414-A1F7-81A772E5388D}.Release|x64.Build.0 = Release|x64
+		{B4F8DA60-2CB9-4414-A1F7-81A772E5388D}.Release|x86.ActiveCfg = Release|Win32
+		{B4F8DA60-2CB9-4414-A1F7-81A772E5388D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
