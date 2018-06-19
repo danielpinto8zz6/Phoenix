@@ -63,7 +63,16 @@
     <Image Include="Ship.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="bitmap1.bmp">
+    <Image Include="icePUP.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="defenders.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bom.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="enimies.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
