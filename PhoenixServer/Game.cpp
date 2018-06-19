@@ -120,5 +120,52 @@ BOOL isRectangleOverlapping(Coordinates rect1Coord, Size rect1Sz,
   totalRect2.x = rect2Coord.x + rect2Sz.width;
   totalRect2.y = rect2Coord.y + rect2Sz.height;
 
-  return TRUE;
+  /**
+   * Check overlap on x & y
+   */
+  if (rect1Coord.x < rect2Coord.x) {
+    if (rect2Coord.x <= totalRect1.x) {
+      if (rect1Coord.y < rect2Coord.y) {
+        if (rect2Coord.y <= totalRect1.y) {
+          return TRUE;
+        }
+      } else {
+        if (rect1Coord.y <= totalRect2.y) {
+          return TRUE;
+        }
+      }
+    }
+  } else {
+    if (rect1Coord.x <= totalRect2.x) {
+      if (rect1Coord.y < rect2Coord.y) {
+        if (rect2Coord.y <= totalRect1.y) {
+          return TRUE;
+        }
+      } else {
+        if (rect1Coord.y <= totalRect2.y) {
+          return TRUE;
+        }
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+BOOL isPointInsideRect(Coordinates rect1Coord, Size rect1Sz,
+                       Coordinates point) {
+  Coordinates totalRect1;
+
+  totalRect1.x = rect1Coord.x + rect1Sz.width;
+  totalRect1.y = rect1Coord.y + rect1Sz.height;
+
+  /**
+   * Check on x
+   */
+  if (point.x >= rect1Coord.x && point.x <= rect2Coord.x) {
+    if (point.y >= rect1Coord.y && point.y <= rect2Coord.y) {
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
