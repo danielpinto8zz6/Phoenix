@@ -44,9 +44,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
    * Start event at instance start
    */
   if (isServerRunning()) {
-    error(TEXT("There is an instance of server already running! Only 1 server "
-               "at time"));
-    system("pause");
+    errorGui(
+        TEXT("There is an instance of server already running! Only 1 server "
+             "at time"));
     return FALSE;
   }
 
@@ -54,28 +54,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   HANDLE hThreadManageEnemyShips;
 
   if (!initGameZone(&gameData)) {
-    error(TEXT("Can't connect game data with server. Exiting..."));
-    system("pause");
+    errorGui(TEXT("Can't connect game data with server. Exiting..."));
+    return FALSE;
   }
 
   gameData.gameUpdateEvent =
       CreateEventW(NULL, FALSE, FALSE, GAME_UPDATE_EVENT);
 
   if (gameData.gameUpdateEvent == NULL) {
-    error(TEXT("CreateEvent failed"));
+    errorGui(TEXT("CreateEvent failed"));
     return FALSE;
   }
 
   if (!initMessageZone(&messageData)) {
-    error(TEXT("Can't connect message data with server. Exiting..."));
-    system("pause");
+    errorGui(TEXT("Can't connect message data with server. Exiting..."));
+    return FALSE;
   }
 
   messageData.gatewayMessageUpdateEvent =
       CreateEventW(NULL, FALSE, FALSE, MESSAGE_GATEWAY_UPDATE_EVENT);
 
   if (messageData.gatewayMessageUpdateEvent == NULL) {
-    error(TEXT("CreateEvent failed"));
+    errorGui(TEXT("CreateEvent failed"));
     return FALSE;
   }
 
@@ -83,7 +83,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
       CreateEventW(NULL, FALSE, FALSE, MESSAGE_SERVER_UPDATE_EVENT);
 
   if (messageData.serverMessageUpdateEvent == NULL) {
-    error(TEXT("CreateEvent failed"));
+    errorGui(TEXT("CreateEvent failed"));
     return FALSE;
   }
 
@@ -91,21 +91,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)receiveMessagesFromGateway,
                    &data, 0, &threadReceiveMessagesFromServerId);
   if (hThreadReceiveMessagesFromGateway == NULL) {
-    error(TEXT("Creating thread to receive data from server"));
-    system("pause");
-    return -1;
+    errorGui(TEXT("Creating thread to receive data from server"));
+    return FALSE;
   }
 
   hThreadManageEnemyShips =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadManageEnemyShips,
                    &gameData, 0, &threadManageEnemyShipsId);
   if (hThreadManageEnemyShips == NULL) {
-    error(TEXT("Creating thread to manage enemy ships"));
-    system("pause");
-    return -1;
+    errorGui(TEXT("Creating thread to manage enemy ships"));
+    return FALSE;
   }
-
-  debug(TEXT("Server started successfully"));
 
   Registry();
 

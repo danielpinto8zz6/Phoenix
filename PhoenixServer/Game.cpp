@@ -44,13 +44,11 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
 
   HANDLE hMutexManageEnemyShips;
 
-  debug(TEXT("[ManageEnemyShips] -> Thread-%d"), GetCurrentThreadId());
-
   // Create a mutex with no initial owner
   hMutexManageEnemyShips = CreateMutex(NULL, FALSE, ENEMYSHIPS_MUTEX);
 
   if (hMutexManageEnemyShips == NULL) {
-    error(TEXT("Creating enemy ships mutex"));
+    errorGui(TEXT("Creating enemy ships mutex"));
     return 1;
   }
 
@@ -61,7 +59,7 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
                               gameData, 0, &ThreadID);
 
     if (aThread[i] == NULL) {
-      error(TEXT("Creating enemy ship thread"));
+      errorGui(TEXT("Creating enemy ship thread"));
       return 1;
     }
     Sleep(500);
@@ -93,7 +91,7 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   // Place ship...
   Coordinates c = getFirstEmptyPosition(&gameData->game);
   if (!isCoordinatesValid(c)) {
-    error(TEXT("Can't find an empty position"));
+    errorGui(TEXT("Can't find an empty position"));
     return FALSE;
   }
 

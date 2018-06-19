@@ -19,13 +19,11 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
       readDataFromSharedMemory(messageData->sharedMessage,
                                &messageData->message, sizeof(Message),
                                &messageData->hMutex);
-      debug(TEXT("%d Bytes received"), sizeof(Message));
       switch (messageData->message.cmd) {
       case LOGIN:
         clientLogin(data, messageData->message);
         break;
       case CLIENT_DISCONNECTED:
-        debug(TEXT("%d disconnected"), messageData->message.clientId);
         break;
       }
     }

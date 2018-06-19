@@ -19,9 +19,8 @@ BOOL addClient(Data *data, TCHAR username[50], int id) {
 }
 
 void clientLogin(Data *data, Message message) {
-  debug(TEXT("Login : %s %d"), message.text, message.clientId);
   if (!addClient(data, message.text, message.clientId)) {
-    error(TEXT("Can't add client"));
+    errorGui(TEXT("Can't add client"));
   }
 
   message.cmd = LOGGED;
