@@ -32,7 +32,10 @@ typedef enum {
   KEYLEFT,
   KEYRIGHT,
   KEYSPACE,
-  GAME_STARTED
+  GAME_STARTED,
+  JOIN_GAME,
+  IN_GAME,
+  CANT_JOIN
 } Command;
 
 typedef struct {
@@ -140,12 +143,20 @@ typedef struct {
   BOOL readerAlive;
   Game *game;
   BOOL gameStarted;
+  BOOL logged;
+  BOOL inGame;
 } Client;
+
+typedef struct {
+  int id;
+  TCHAR username[50];
+} Clients;
 
 typedef struct {
   MessageData *messageData;
   GameData *gameData;
   Client client[MAXCLIENTS];
+  Clients clients[MAXCLIENTS];
   int totalClients;
   HANDLE tmpPipeMessage;
   HANDLE tmpPipeGame;

@@ -154,6 +154,30 @@ void handleCommand(Client *client, Message message) {
   case LOGGED:
     MessageBox(NULL, message.text, TEXT("Login succeed"),
                MB_OK | MB_ICONINFORMATION);
+    client->logged = TRUE;
+    break;
+
+  case IN_GAME:
+    MessageBox(NULL, TEXT("Joined to game!"), TEXT("Joined"),
+               MB_OK | MB_ICONINFORMATION);
+    client->inGame = TRUE;
+    break;
+
+  case CANT_JOIN:
+    MessageBox(NULL, TEXT("Can't join to game!"), TEXT("Error"),
+               MB_OK | MB_ICONINFORMATION);
+    client->inGame = TRUE;
     break;
   }
+}
+
+BOOL joinGame(Client *client) {
+  Message message;
+
+  message.cmd = JOIN_GAME;
+
+  _tcscpy_s(message.text, client->username);
+
+  return writeDataToPipeAsync(client->hPipeMessage, client->hEvent, &message,
+                              sizeof(Message));
 }

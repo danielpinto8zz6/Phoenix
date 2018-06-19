@@ -48,6 +48,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
+  client.logged = FALSE;
+  client.inGame = FALSE;
+  client.gameStarted = FALSE;
+
   if (!isGatewayRunning()) {
     errorGui(TEXT("There's no gateway instance running! Start gateway first!"));
     return FALSE;
@@ -166,9 +170,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   switch (message) {
   case WM_CREATE:
 
-    hNave =
-        (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_BOMBS),
-                           IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+    hNave = (HBITMAP)LoadImage(GetModuleHandle(NULL),
+                               MAKEINTRESOURCE(IDB_BITMAP_BOMBS), IMAGE_BITMAP,
+                               0, 0, LR_DEFAULTSIZE);
     hdc = GetDC(hWnd);
     GetObject(hNave, sizeof(bmNave), &bmNave);
     hdcNave = CreateCompatibleDC(hdc);
@@ -197,6 +201,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     case ID_FILE_LOGIN:
       DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_LOGIN), hWnd, Login);
       break;
+    case ID_FILE_JOINGAME:
+      if (client.inGame) {
+        MessageBox(NULL, TEXT("In Game"), TEXT("Already in game!"),
+                   MB_OK | MB_ICONINFORMATION);
+        return 0;
+      }
+      if (!client.logged) {
+        MessageBox(NULL, TEXT("Login!"), TEXT("Please login first"),
+                   MB_OK | MB_ICONINFORMATION);
+        return 0;
+      }
+      if (client.gameStarted) {
+        MessageBox(NULL, TEXT("Can't join!"), TEXT("Game already started!"),
+                   MB_OK | MB_ICONINFORMATION);
+        return 0;
+      }
+      if (!joinGame(&client)) {
+        MessageBox(NULL, TEXT("Can't join!"), TEXT("Error"),
+                   MB_OK | MB_ICONINFORMATION);
+        return 0;
+      }
+      break;
     case IDM_ABOUT:
       DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
       break;
@@ -210,7 +236,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_KEYDOWN:
     Message msg;
 
-    if (client.gameStarted) {
+    if (client.gameStarted && client.inGame) {
       if (wParam == VK_RIGHT) {
         msg.cmd = KEYRIGHT;
         writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,

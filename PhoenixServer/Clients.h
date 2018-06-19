@@ -2,5 +2,5 @@
 
 BOOL addClient(Data *data, TCHAR username[50], int id);
 void clientLogin(Data *data, Message message);
-int getClientIndex(Game *game, int id);
-BOOL removeClient(Game *game, int id);
+int getClientIndex(Data *data, int id);
+BOOL removeClient(Data *data, int id);

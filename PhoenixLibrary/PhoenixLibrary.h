@@ -8,8 +8,9 @@
 #define PHOENIXLIBRARY_API __declspec(dllimport)
 #endif
 
-#define MAX_ENEMY_SHIPS 50
-#define MAX_PLAYERS 20
+#define MAX_ENEMY_SHIPS 20
+#define MAX_PLAYERS 5
+#define MAX_CLIENTS 10
 
 #define GAMEDATA_READ_SEMAPHORE_NAME TEXT("phoenix_gamedata_read_semaphore")
 #define GAMEDATA_WRITE_SEMAPHORE_NAME TEXT("phoenix_gamedata_write_semaphore")

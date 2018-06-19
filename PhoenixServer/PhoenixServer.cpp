@@ -37,6 +37,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   data.gameData = &gameData;
   data.messageData = &messageData;
 
+  data.totalClients = 0;
+  
   initGameVariables(&data.gameData->game);
 
   /**

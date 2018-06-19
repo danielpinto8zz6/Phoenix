@@ -1,47 +1,45 @@
 #include "stdafx.h"
 
 #include "Clients.h"
+#include "Game.h"
 #include "MessageZone.h"
 
 BOOL addClient(Data *data, TCHAR username[50], int id) {
-  Game *game = &data->gameData->game;
-
-  if (game->totalPlayers >= MAX_PLAYERS) {
+  if (data->totalClients >= MAX_CLIENTS) {
     return FALSE;
   }
 
-  _tcscpy_s(game->player[game->totalPlayers].username, username);
-  game->player[game->totalPlayers].id = id;
+  _tcscpy_s(data->clients[data->totalClients].username, username);
+  data->clients[data->totalClients].id = id;
 
-  game->totalPlayers++;
+  data->totalClients++;
 
   return TRUE;
 }
 
-int getClientIndex(Game *game, int id) {
-  for (int i = 0; i < game->totalPlayers; i++) {
-    if (game->player[i].id == id) {
+int getClientIndex(Data *data, int id) {
+  for (int i = 0; i < data->totalClients; i++) {
+    if (data->clients[i].id == id) {
       return i;
     }
   }
   return -1;
 }
 
-BOOL removeClient(Game *game, int id) {
-  int n = getClientIndex(game, id);
+BOOL removeClient(Data *data, int id) {
+  int n = getClientIndex(data, id);
 
   if (n == -1) {
     return FALSE;
   }
 
-  MessageBox(NULL, game->player[n].username, TEXT("Client disconnected"),
-             MB_OK | MB_ICONINFORMATION);
-
-  for (int i = n; i < game->totalPlayers; i++) {
-    game->player[i] = game->player[i + 1];
+  for (int i = n; i < data->totalClients; i++) {
+    data->clients[i] = data->clients[i + 1];
   }
 
-  game->totalPlayers--;
+  data->totalClients--;
+
+  removePlayer(&data->gameData->game, id);
 
   return TRUE;
 }

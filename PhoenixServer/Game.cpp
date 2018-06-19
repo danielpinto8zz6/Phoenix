@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "GameZone.h"
+#include "Clients.h"
 
 Coordinates getFirstEmptyPosition(Game *game) {
   Coordinates coordinates;
@@ -102,7 +103,6 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   //       gameData->game.enemyShip[position].position.y);
 
   while (TRUE) {
-    
   }
 
   sendGameToGateway(gameData, &gameData->game);
@@ -170,4 +170,53 @@ BOOL isPointInsideRect(Coordinates rect1Coord, Size rect1Sz,
     }
   }
   return FALSE;
+}
+
+BOOL addPlayer(Game *game, TCHAR username[50], int id) {
+  if (game->totalPlayers >= MAX_PLAYERS) {
+    return FALSE;
+  }
+
+  _tcscpy_s(game->player[game->totalPlayers].username, username);
+  game->player[game->totalPlayers].id = id;
+
+  game->totalPlayers++;
+
+  return TRUE;
+}
+
+int getPlayerIndex(Game *game, int id) {
+  for (int i = 0; i < game->totalPlayers; i++) {
+    if (game->player[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+BOOL removePlayer(Game *game, int id) {
+  int n = getPlayerIndex(game, id);
+
+  if (n == -1) {
+    return FALSE;
+  }
+
+  for (int i = n; i < game->totalPlayers; i++) {
+    game->player[i] = game->player[i + 1];
+  }
+
+  game->totalPlayers--;
+
+  return TRUE;
+}
+
+BOOL joinGame(Data *data, int id) {
+  int i = getClientIndex(data, id);
+
+  if (i == -1) {
+    return FALSE;
+  }
+
+  return addPlayer(&data->gameData->game, data->clients[i].username,
+            data->clients[i].id);
 }
