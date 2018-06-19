@@ -15,7 +15,23 @@ HINSTANCE hInst;                     // current instance
 WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
 
-HBITMAP hNave = NULL;
+HBITMAP hNaveBasic = NULL;
+HBITMAP hNaveDefender = NULL;
+HBITMAP hNaveDodge = NULL;
+HBITMAP hBomb = NULL;
+HBITMAP hShot = NULL;
+HBITMAP hPower1 = NULL;
+HBITMAP hPower2 = NULL;
+HBITMAP hPower3 = NULL;
+HBITMAP hPower4 = NULL;
+
+
+
+
+
+
+
+
 
 int x, y;
 HDC hdc = NULL, auxDC = NULL;
@@ -35,65 +51,65 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                      _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine,
-                      _In_ int nCmdShow) {
-  UNREFERENCED_PARAMETER(hPrevInstance);
-  UNREFERENCED_PARAMETER(lpCmdLine);
+	_In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine,
+	_In_ int nCmdShow) {
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
 
-  HANDLE hThreadMessageReceiver;
-  DWORD threadMessageReceiverId = 0;
+	HANDLE hThreadMessageReceiver;
+	DWORD threadMessageReceiverId = 0;
 
 #ifdef UNICODE
-  _setmode(_fileno(stdin), _O_WTEXT);
-  _setmode(_fileno(stdout), _O_WTEXT);
+	_setmode(_fileno(stdin), _O_WTEXT);
+	_setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
-  if (!isGatewayRunning()) {
-    errorGui(TEXT("There's no gateway instance running! Start gateway first!"));
-    return FALSE;
-  }
+	if (!isGatewayRunning()) {
+		errorGui(TEXT("There's no gateway instance running! Start gateway first!"));
+		return FALSE;
+	}
 
-  if (!connectPipes(&client)) {
-    return FALSE;
-  }
+	if (!connectPipes(&client)) {
+		return FALSE;
+	}
 
-  client.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	client.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-  client.threadContinue = TRUE;
+	client.threadContinue = TRUE;
 
-  hThreadMessageReceiver = CreateThread(NULL, 0, messageReceiver, &client, 0,
-                                        &threadMessageReceiverId);
-  if (hThreadMessageReceiver == NULL) {
-    errorGui(TEXT("Creating data receiver thread"));
-    return FALSE;
-  }
+	hThreadMessageReceiver = CreateThread(NULL, 0, messageReceiver, &client, 0,
+		&threadMessageReceiverId);
+	if (hThreadMessageReceiver == NULL) {
+		errorGui(TEXT("Creating data receiver thread"));
+		return FALSE;
+	}
 
-  hInst = hInstance;
+	hInst = hInstance;
 
-  // Initialize global strings
-  LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-  LoadStringW(hInstance, IDC_PHOENIXCLIENT, szWindowClass, MAX_LOADSTRING);
-  MyRegisterClass(hInstance);
+	// Initialize global strings
+	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+	LoadStringW(hInstance, IDC_PHOENIXCLIENT, szWindowClass, MAX_LOADSTRING);
+	MyRegisterClass(hInstance);
 
-  // Perform application initialization:
-  if (!InitInstance(hInstance, nCmdShow)) {
-    return FALSE;
-  }
+	// Perform application initialization:
+	if (!InitInstance(hInstance, nCmdShow)) {
+		return FALSE;
+	}
 
-  HACCEL hAccelTable =
-      LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_PHOENIXCLIENT));
+	HACCEL hAccelTable =
+		LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_PHOENIXCLIENT));
 
-  MSG msg;
+	MSG msg;
 
-  // Main message loop:
-  while (GetMessage(&msg, nullptr, 0, 0)) {
-    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
-    }
-  }
+	// Main message loop:
+	while (GetMessage(&msg, nullptr, 0, 0)) {
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
 
-  return (int)msg.wParam;
+	return (int)msg.wParam;
 }
 
 //
@@ -102,23 +118,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //  PURPOSE: Registers the window class.
 //
 ATOM MyRegisterClass(HINSTANCE hInstance) {
-  WNDCLASSEXW wcex;
+	WNDCLASSEXW wcex;
 
-  wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.cbSize = sizeof(WNDCLASSEX);
 
-  wcex.style = CS_HREDRAW | CS_VREDRAW;
-  wcex.lpfnWndProc = WndProc;
-  wcex.cbClsExtra = 0;
-  wcex.cbWndExtra = 0;
-  wcex.hInstance = hInstance;
-  wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PHOENIXCLIENT));
-  wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-  wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-  wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_PHOENIXCLIENT);
-  wcex.lpszClassName = szWindowClass;
-  wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PHOENIXCLIENT));
+	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_PHOENIXCLIENT);
+	wcex.lpszClassName = szWindowClass;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-  return RegisterClassExW(&wcex);
+	return RegisterClassExW(&wcex);
 }
 
 //
@@ -132,20 +148,20 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 //        create and display the main program window.
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
-  hInst = hInstance; // Store instance handle in our global variable
+	hInst = hInstance; // Store instance handle in our global variable
 
-  HWND hWnd =
-      CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-                    0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	HWND hWnd =
+		CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+			0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
-  if (!hWnd) {
-    return FALSE;
-  }
+	if (!hWnd) {
+		return FALSE;
+	}
 
-  ShowWindow(hWnd, nCmdShow);
-  UpdateWindow(hWnd);
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
 
-  return TRUE;
+	return TRUE;
 }
 
 //
@@ -159,169 +175,290 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 //
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
-                         LPARAM lParam) {
-  static BITMAP bmNave;
-  static HDC hdcNave;
+	LPARAM lParam) {
+	static BITMAP bmNaveBasic;
+	static HDC hdcNaveBasic;
+	static BITMAP bmNaveDefender;
+	static HDC hdcNaveDefender;
+	static BITMAP bmNaveDodge;
+	static HDC hdcNaveDodge;
+	static BITMAP bmBomb;
+	static HDC hdcBomb;
+	static BITMAP bmPower1;
+	static HDC hdcPower1;
+	static BITMAP bmPower2;
+	static HDC hdcPower2;
+	static BITMAP bmPower3;
+	static HDC hdcPower3;
+	static BITMAP bmPower4;
+	static HDC hdcPower4;
+	static BITMAP bmShot;
+	static HDC hdcShot;
 
-  switch (message) {
-  case WM_CREATE:
 
-    hNave =
-        (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_BOMBS),
-                           IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hNave, sizeof(bmNave), &bmNave);
-    hdcNave = CreateCompatibleDC(hdc);
-    SelectObject(hdcNave, hNave);
-    ReleaseDC(hWnd, hdc);
+	switch (message) {
+	case WM_CREATE:
 
-    // OBTEM AS DIMENSOES DO DISPLAY...
-    bg = CreateSolidBrush(RGB(255, 128, 128));
-    nX = GetSystemMetrics(SM_CXSCREEN);
-    nY = GetSystemMetrics(SM_CYSCREEN);
+		hNaveBasic =
+			(HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_ENEMY_SHIPS_BASIC),
+				IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hdc = GetDC(hWnd);
+		GetObject(hNaveBasic, sizeof(bmNaveBasic), &bmNaveBasic);
+		hdcNaveBasic = CreateCompatibleDC(hdc);
+		SelectObject(hdcNaveBasic, hNaveBasic);
+		ReleaseDC(hWnd, hdc);
 
-    // PREPARA 'BITMAP' E ASSOCIA A UM 'DC' EM MEMORIA...
-    hdc = GetDC(hWnd);
-    auxDC = CreateCompatibleDC(hdc);
-    auxBM = CreateCompatibleBitmap(hdc, nX, nY);
-    SelectObject(auxDC, auxBM);
-    SelectObject(auxDC, GetStockObject(GRAY_BRUSH));
-    PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
-    ReleaseDC(hWnd, hdc);
+		hNaveDefender =
+			(HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_DEFENDERS),
+				IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hdc = GetDC(hWnd);
+		GetObject(hNaveDefender, sizeof(bmNaveDefender), &bmNaveDefender);
+		hdcNaveDefender = CreateCompatibleDC(hdc);
+		SelectObject(hdcNaveDefender, hNaveDefender);
+		ReleaseDC(hWnd, hdc);
 
-    break;
-  case WM_COMMAND: {
-    int wmId = LOWORD(wParam);
-    // Parse the menu selections:
-    switch (wmId) {
-    case ID_FILE_LOGIN:
-      DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_LOGIN), hWnd, Login);
-      break;
-    case IDM_ABOUT:
-      DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-      break;
-    case IDM_EXIT:
-      DestroyWindow(hWnd);
-      break;
-    default:
-      return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-  } break;
-  case WM_KEYDOWN:
-    Message msg;
+		hNaveDodge =
+			(HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_ENEMY_SHIPS_DODGE),
+				IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hdc = GetDC(hWnd);
+		GetObject(hNaveDodge, sizeof(bmNaveDodge), &bmNaveDodge);
+		hdcNaveDodge = CreateCompatibleDC(hdc);
+		SelectObject(hdcNaveDodge, hNaveDodge);
+		ReleaseDC(hWnd, hdc);
 
-    if (client.gameStarted) {
-      if (wParam == VK_RIGHT) {
-        msg.cmd = KEYRIGHT;
-        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                             sizeof(Message));
-      }
-      if (wParam == VK_LEFT) {
-        msg.cmd = KEYLEFT;
-        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                             sizeof(Message));
-      }
-      if (wParam == VK_UP) {
-        msg.cmd = KEYUP;
-        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                             sizeof(Message));
-      }
-      if (wParam == VK_DOWN) {
-        msg.cmd = KEYDOWN;
-        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                             sizeof(Message));
-      }
-      if (wParam == VK_SPACE) {
-        msg.cmd = KEYSPACE;
-        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
-                             sizeof(Message));
-      }
-    }
-    break;
-  case WM_CLOSE:
-    if (MessageBox(hWnd, TEXT("Exit?"), TEXT("Exit"),
-                   MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES)
-      DestroyWindow(hWnd);
-    break;
-  case WM_PAINT: {
-    PAINTSTRUCT ps;
-    PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
+		hBomb =
+			(HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_BOMBS),
+				IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hdc = GetDC(hWnd);
+		GetObject(hBomb, sizeof(bmBomb), &bmBomb);
+		hdcBomb = CreateCompatibleDC(hdc);
+		SelectObject(hdcBomb, hBomb);
+		ReleaseDC(hWnd, hdc);
 
-    SetStretchBltMode(auxDC, BLACKONWHITE);
-    StretchBlt(auxDC, 25, 80, 100, 60, hdcNave, 0, 0, bmNave.bmWidth,
-               bmNave.bmHeight, SRCCOPY);
+		hPower1 =
+			(HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_POWERUP_1),
+				IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hdc = GetDC(hWnd);
+		GetObject(hPower1, sizeof(bmPower1), &bmPower1);
+		hdcPower1 = CreateCompatibleDC(hdc);
+		SelectObject(hdcPower1, hPower1);
+		ReleaseDC(hWnd, hdc);
 
-    // COPIA INFORMACAO DO 'DC' EM MEMORIA PARA O DISPLAY...
-    hdc = BeginPaint(hWnd, &ps);
-    BitBlt(hdc, 0, 0, nX, nY, auxDC, 0, 0, SRCCOPY);
-    EndPaint(hWnd, &ps);
-  } break;
-  case WM_DESTROY:
-    PostQuitMessage(0);
-    DeleteObject(hNave);
-    DeleteDC(hdcNave);
+		hPower2 =
+			(HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_POWERUP_2),
+				IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hdc = GetDC(hWnd);
+		GetObject(hPower2, sizeof(bmPower2), &bmPower2);
+		hdcPower2 = CreateCompatibleDC(hdc);
+		SelectObject(hdcPower2, hPower2);
+		ReleaseDC(hWnd, hdc);
 
-    /**
-     * Release resources in memory
-     */
-    DeleteObject(bg);
-    DeleteObject(auxBM);
-    DeleteDC(auxDC);
-    break;
-  default:
-    return DefWindowProc(hWnd, message, wParam, lParam);
-  }
-  return 0;
+		hPower3 =
+			(HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_POWERUP_3),
+				IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hdc = GetDC(hWnd);
+		GetObject(hPower3, sizeof(bmPower3), &bmPower3);
+		hdcPower3 = CreateCompatibleDC(hdc);
+		SelectObject(hdcPower3, hPower3);
+		ReleaseDC(hWnd, hdc);
+
+		hPower4 =
+			(HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_POWERUP_4),
+				IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hdc = GetDC(hWnd);
+		GetObject(hPower4, sizeof(bmPower4), &bmPower4);
+		hdcPower4 = CreateCompatibleDC(hdc);
+		SelectObject(hdcPower4, hPower4);
+		ReleaseDC(hWnd, hdc);
+		
+		hShot =
+			(HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_SHOT),
+				IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hdc = GetDC(hWnd);
+		GetObject(hShot, sizeof(bmShot), &bmShot);
+		hdcShot = CreateCompatibleDC(hdc);
+		SelectObject(hdcShot, hShot);
+		ReleaseDC(hWnd, hdc);
+
+
+		// OBTEM AS DIMENSOES DO DISPLAY...
+		bg = CreateSolidBrush(RGB(255, 128, 128));
+		nX = GetSystemMetrics(SM_CXSCREEN);
+		nY = GetSystemMetrics(SM_CYSCREEN);
+
+		// PREPARA 'BITMAP' E ASSOCIA A UM 'DC' EM MEMORIA...
+		hdc = GetDC(hWnd);
+		auxDC = CreateCompatibleDC(hdc);
+		auxBM = CreateCompatibleBitmap(hdc, nX, nY);
+		SelectObject(auxDC, auxBM);
+		SelectObject(auxDC, GetStockObject(GRAY_BRUSH));
+		PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
+		ReleaseDC(hWnd, hdc);
+
+		break;
+	case WM_COMMAND: {
+		int wmId = LOWORD(wParam);
+		// Parse the menu selections:
+		switch (wmId) {
+		case ID_FILE_LOGIN:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_LOGIN), hWnd, Login);
+			break;
+		case IDM_ABOUT:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+			break;
+		case IDM_EXIT:
+			DestroyWindow(hWnd);
+			break;
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
+	} break;
+	case WM_KEYDOWN:
+		Message msg;
+
+		if (client.gameStarted) {
+			if (wParam == VK_RIGHT) {
+				msg.cmd = KEYRIGHT;
+				writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+					sizeof(Message));
+			}
+			if (wParam == VK_LEFT) {
+				msg.cmd = KEYLEFT;
+				writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+					sizeof(Message));
+			}
+			if (wParam == VK_UP) {
+				msg.cmd = KEYUP;
+				writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+					sizeof(Message));
+			}
+			if (wParam == VK_DOWN) {
+				msg.cmd = KEYDOWN;
+				writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+					sizeof(Message));
+			}
+			if (wParam == VK_SPACE) {
+				msg.cmd = KEYSPACE;
+				writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+					sizeof(Message));
+			}
+		}
+		break;
+	case WM_CLOSE:
+		if (MessageBox(hWnd, TEXT("Exit?"), TEXT("Exit"),
+			MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES)
+			DestroyWindow(hWnd);
+		break;
+	case WM_PAINT: {
+		PAINTSTRUCT ps;
+		PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
+		SetStretchBltMode(auxDC, BLACKONWHITE);
+
+		//for (int i = 0; i < client.game->totalEnemyShips; i++) {
+
+			StretchBlt(auxDC, 0, 0, 50, 25, hdcNaveBasic, 0, 0, bmNaveBasic.bmWidth,
+				bmNaveBasic.bmHeight, SRCCOPY);
+			//if (client.game->enemyShip[i].type == BASIC) {
+	
+		//StretchBlt(auxDC, client.game->enemyShip[i].position.x, client.game->enemyShip[i].position.y, 50, 25, hdcNave, 0, 0, bmNave.bmWidth,
+		//			bmNave.bmHeight, SRCCOPY);
+			//}
+		//}
+
+
+		StretchBlt(auxDC,0 ,300, 50, 25, hdcNaveDefender, 0, 0, bmNaveDefender.bmWidth,
+			bmNaveDefender.bmHeight, SRCCOPY);
+
+		StretchBlt(auxDC,50, 0, 50, 25, hdcNaveDodge, 0, 0, bmNaveDodge.bmWidth,
+			bmNaveDodge.bmHeight, SRCCOPY);
+
+		StretchBlt(auxDC,0, 50, 50, 25, hdcBomb, 0, 0, bmBomb.bmWidth,
+			bmBomb.bmHeight, SRCCOPY);
+
+		StretchBlt(auxDC, 0, 100, 50, 25, hdcPower1, 0, 0, bmPower1.bmWidth,
+			bmPower1.bmHeight, SRCCOPY);
+		StretchBlt(auxDC, 50, 100, 50, 25, hdcPower2, 0, 0, bmPower2.bmWidth,
+			bmPower2.bmHeight, SRCCOPY);
+		StretchBlt(auxDC, 100, 100, 50, 25, hdcPower3, 0, 0, bmPower3.bmWidth,
+			bmPower3.bmHeight, SRCCOPY);
+		StretchBlt(auxDC, 159, 100, 50, 25, hdcPower4, 0, 0, bmPower4.bmWidth,
+			bmPower4.bmHeight, SRCCOPY);
+		StretchBlt(auxDC, 0, 150, 50, 25, hdcShot, 0, 0, bmShot.bmWidth,
+			bmShot.bmHeight, SRCCOPY);
+		StretchBlt(auxDC, 50, 300, 50, 25, hdcNaveDefender, 0, 0, bmNaveDefender.bmWidth,
+			bmNaveDefender.bmHeight, SRCCOPY);
+
+		// COPIA INFORMACAO DO 'DC' EM MEMORIA PARA O DISPLAY...
+		hdc = BeginPaint(hWnd, &ps);
+		BitBlt(hdc, 0, 0, nX, nY, auxDC, 0, 0, SRCCOPY);
+		EndPaint(hWnd, &ps);
+	} break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		//DeleteObject(hNave);
+		//DeleteDC(hdcNave);
+
+		/**
+		 * Release resources in memory
+		 */
+		DeleteObject(bg);
+		DeleteObject(auxBM);
+		DeleteDC(auxDC);
+		break;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
 }
 
 // Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
-  UNREFERENCED_PARAMETER(lParam);
-  switch (message) {
-  case WM_INITDIALOG:
-    return (INT_PTR)TRUE;
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message) {
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
 
-  case WM_COMMAND:
-    if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
-      EndDialog(hDlg, LOWORD(wParam));
-      return (INT_PTR)TRUE;
-    }
-    break;
-  }
-  return (INT_PTR)FALSE;
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
 }
 
 BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
-  Message message;
+	Message message;
 
-  switch (messg) {
-  case WM_COMMAND:
-    switch (LOWORD(wParam)) {
-    case IDOK:
-      GetDlgItemText(hWnd, IDC_EDIT_USERNAME, message.text, 50);
-      if (_tcslen(message.text) == 0) {
-        MessageBox(NULL, TEXT("Fill in all the fields first!"),
-                   TEXT("Missing fields"), MB_OK | MB_ICONINFORMATION);
-        break;
-      }
+	switch (messg) {
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			GetDlgItemText(hWnd, IDC_EDIT_USERNAME, message.text, 50);
+			if (_tcslen(message.text) == 0) {
+				MessageBox(NULL, TEXT("Fill in all the fields first!"),
+					TEXT("Missing fields"), MB_OK | MB_ICONINFORMATION);
+				break;
+			}
 
-      message.cmd = LOGIN;
-      _tcscpy_s(client.username, message.text);
+			message.cmd = LOGIN;
+			_tcscpy_s(client.username, message.text);
 
-      if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &message,
-                                sizeof(Message))) {
-        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
-                   MB_OK | MB_ICONINFORMATION);
-        break;
-      }
+			if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &message,
+				sizeof(Message))) {
+				MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
+					MB_OK | MB_ICONINFORMATION);
+				break;
+			}
 
-      EndDialog(hWnd, LOWORD(wParam));
-      return (INT_PTR)TRUE;
-    case IDCANCEL:
-      EndDialog(hWnd, LOWORD(wParam));
-      return (INT_PTR)TRUE;
-    }
-    break;
-  }
-  return 0;
+			EndDialog(hWnd, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		case IDCANCEL:
+			EndDialog(hWnd, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return 0;
 }

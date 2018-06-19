@@ -16,9 +16,16 @@
 #define IDD_DIALOG_MENU                 130
 #define IDB_BITMAP_BOMBS                131
 #define IDB_BITMAP_POWERUP_ICE          133
+#define IDB_BITMAP_POWERUP_1            133
 #define IDB_BITMAP_DEFENDERS            134
 #define IDB_BITMAP_ENEMY_SHIPS          135
 #define IDB_BITMAP_ENEMY_SHIPS_BASIC    135
+#define IDB_BITMAP_ENEMY_SHIPS_DODGE    136
+#define IDB_BITMAP_POWER_UP_2           137
+#define IDB_BITMAP_POWERUP_2            137
+#define IDB_BITMAP_POWERUP_3            138
+#define IDB_BITMAP_POWERUP_4            139
+#define IDB_BITMAP_SHOT                 140
 #define IDC_EDIT1                       1000
 #define IDC_EDIT_USERNAME               1000
 #define IDC_BUTTON1                     1001
@@ -34,7 +41,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        136
+#define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         32772
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           110
