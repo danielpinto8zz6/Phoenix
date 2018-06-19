@@ -32,6 +32,7 @@ void handleCommand(Data *data, Message message) {
     clientLogin(data, message);
     break;
   case CLIENT_DISCONNECTED:
+    removeClient(&data->gameData->game, message.clientId);
     break;
   case GATEWAY_DISCONNECTED:
     break;

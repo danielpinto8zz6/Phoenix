@@ -18,6 +18,34 @@ BOOL addClient(Data *data, TCHAR username[50], int id) {
   return TRUE;
 }
 
+int getClientIndex(Game *game, int id) {
+  for (int i = 0; i < game->totalPlayers; i++) {
+    if (game->player[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+BOOL removeClient(Game *game, int id) {
+  int n = getClientIndex(game, id);
+
+  if (n == -1) {
+    return FALSE;
+  }
+
+  MessageBox(NULL, game->player[n].username, TEXT("Client disconnected"),
+             MB_OK | MB_ICONINFORMATION);
+
+  for (int i = n; i < game->totalPlayers; i++) {
+    game->player[i] = game->player[i + 1];
+  }
+
+  game->totalPlayers--;
+
+  return TRUE;
+}
+
 void clientLogin(Data *data, Message message) {
   if (!addClient(data, message.text, message.clientId)) {
     errorGui(TEXT("Can't add client"));

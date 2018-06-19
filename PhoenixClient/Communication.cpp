@@ -72,11 +72,10 @@ BOOL connectPipes(Client *client) {
 
 DWORD WINAPI gameReceiver(LPVOID lpParam) {
   Client *client = (Client *)lpParam;
+  Game *game = client->game;
 
   DWORD nBytes = 0;
   BOOL fSuccess = FALSE;
-
-  Game game;
 
   if (client->hPipeGame == NULL) {
     errorGui(TEXT("Game pipe is NULL"));
@@ -84,7 +83,7 @@ DWORD WINAPI gameReceiver(LPVOID lpParam) {
   }
 
   while (client->threadContinue) {
-    fSuccess = readDataFromPipe(client->hPipeGame, &game, sizeof(Game));
+    fSuccess = readDataFromPipe(client->hPipeGame, game, sizeof(Game));
 
     if (!fSuccess) {
       // Ignore it because messagereceiver already handles broken pipe error...
@@ -139,14 +138,22 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
       break;
     }
 
-    // TODO
-    if (message.cmd == LOGGED) {
-      MessageBox(NULL, message.text, TEXT("Login succeed"),
-                 MB_OK | MB_ICONINFORMATION);
-    }
+    handleCommand(client, message);
   }
 
   client->readerAlive = FALSE;
 
   return TRUE;
+}
+
+void handleCommand(Client *client, Message message) {
+  switch (message.cmd) {
+  case GAME_STARTED:
+    startGame(client);
+    break;
+  case LOGGED:
+    MessageBox(NULL, message.text, TEXT("Login succeed"),
+               MB_OK | MB_ICONINFORMATION);
+    break;
+  }
 }

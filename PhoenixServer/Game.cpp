@@ -101,7 +101,9 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   //       gameData->game.enemyShip[position].position.x,
   //       gameData->game.enemyShip[position].position.y);
 
-  gameData->game.level = 5;
+  while (TRUE) {
+    
+  }
 
   sendGameToGateway(gameData, &gameData->game);
 

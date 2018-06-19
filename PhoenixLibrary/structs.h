@@ -31,7 +31,8 @@ typedef enum {
   KEYUP,
   KEYLEFT,
   KEYRIGHT,
-  KEYSPACE
+  KEYSPACE,
+  GAME_STARTED
 } Command;
 
 typedef struct {
@@ -137,6 +138,8 @@ typedef struct {
   HANDLE hPipeMessage;
   HANDLE hEvent;
   BOOL readerAlive;
+  Game *game;
+  BOOL gameStarted;
 } Client;
 
 typedef struct {
