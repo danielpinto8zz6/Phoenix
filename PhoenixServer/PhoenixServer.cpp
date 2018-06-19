@@ -265,7 +265,7 @@ INT_PTR CALLBACK Configure(HWND hDlg, UINT message, WPARAM wParam,
 
 VOID handleClose(MessageData *messageData) {
   Message msg;
-  msg.cmd = SERVER_CLOSING;
+  msg.cmd = SERVER_DISCONNECTED;
   writeDataToSharedMemory(messageData->sharedMessage, &msg, sizeof(Message),
                           messageData->hMutex,
                           messageData->gatewayMessageUpdateEvent);

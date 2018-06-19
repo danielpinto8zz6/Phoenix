@@ -162,8 +162,8 @@ BOOL isPointInsideRect(Coordinates rect1Coord, Size rect1Sz,
   /**
    * Check on x
    */
-  if (point.x >= rect1Coord.x && point.x <= rect2Coord.x) {
-    if (point.y >= rect1Coord.y && point.y <= rect2Coord.y) {
+  if (point.x >= rect1Coord.x && point.x <= rect1Coord.x) {
+    if (point.y >= rect1Coord.y && point.y <= rect1Coord.y) {
       return TRUE;
     }
   }

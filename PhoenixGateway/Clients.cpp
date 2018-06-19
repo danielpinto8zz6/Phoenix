@@ -192,7 +192,7 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
                             sizeof(Message), data->messageData->hMutex,
                             data->messageData->serverMessageUpdateEvent);
 
-    if (message.cmd == CLIENT_CLOSING) {
+    if (message.cmd == CLIENT_DISCONNECTED) {
       break;
     }
   }

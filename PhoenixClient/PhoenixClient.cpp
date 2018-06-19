@@ -220,23 +220,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     }
   } break;
   case WM_CHAR:
+    Message msg;
     key[0] = wParam;
     InvalidateRect(hWnd, NULL, FALSE);
     break;
   case WM_KEYDOWN:
     if (wParam == VK_RIGHT) {
+      msg.cmd = KEYRIGHT;
       x++;
       InvalidateRect(hWnd, NULL, FALSE);
     }
     if (wParam == VK_LEFT) {
+      msg.cmd = KEYLEFT;
       x--;
       InvalidateRect(hWnd, NULL, FALSE);
     }
     if (wParam == VK_UP) {
+      msg.cmd = KEYUP;
       y--;
       InvalidateRect(hWnd, NULL, FALSE);
     }
     if (wParam == VK_DOWN) {
+      msg.cmd = KEYDOWN;
+      y++;
+      InvalidateRect(hWnd, NULL, FALSE);
+    }
+    if (wParam == VK_SPACE) {
+      msg.cmd = KEYSPACE;
       y++;
       InvalidateRect(hWnd, NULL, FALSE);
     }

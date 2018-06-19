@@ -19,14 +19,41 @@ DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
       readDataFromSharedMemory(messageData->sharedMessage,
                                &messageData->message, sizeof(Message),
                                &messageData->hMutex);
-      switch (messageData->message.cmd) {
-      case LOGIN:
-        clientLogin(data, messageData->message);
-        break;
-      case CLIENT_DISCONNECTED:
-        break;
-      }
+      handleCommand(data, messageData->message);
     }
   }
   return 0;
+}
+
+void handleCommand(Data *data, Message message) {
+
+  switch (message.cmd) {
+  case LOGIN:
+    clientLogin(data, message);
+    break;
+  case CLIENT_DISCONNECTED:
+    break;
+  case GATEWAY_DISCONNECTED:
+    break;
+  case KEYDOWN:
+    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYDOWN"),
+               MB_OK | MB_ICONINFORMATION);
+    break;
+  case KEYUP:
+    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYUP"),
+               MB_OK | MB_ICONINFORMATION);
+    break;
+  case KEYLEFT:
+    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYLEFT"),
+               MB_OK | MB_ICONINFORMATION);
+    break;
+  case KEYRIGHT:
+    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYRIGHT"),
+               MB_OK | MB_ICONINFORMATION);
+    break;
+  case KEYSPACE:
+    MessageBox(NULL, TEXT("Key pressedt!"), TEXT("KEYSPACE"),
+               MB_OK | MB_ICONINFORMATION);
+    break;
+  }
 }
