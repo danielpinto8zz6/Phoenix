@@ -98,13 +98,6 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   gameData->game.enemyShip[position].position = c;
 
-  // debug(TEXT("(EnemyShips Coordinates): %d %d"),
-  //       gameData->game.enemyShip[position].position.x,
-  //       gameData->game.enemyShip[position].position.y);
-
-  while (TRUE) {
-  }
-
   sendGameToGateway(gameData, &gameData->game);
 
   ReleaseMutex(hMutexManageEnemyShips);

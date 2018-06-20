@@ -4,6 +4,7 @@
 #include "stdafx.h"
 
 #include "Communication.h"
+#include "Game.h"
 #include "PhoenixClient.h"
 #include <process.h>
 #include <windowsx.h>
@@ -50,6 +51,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   HANDLE hThreadMessageReceiver;
   DWORD threadMessageReceiverId = 0;
+  HANDLE hThreadGameReceiver;
+  DWORD threadGameReceiverId = 0;
 
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
@@ -76,6 +79,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   hThreadMessageReceiver = CreateThread(NULL, 0, messageReceiver, &client, 0,
                                         &threadMessageReceiverId);
   if (hThreadMessageReceiver == NULL) {
+    errorGui(TEXT("Creating data receiver thread"));
+    return FALSE;
+  }
+
+  hThreadGameReceiver =
+      CreateThread(NULL, 0, gameReceiver, &client, 0, &threadGameReceiverId);
+  if (hThreadGameReceiver == NULL) {
     errorGui(TEXT("Creating data receiver thread"));
     return FALSE;
   }
@@ -375,13 +385,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
     SetStretchBltMode(auxDC, BLACKONWHITE);
 
+    if (client.gameStarted) {
+      errorGui(TEXT("Game started"));
+    }
     // if (client.gameStarted) {
     //   errorGui(TEXT("HERE"));
-      // for (int i = 0; i < client.game.totalEnemyShips; i++) {
-      //   StretchBlt(auxDC, client.game.enemyShip[i].position.x,
-      //              client.game.enemyShip[i].position.y, 50, 50, hdcNaveBasic,
-      //              0, 0, bmNaveBasic.bmWidth, bmNaveBasic.bmHeight, SRCCOPY);
-      // }
+    // for (int i = 0; i < client.game.totalEnemyShips; i++) {
+    //   StretchBlt(auxDC, client.game.enemyShip[i].position.x,
+    //              client.game.enemyShip[i].position.y, 50, 50, hdcNaveBasic,
+    //              0, 0, bmNaveBasic.bmWidth, bmNaveBasic.bmHeight, SRCCOPY);
+    // }
     // }
 
     StretchBlt(auxDC, 0, 300, 50, 25, hdcNaveDefender, 0, 0,

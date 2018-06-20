@@ -149,7 +149,9 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
 void handleCommand(Client *client, Message message) {
   switch (message.cmd) {
   case GAME_STARTED:
-    startGame(client);
+      MessageBox(NULL, TEXT("Game started"), TEXT("Info"),
+               MB_OK | MB_ICONINFORMATION);
+    client->gameStarted = TRUE;
     break;
   case LOGGED:
     MessageBox(NULL, message.text, TEXT("Login succeed"),
