@@ -4,18 +4,21 @@
 #include "Game.h"
 #include "GameZone.h"
 
+#define ENEMYSHIP_WIDTH 50
+#define ENEMYSHIP_HEIGHT 50
+
 Coordinates getFirstEmptyPosition(Game *game) {
   Coordinates coordinates;
 
-  for (coordinates.y = 0; coordinates.y < HEIGHT; coordinates.y) {
-    for (coordinates.x = 0; coordinates.x < WIDTH; coordinates.x) {
-      if (!isPositionOccupied(game, coordinates)) {
-        return coordinates;
-      }
+  coordinates.y = 0;
+  coordinates.x = 0;
+  for (int i = 0; i < game->totalEnemyShips; i++) {
+    coordinates.x += ENEMYSHIP_WIDTH;
+    if (coordinates.x == 500) {
+      coordinates.x = 0;
+      coordinates.y += ENEMYSHIP_HEIGHT + 5;
     }
   }
-  coordinates.x = -1;
-  coordinates.y = -1;
 
   return coordinates;
 }
@@ -56,6 +59,7 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
   // Create Enemy Ships threads
   for (int i = 0; i < ENEMYSHIPS; i++) {
     gameData->position = i;
+    gameData->game.totalEnemyShips = i;
     aThread[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadEnemyShip,
                               gameData, 0, &ThreadID);
 
@@ -87,11 +91,9 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   int position = gameData->position;
 
-  gameData->game.totalEnemyShips++;
-
   WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
 
-  // Place ship...
+  // Place ship...hNaveBasichNaveDodge
   Coordinates c = getFirstEmptyPosition(&gameData->game);
   if (!isCoordinatesValid(c)) {
     errorGui(TEXT("Can't find an empty position"));
@@ -99,7 +101,12 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   }
 
   gameData->game.enemyShip[position].position = c;
+  if (gameData->game.totalEnemyShips > 10) {
 
+    gameData->game.enemyShip[position].type = BASIC;
+  } else {
+    gameData->game.enemyShip[position].type = DODGE;
+  }
   sendGameToGateway(gameData, &gameData->game);
 
   ReleaseMutex(hMutexManageEnemyShips);

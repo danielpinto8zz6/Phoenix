@@ -3,7 +3,6 @@
 #include "resource.h"
 
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-void drawGame(RECT r);
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow);
 void loadBitmaps();
 BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam);
