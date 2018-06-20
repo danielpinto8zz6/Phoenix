@@ -60,9 +60,6 @@
     <Image Include="PhoenixClient.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Ship.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="icePUP.bmp">
       <Filter>Resource Files</Filter>
     </Image>
@@ -73,6 +70,27 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="enimies.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="dodge.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="pp2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="pp3.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="pp4.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="shots.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="tiro.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

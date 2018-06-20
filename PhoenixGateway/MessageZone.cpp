@@ -10,6 +10,8 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
 
   DWORD dwWaitResult;
 
+  int x;
+
   messageData->STOP = FALSE;
 
   while (!messageData->STOP) {
@@ -23,15 +25,23 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
        */
       debug(TEXT("%d Bytes received"), sizeof(Message));
 
-      if (message.cmd == LOGGED) {
-        int x = getClientIndex(data, message.clientId);
+      switch (message.cmd) {
+      case LOGGED:
+        x = getClientIndex(data, message.clientId);
         if (x != -1) {
-          writeDataToPipeAsync(data->client[x].hPipeMessage, data->hEvent, &message,
-                               sizeof(Message));
-          debug(TEXT("%s logged"), message.text);
+          writeDataToPipeAsync(data->client[x].hPipeMessage, data->hEvent,
+                               &message, sizeof(Message));
         }
+        break;
+      case IN_GAME:
+        x = getClientIndex(data, message.clientId);
+        if (x != -1) {
+          writeDataToPipeAsync(data->client[x].hPipeMessage, data->hEvent,
+                               &message, sizeof(Message));
+        }
+        break;
+        // broadcastGameToClients(data, &game, data->writeReady);
       }
-      // broadcastGameToClients(data, &game, data->writeReady);
     }
   }
   return 0;

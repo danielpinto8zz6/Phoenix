@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 
+#include "Clients.h"
 #include "Game.h"
 #include "GameZone.h"
-#include "Clients.h"
 
 Coordinates getFirstEmptyPosition(Game *game) {
   Coordinates coordinates;
@@ -211,12 +211,25 @@ BOOL removePlayer(Game *game, int id) {
 }
 
 BOOL joinGame(Data *data, int id) {
+  Message message;
+
   int i = getClientIndex(data, id);
 
   if (i == -1) {
     return FALSE;
   }
 
-  return addPlayer(&data->gameData->game, data->clients[i].username,
-            data->clients[i].id);
+  if (!addPlayer(&data->gameData->game, data->clients[i].username,
+                 data->clients[i].id)) {
+    return FALSE;
+  }
+
+  message.clientId = id;
+  message.cmd = IN_GAME;
+
+  writeDataToSharedMemory(data->messageData->sharedMessage, &message,
+                          sizeof(Message), data->messageData->hMutex,
+                          data->messageData->gatewayMessageUpdateEvent);
+
+  return TRUE;
 }
