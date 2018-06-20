@@ -40,7 +40,9 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
                                &message, sizeof(Message));
         }
         break;
-        // broadcastGameToClients(data, &game, data->writeReady);
+      default:
+        broadcastMessageToClients(data, &message);
+        break;
       }
     }
   }
