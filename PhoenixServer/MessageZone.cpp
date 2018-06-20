@@ -39,7 +39,7 @@ void handleCommand(Data *data, Message message) {
     joinGame(data, message.clientId);
     break;
   case PLAYER_LOST:
-    removePlayer(data, message.clientId);
+    removePlayer(&data->gameData->game, message.clientId);
     break;
   case GATEWAY_DISCONNECTED:
     break;

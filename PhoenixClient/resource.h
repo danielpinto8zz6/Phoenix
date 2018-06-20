@@ -19,6 +19,7 @@
 #define IDB_BITMAP_DEFENDERS            134
 #define IDB_BITMAP_ENEMY_SHIPS          135
 #define IDB_BITMAP_ENEMY_SHIPS_BASIC    135
+#define IDD_DIALOG_SCORE                136
 #define IDC_EDIT1                       1000
 #define IDC_EDIT_USERNAME               1000
 #define IDC_BUTTON1                     1001
@@ -26,8 +27,12 @@
 #define IDC_BUTTON3                     1003
 #define IDC_CHECK1                      1004
 #define IDC_BUTTON4                     1005
+#define IDC_LIST2                       1011
+#define IDC_LIST3                       1012
+#define ID_GET_SCORE                    1013
 #define ID_FILE_LOGIN                   32771
 #define ID_FILE_JOINGAME                32772
+#define ID_FILE_TOP10                   32773
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -35,9 +40,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1006
+#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_COMMAND_VALUE         32774
+#define _APS_NEXT_CONTROL_VALUE         1014
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

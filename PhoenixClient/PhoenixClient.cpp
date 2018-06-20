@@ -223,6 +223,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
         return 0;
       }
       break;
+    case ID_FILE_TOP10:
+      DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_SCORE), hWnd, Score);
+      break;
     case IDM_ABOUT:
       DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
       break;
@@ -345,6 +348,32 @@ BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
       return (INT_PTR)TRUE;
     case IDCANCEL:
       EndDialog(hWnd, LOWORD(wParam));
+      return (INT_PTR)TRUE;
+    }
+    break;
+  }
+  return 0;
+}
+
+INT_PTR CALLBACK Score(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+  UNREFERENCED_PARAMETER(lParam);
+  switch (message) {
+  case WM_INITDIALOG:
+    for (int i = 0; i < 10; i++) {
+      TCHAR nome[20];
+      TCHAR pontos[20];
+
+      _stprintf_s(nome, 20, TEXT("Daniel"));
+      _stprintf_s(pontos, 20, TEXT("%d"), 10);
+
+      SendDlgItemMessage(hDlg, IDC_LIST3, LB_ADDSTRING, NULL, (LPARAM)nome);
+      SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, NULL, (LPARAM)pontos);
+    }
+    return (INT_PTR)TRUE;
+
+  case WM_COMMAND:
+    if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+      EndDialog(hDlg, LOWORD(wParam));
       return (INT_PTR)TRUE;
     }
     break;
