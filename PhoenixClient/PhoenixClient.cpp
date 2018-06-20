@@ -154,6 +154,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     return FALSE;
   }
 
+  client.hWnd = hWnd;
+
   ShowWindow(hWnd, nCmdShow);
   UpdateWindow(hWnd);
 
@@ -373,10 +375,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
     SetStretchBltMode(auxDC, BLACKONWHITE);
 
+    // if (client.gameStarted) {
+    //   errorGui(TEXT("HERE"));
+      // for (int i = 0; i < client.game.totalEnemyShips; i++) {
+      //   StretchBlt(auxDC, client.game.enemyShip[i].position.x,
+      //              client.game.enemyShip[i].position.y, 50, 50, hdcNaveBasic,
+      //              0, 0, bmNaveBasic.bmWidth, bmNaveBasic.bmHeight, SRCCOPY);
+      // }
+    // }
+
+    StretchBlt(auxDC, 0, 300, 50, 25, hdcNaveDefender, 0, 0,
+               bmNaveDefender.bmWidth, bmNaveDefender.bmHeight, SRCCOPY);
+
     // for (int i = 0; i < client.game->totalEnemyShips; i++) {
 
-    StretchBlt(auxDC, 0, 0, 50, 25, hdcNaveBasic, 0, 0, bmNaveBasic.bmWidth,
-               bmNaveBasic.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 0, 0, 50, 25, hdcNaveBasic, 0, 0, bmNaveBasic.bmWidth,
+    //            bmNaveBasic.bmHeight, SRCCOPY);
     // if (client.game->enemyShip[i].type == BASIC) {
 
     // StretchBlt(auxDC, client.game->enemyShip[i].position.x,
@@ -385,27 +399,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     //}
     //}
 
-    StretchBlt(auxDC, 0, 300, 50, 25, hdcNaveDefender, 0, 0,
-               bmNaveDefender.bmWidth, bmNaveDefender.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 0, 300, 50, 25, hdcNaveDefender, 0, 0,
+    //            bmNaveDefender.bmWidth, bmNaveDefender.bmHeight, SRCCOPY);
 
-    StretchBlt(auxDC, 50, 0, 50, 25, hdcNaveDodge, 0, 0, bmNaveDodge.bmWidth,
-               bmNaveDodge.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 50, 0, 50, 25, hdcNaveDodge, 0, 0, bmNaveDodge.bmWidth,
+    //            bmNaveDodge.bmHeight, SRCCOPY);
 
-    StretchBlt(auxDC, 0, 50, 50, 25, hdcBomb, 0, 0, bmBomb.bmWidth,
-               bmBomb.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 0, 50, 50, 25, hdcBomb, 0, 0, bmBomb.bmWidth,
+    //            bmBomb.bmHeight, SRCCOPY);
 
-    StretchBlt(auxDC, 0, 100, 50, 25, hdcPower1, 0, 0, bmPower1.bmWidth,
-               bmPower1.bmHeight, SRCCOPY);
-    StretchBlt(auxDC, 50, 100, 50, 25, hdcPower2, 0, 0, bmPower2.bmWidth,
-               bmPower2.bmHeight, SRCCOPY);
-    StretchBlt(auxDC, 100, 100, 50, 25, hdcPower3, 0, 0, bmPower3.bmWidth,
-               bmPower3.bmHeight, SRCCOPY);
-    StretchBlt(auxDC, 159, 100, 50, 25, hdcPower4, 0, 0, bmPower4.bmWidth,
-               bmPower4.bmHeight, SRCCOPY);
-    StretchBlt(auxDC, 0, 150, 50, 25, hdcShot, 0, 0, bmShot.bmWidth,
-               bmShot.bmHeight, SRCCOPY);
-    StretchBlt(auxDC, 50, 300, 50, 25, hdcNaveDefender, 0, 0,
-               bmNaveDefender.bmWidth, bmNaveDefender.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 0, 100, 50, 25, hdcPower1, 0, 0, bmPower1.bmWidth,
+    //            bmPower1.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 50, 100, 50, 25, hdcPower2, 0, 0, bmPower2.bmWidth,
+    //            bmPower2.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 100, 100, 50, 25, hdcPower3, 0, 0, bmPower3.bmWidth,
+    //            bmPower3.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 159, 100, 50, 25, hdcPower4, 0, 0, bmPower4.bmWidth,
+    //            bmPower4.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 0, 150, 50, 25, hdcShot, 0, 0, bmShot.bmWidth,
+    //            bmShot.bmHeight, SRCCOPY);
+    // StretchBlt(auxDC, 50, 300, 50, 25, hdcNaveDefender, 0, 0,
+    //            bmNaveDefender.bmWidth, bmNaveDefender.bmHeight, SRCCOPY);
 
     // COPIA INFORMACAO DO 'DC' EM MEMORIA PARA O DISPLAY...
     hdc = BeginPaint(hWnd, &ps);

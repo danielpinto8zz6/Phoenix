@@ -7,8 +7,8 @@
 Coordinates getFirstEmptyPosition(Game *game) {
   Coordinates coordinates;
 
-  for (coordinates.y = 0; coordinates.y < HEIGHT; coordinates.y++) {
-    for (coordinates.x = 0; coordinates.x < WIDTH; coordinates.x++) {
+  for (coordinates.y = 0; coordinates.y < HEIGHT; coordinates.y + 50) {
+    for (coordinates.x = 0; coordinates.x < WIDTH; coordinates.x + 50) {
       if (!isPositionOccupied(game, coordinates)) {
         return coordinates;
       }

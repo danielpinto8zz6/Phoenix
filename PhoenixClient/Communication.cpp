@@ -72,7 +72,7 @@ BOOL connectPipes(Client *client) {
 
 DWORD WINAPI gameReceiver(LPVOID lpParam) {
   Client *client = (Client *)lpParam;
-  Game *game = client->game;
+  Game *game = &client->game;
 
   DWORD nBytes = 0;
   BOOL fSuccess = FALSE;
@@ -91,11 +91,11 @@ DWORD WINAPI gameReceiver(LPVOID lpParam) {
       //   errorGui(TEXT("Gateway disconnected! Can't obtain data!"));
       // }
 
-      errorGui(TEXT("Can't read message data"));
+      errorGui(TEXT("Can't read game data"));
       break;
     }
 
-    // TODO
+    WndProc(client->hWnd, WM_PAINT, NULL, NULL);
   }
 
   return FALSE;

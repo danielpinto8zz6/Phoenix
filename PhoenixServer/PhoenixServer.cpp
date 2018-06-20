@@ -11,6 +11,8 @@
 
 #define MAX_LOADSTRING 100
 
+Data data;
+
 // Global Variables:
 HINSTANCE hInst;                     // current instance
 WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
@@ -24,7 +26,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   MessageData messageData;
   GameData gameData;
-  Data data;
 
   DWORD threadReceiveMessagesFromServerId;
   HANDLE hThreadReceiveMessagesFromGateway;
@@ -206,6 +207,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_CONFIGURATION), hWnd,
                 Configure);
       break;
+    case ID_FILE_STARTGAME:
+      Message msg;
+      msg.cmd = GAME_STARTED;
+      writeDataToSharedMemory(data.messageData->sharedMessage, &msg,
+                              sizeof(Message), data.messageData->hMutex,
+                              data.messageData->gatewayMessageUpdateEvent);
+
+      break;
     case IDM_ABOUT:
       DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
       break;
@@ -284,6 +293,10 @@ VOID initGameVariables(Game *game) {
   game->totalPlayers = 0;
 
   game->totalEnemyShips = 0;
+
+  game->maxEnemyShips = MAX_ENEMY_SHIPS;
+
+  game->maxPlayers = MAX_PLAYERS;
 
   game->started = FALSE;
 }

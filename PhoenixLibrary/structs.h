@@ -7,8 +7,8 @@
 
 #define PLAYERS 10
 #define ENEMYSHIPS 20
-#define WIDTH 10
-#define HEIGHT 15
+#define WIDTH 1000
+#define HEIGHT 1000
 
 #define MAXCLIENTS 20
 
@@ -105,8 +105,10 @@ typedef struct {
   int level;
   Player player[PLAYERS];
   int totalPlayers;
+  int maxPlayers;
   EnemyShip enemyShip[ENEMYSHIPS];
   int totalEnemyShips;
+  int maxEnemyShips;
   BOOL started;
   Message message;
 } Game;
@@ -142,10 +144,11 @@ typedef struct {
   HANDLE hPipeMessage;
   HANDLE hEvent;
   BOOL readerAlive;
-  Game *game;
+  Game game;
   BOOL gameStarted;
   BOOL logged;
   BOOL inGame;
+  HWND hWnd;
 } Client;
 
 typedef struct {

@@ -43,7 +43,8 @@ BOOL removeClient(Data *data, int clientId) {
 int broadcastGameToClients(Data *data, Game *game) {
   int nWrites = 0;
   for (int i = 0; i < data->totalClients; i++) {
-    if (writeDataToPipe(data->client[i].hPipeGame, (LPVOID)game, sizeof(Game)))
+    if (writeDataToPipeAsync(data->client[i].hPipeGame, data->hEvent, game,
+                             sizeof(Game)))
       nWrites++;
   }
   return nWrites;
@@ -52,8 +53,8 @@ int broadcastGameToClients(Data *data, Game *game) {
 int broadcastMessageToClients(Data *data, Message *message) {
   int nWrites = 0;
   for (int i = 0; i < data->totalClients; i++) {
-    if (writeDataToPipe(data->client[i].hPipeMessage, (LPVOID)message,
-                        sizeof(Message)))
+    if (writeDataToPipeAsync(data->client[i].hPipeMessage, data->hEvent,
+                             message, sizeof(Message)))
       nWrites++;
   }
   return nWrites;
