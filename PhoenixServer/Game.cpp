@@ -7,8 +7,8 @@
 Coordinates getFirstEmptyPosition(Game *game) {
   Coordinates coordinates;
 
-  for (coordinates.y = 0; coordinates.y < HEIGHT; coordinates.y + 50) {
-    for (coordinates.x = 0; coordinates.x < WIDTH; coordinates.x + 50) {
+  for (coordinates.y = 0; coordinates.y < HEIGHT; coordinates.y) {
+    for (coordinates.x = 0; coordinates.x < WIDTH; coordinates.x) {
       if (!isPositionOccupied(game, coordinates)) {
         return coordinates;
       }
@@ -86,6 +86,8 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   hMutexManageEnemyShips = OpenMutex(MUTEX_ALL_ACCESS, FALSE, ENEMYSHIPS_MUTEX);
 
   int position = gameData->position;
+
+  gameData->game.totalEnemyShips++;
 
   WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
 

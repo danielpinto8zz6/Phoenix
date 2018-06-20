@@ -158,7 +158,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
   HWND hWnd =
       CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-                    0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+                    0, 1000, 850, nullptr, nullptr, hInstance, nullptr);
 
   if (!hWnd) {
     return FALSE;
@@ -381,21 +381,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       DestroyWindow(hWnd);
     break;
   case WM_PAINT: {
+    InvalidateRect(hWnd, NULL, 1);
     PAINTSTRUCT ps;
     PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
     SetStretchBltMode(auxDC, BLACKONWHITE);
 
     if (client.gameStarted) {
-      errorGui(TEXT("Game started"));
+      for (int i = 0; i < 20; i++) {
+        StretchBlt(auxDC, i * 50, 0, 50, 50, hdcNaveBasic, 0, 0,
+                   bmNaveBasic.bmWidth, bmNaveBasic.bmHeight, SRCCOPY);
+      }
     }
-    // if (client.gameStarted) {
-    //   errorGui(TEXT("HERE"));
-    // for (int i = 0; i < client.game.totalEnemyShips; i++) {
-    //   StretchBlt(auxDC, client.game.enemyShip[i].position.x,
-    //              client.game.enemyShip[i].position.y, 50, 50, hdcNaveBasic,
-    //              0, 0, bmNaveBasic.bmWidth, bmNaveBasic.bmHeight, SRCCOPY);
-    // }
-    // }
 
     StretchBlt(auxDC, 0, 300, 50, 25, hdcNaveDefender, 0, 0,
                bmNaveDefender.bmWidth, bmNaveDefender.bmHeight, SRCCOPY);
