@@ -387,9 +387,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
 
     if (client.gameStarted) {
 
-      for (int i = 0; i < 20; i++) {
+      for (int i = 0; i < client.game.totalEnemyShips; i++) {
         if (client.game.enemyShip[i].type == BASIC) {
-
           StretchBlt(auxDC, client.game.enemyShip[i].position.x,
                      client.game.enemyShip[i].position.y, 50, 50, hdcNaveBasic,
                      0, 0, bmNaveBasic.bmWidth, bmNaveBasic.bmHeight, SRCCOPY);

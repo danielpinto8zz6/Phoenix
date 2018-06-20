@@ -12,9 +12,13 @@ Coordinates getFirstEmptyPosition(Game *game) {
 
   coordinates.y = 0;
   coordinates.x = 0;
-  for (int i = 0; i < game->totalEnemyShips; i++) {
-    coordinates.x += ENEMYSHIP_WIDTH;
+
+  int j = 0;
+
+  for (int i = 0; i < game->totalEnemyShips; i++, j++) {
+    coordinates.x = ENEMYSHIP_WIDTH * j;
     if (coordinates.x == 500) {
+      j = 0;
       coordinates.x = 0;
       coordinates.y += ENEMYSHIP_HEIGHT + 5;
     }
@@ -59,7 +63,6 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
   // Create Enemy Ships threads
   for (int i = 0; i < ENEMYSHIPS; i++) {
     gameData->position = i;
-    gameData->game.totalEnemyShips = i;
     aThread[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadEnemyShip,
                               gameData, 0, &ThreadID);
 
@@ -91,6 +94,8 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   int position = gameData->position;
 
+  gameData->game.totalEnemyShips = position + 1;
+
   WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
 
   // Place ship...hNaveBasichNaveDodge
@@ -101,8 +106,7 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   }
 
   gameData->game.enemyShip[position].position = c;
-  if (gameData->game.totalEnemyShips > 10) {
-
+  if (gameData->game.totalEnemyShips > 9) {
     gameData->game.enemyShip[position].type = BASIC;
   } else {
     gameData->game.enemyShip[position].type = DODGE;
