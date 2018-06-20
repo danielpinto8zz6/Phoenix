@@ -70,37 +70,6 @@ BOOL connectPipes(Client *client) {
   return TRUE;
 }
 
-DWORD WINAPI gameReceiver(LPVOID lpParam) {
-  Client *client = (Client *)lpParam;
-  Game *game = &client->game;
-
-  DWORD nBytes = 0;
-  BOOL fSuccess = FALSE;
-
-  if (client->hPipeGame == NULL) {
-    errorGui(TEXT("Game pipe is NULL"));
-    return FALSE;
-  }
-
-  while (client->threadContinue) {
-    fSuccess = readDataFromPipe(client->hPipeGame, game, sizeof(Game));
-
-    if (!fSuccess) {
-      // Ignore it because messagereceiver already handles broken pipe error...
-      // if (GetLastError() == ERROR_BROKEN_PIPE) {
-      //   errorGui(TEXT("Gateway disconnected! Can't obtain data!"));
-      // }
-
-      errorGui(TEXT("Can't read game data"));
-      break;
-    }
-
-    WndProc(client->hWnd, WM_PAINT, NULL, NULL);
-  }
-
-  return FALSE;
-}
-
 DWORD WINAPI messageReceiver(LPVOID lpParam) {
   Client *client = (Client *)lpParam;
 
@@ -149,9 +118,8 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
 void handleCommand(Client *client, Message message) {
   switch (message.cmd) {
   case GAME_STARTED:
-      MessageBox(NULL, TEXT("Game started"), TEXT("Info"),
-               MB_OK | MB_ICONINFORMATION);
     client->gameStarted = TRUE;
+    InvalidateRect(client->hWnd, NULL, TRUE);
     break;
   case LOGGED:
     MessageBox(NULL, message.text, TEXT("Login succeed"),
@@ -182,4 +150,35 @@ BOOL joinGame(Client *client) {
 
   return writeDataToPipeAsync(client->hPipeMessage, client->hEvent, &message,
                               sizeof(Message));
+}
+
+DWORD WINAPI gameReceiver(LPVOID lpParam) {
+  Client *client = (Client *)lpParam;
+  Game *game = &client->game;
+
+  DWORD nBytes = 0;
+  BOOL fSuccess = FALSE;
+
+  if (client->hPipeGame == NULL) {
+    errorGui(TEXT("Game pipe is NULL"));
+    return FALSE;
+  }
+
+  while (client->threadContinue) {
+    fSuccess = readDataFromPipe(client->hPipeGame, game, sizeof(Game));
+
+    if (!fSuccess) {
+      // Ignore it because messagereceiver already handles broken pipe error...
+      // if (GetLastError() == ERROR_BROKEN_PIPE) {
+      //   errorGui(TEXT("Gateway disconnected! Can't obtain data!"));
+      // }
+
+      errorGui(TEXT("Can't read game data"));
+      break;
+    }
+
+    InvalidateRect(client->hWnd, NULL, TRUE);
+  }
+
+  return FALSE;
 }

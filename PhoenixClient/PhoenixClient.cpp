@@ -35,13 +35,11 @@ int nX = 0, nY = 0;
 TCHAR login[40] = TEXT("\0");
 TCHAR key[10] = TEXT("\0");
 
+HBITMAP bitmaps[20];
+
 Client client;
 
-// Forward declarations of functions included in this code module:
-ATOM MyRegisterClass(HINSTANCE hInstance);
-BOOL InitInstance(HINSTANCE, int);
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
+BOOL started = FALSE;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                       _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine,
@@ -58,6 +56,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   _setmode(_fileno(stdin), _O_WTEXT);
   _setmode(_fileno(stdout), _O_WTEXT);
 #endif
+
+  loadBitmaps();
 
   client.logged = FALSE;
   client.inGame = FALSE;
@@ -83,13 +83,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return FALSE;
   }
 
-  hThreadGameReceiver =
-      CreateThread(NULL, 0, gameReceiver, &client, 0, &threadGameReceiverId);
-  if (hThreadGameReceiver == NULL) {
-    errorGui(TEXT("Creating data receiver thread"));
-    return FALSE;
-  }
-
   hInst = hInstance;
 
   // Initialize global strings
@@ -99,6 +92,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   // Perform application initialization:
   if (!InitInstance(hInstance, nCmdShow)) {
+    return FALSE;
+  }
+
+  hThreadGameReceiver =
+      CreateThread(NULL, 0, gameReceiver, &client, 0, &threadGameReceiverId);
+  if (hThreadGameReceiver == NULL) {
+    errorGui(TEXT("Creating data receiver thread"));
     return FALSE;
   }
 
@@ -156,9 +156,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   hInst = hInstance; // Store instance handle in our global variable
 
-  HWND hWnd =
-      CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-                    0, 1000, 850, nullptr, nullptr, hInstance, nullptr);
+  HWND hWnd = CreateWindowW(
+      szWindowClass, szTitle,
+      WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, CW_USEDEFAULT, 0,
+      1000, 850, nullptr, nullptr, hInstance, nullptr);
 
   if (!hWnd) {
     return FALSE;
@@ -184,123 +185,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                          LPARAM lParam) {
-  static BITMAP bmNaveBasic;
-  static HDC hdcNaveBasic;
-  static BITMAP bmNaveDefender;
-  static HDC hdcNaveDefender;
-  static BITMAP bmNaveDodge;
-  static HDC hdcNaveDodge;
-  static BITMAP bmBomb;
-  static HDC hdcBomb;
-  static BITMAP bmPower1;
-  static HDC hdcPower1;
-  static BITMAP bmPower2;
-  static HDC hdcPower2;
-  static BITMAP bmPower3;
-  static HDC hdcPower3;
-  static BITMAP bmPower4;
-  static HDC hdcPower4;
-  static BITMAP bmShot;
-  static HDC hdcShot;
+  HDC hdc;
+  static int xi = 0, yi = 0;
+  HBITMAP hBitmap;
+  RECT r;
+  GetWindowRect(hWnd, &r);
+  PAINTSTRUCT pt;
 
   switch (message) {
   case WM_CREATE:
-
-    hNaveBasic = (HBITMAP)LoadImage(
-        GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_ENEMY_SHIPS_BASIC),
-        IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
     hdc = GetDC(hWnd);
-    GetObject(hNaveBasic, sizeof(bmNaveBasic), &bmNaveBasic);
-    hdcNaveBasic = CreateCompatibleDC(hdc);
-    SelectObject(hdcNaveBasic, hNaveBasic);
+    auxDC = NULL;
     ReleaseDC(hWnd, hdc);
-
-    hNaveDefender = (HBITMAP)LoadImage(GetModuleHandle(NULL),
-                                       MAKEINTRESOURCE(IDB_BITMAP_DEFENDERS),
-                                       IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hNaveDefender, sizeof(bmNaveDefender), &bmNaveDefender);
-    hdcNaveDefender = CreateCompatibleDC(hdc);
-    SelectObject(hdcNaveDefender, hNaveDefender);
-    ReleaseDC(hWnd, hdc);
-
-    hNaveDodge = (HBITMAP)LoadImage(
-        GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_ENEMY_SHIPS_DODGE),
-        IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hNaveDodge, sizeof(bmNaveDodge), &bmNaveDodge);
-    hdcNaveDodge = CreateCompatibleDC(hdc);
-    SelectObject(hdcNaveDodge, hNaveDodge);
-    ReleaseDC(hWnd, hdc);
-
-    hBomb = (HBITMAP)LoadImage(GetModuleHandle(NULL),
-                               MAKEINTRESOURCE(IDB_BITMAP_BOMBS), IMAGE_BITMAP,
-                               0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hBomb, sizeof(bmBomb), &bmBomb);
-    hdcBomb = CreateCompatibleDC(hdc);
-    SelectObject(hdcBomb, hBomb);
-    ReleaseDC(hWnd, hdc);
-
-    hPower1 = (HBITMAP)LoadImage(GetModuleHandle(NULL),
-                                 MAKEINTRESOURCE(IDB_BITMAP_POWERUP_1),
-                                 IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hPower1, sizeof(bmPower1), &bmPower1);
-    hdcPower1 = CreateCompatibleDC(hdc);
-    SelectObject(hdcPower1, hPower1);
-    ReleaseDC(hWnd, hdc);
-
-    hPower2 = (HBITMAP)LoadImage(GetModuleHandle(NULL),
-                                 MAKEINTRESOURCE(IDB_BITMAP_POWERUP_2),
-                                 IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hPower2, sizeof(bmPower2), &bmPower2);
-    hdcPower2 = CreateCompatibleDC(hdc);
-    SelectObject(hdcPower2, hPower2);
-    ReleaseDC(hWnd, hdc);
-
-    hPower3 = (HBITMAP)LoadImage(GetModuleHandle(NULL),
-                                 MAKEINTRESOURCE(IDB_BITMAP_POWERUP_3),
-                                 IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hPower3, sizeof(bmPower3), &bmPower3);
-    hdcPower3 = CreateCompatibleDC(hdc);
-    SelectObject(hdcPower3, hPower3);
-    ReleaseDC(hWnd, hdc);
-
-    hPower4 = (HBITMAP)LoadImage(GetModuleHandle(NULL),
-                                 MAKEINTRESOURCE(IDB_BITMAP_POWERUP_4),
-                                 IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hPower4, sizeof(bmPower4), &bmPower4);
-    hdcPower4 = CreateCompatibleDC(hdc);
-    SelectObject(hdcPower4, hPower4);
-    ReleaseDC(hWnd, hdc);
-
-    hShot = (HBITMAP)LoadImage(GetModuleHandle(NULL),
-                               MAKEINTRESOURCE(IDB_BITMAP_SHOT), IMAGE_BITMAP,
-                               0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hShot, sizeof(bmShot), &bmShot);
-    hdcShot = CreateCompatibleDC(hdc);
-    SelectObject(hdcShot, hShot);
-    ReleaseDC(hWnd, hdc);
-
-    // OBTEM AS DIMENSOES DO DISPLAY...
-    bg = CreateSolidBrush(RGB(255, 128, 128));
-    nX = GetSystemMetrics(SM_CXSCREEN);
-    nY = GetSystemMetrics(SM_CYSCREEN);
-
-    // PREPARA 'BITMAP' E ASSOCIA A UM 'DC' EM MEMORIA...
-    hdc = GetDC(hWnd);
-    auxDC = CreateCompatibleDC(hdc);
-    auxBM = CreateCompatibleBitmap(hdc, nX, nY);
-    SelectObject(auxDC, auxBM);
-    SelectObject(auxDC, GetStockObject(GRAY_BRUSH));
-    PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
-    ReleaseDC(hWnd, hdc);
-
     break;
   case WM_COMMAND: {
     int wmId = LOWORD(wParam);
@@ -380,61 +276,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                    MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES)
       DestroyWindow(hWnd);
     break;
-  case WM_PAINT: {
-    InvalidateRect(hWnd, NULL, 1);
-    PAINTSTRUCT ps;
-    PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
-    SetStretchBltMode(auxDC, BLACKONWHITE);
+  case WM_PAINT:
+    hdc = BeginPaint(hWnd, &pt);
 
-    if (client.gameStarted) {
-      for (int i = 0; i < 20; i++) {
-        StretchBlt(auxDC, i * 50, 0, 50, 50, hdcNaveBasic, 0, 0,
-                   bmNaveBasic.bmWidth, bmNaveBasic.bmHeight, SRCCOPY);
-      }
+    if (auxDC == NULL) {
+      auxDC = CreateCompatibleDC(hdc);
+      hBitmap = CreateCompatibleBitmap(hdc, r.right - r.left, r.bottom - r.top);
+      SelectObject(auxDC, hBitmap);
     }
 
-    StretchBlt(auxDC, 0, 300, 50, 25, hdcNaveDefender, 0, 0,
-               bmNaveDefender.bmWidth, bmNaveDefender.bmHeight, SRCCOPY);
+    if (client.gameStarted) {
+      drawGame(r);
+    }
 
-    // for (int i = 0; i < client.game->totalEnemyShips; i++) {
+    BitBlt(hdc, 0, 0, r.right - r.left, r.bottom - r.top, auxDC, 0, 0, SRCCOPY);
 
-    // StretchBlt(auxDC, 0, 0, 50, 25, hdcNaveBasic, 0, 0, bmNaveBasic.bmWidth,
-    //            bmNaveBasic.bmHeight, SRCCOPY);
-    // if (client.game->enemyShip[i].type == BASIC) {
-
-    // StretchBlt(auxDC, client.game->enemyShip[i].position.x,
-    // client.game->enemyShip[i].position.y, 50, 25, hdcNave, 0, 0,
-    // bmNave.bmWidth, 			bmNave.bmHeight, SRCCOPY);
-    //}
-    //}
-
-    // StretchBlt(auxDC, 0, 300, 50, 25, hdcNaveDefender, 0, 0,
-    //            bmNaveDefender.bmWidth, bmNaveDefender.bmHeight, SRCCOPY);
-
-    // StretchBlt(auxDC, 50, 0, 50, 25, hdcNaveDodge, 0, 0, bmNaveDodge.bmWidth,
-    //            bmNaveDodge.bmHeight, SRCCOPY);
-
-    // StretchBlt(auxDC, 0, 50, 50, 25, hdcBomb, 0, 0, bmBomb.bmWidth,
-    //            bmBomb.bmHeight, SRCCOPY);
-
-    // StretchBlt(auxDC, 0, 100, 50, 25, hdcPower1, 0, 0, bmPower1.bmWidth,
-    //            bmPower1.bmHeight, SRCCOPY);
-    // StretchBlt(auxDC, 50, 100, 50, 25, hdcPower2, 0, 0, bmPower2.bmWidth,
-    //            bmPower2.bmHeight, SRCCOPY);
-    // StretchBlt(auxDC, 100, 100, 50, 25, hdcPower3, 0, 0, bmPower3.bmWidth,
-    //            bmPower3.bmHeight, SRCCOPY);
-    // StretchBlt(auxDC, 159, 100, 50, 25, hdcPower4, 0, 0, bmPower4.bmWidth,
-    //            bmPower4.bmHeight, SRCCOPY);
-    // StretchBlt(auxDC, 0, 150, 50, 25, hdcShot, 0, 0, bmShot.bmWidth,
-    //            bmShot.bmHeight, SRCCOPY);
-    // StretchBlt(auxDC, 50, 300, 50, 25, hdcNaveDefender, 0, 0,
-    //            bmNaveDefender.bmWidth, bmNaveDefender.bmHeight, SRCCOPY);
-
-    // COPIA INFORMACAO DO 'DC' EM MEMORIA PARA O DISPLAY...
-    hdc = BeginPaint(hWnd, &ps);
-    BitBlt(hdc, 0, 0, nX, nY, auxDC, 0, 0, SRCCOPY);
-    EndPaint(hWnd, &ps);
-  } break;
+    EndPaint(hWnd, &pt);
+    break;
   case WM_DESTROY:
     PostQuitMessage(0);
     // DeleteObject(hNave);
@@ -510,14 +368,14 @@ INT_PTR CALLBACK Score(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case WM_INITDIALOG:
     for (int i = 0; i < 10; i++) {
-      TCHAR nome[20];
-      TCHAR pontos[20];
+      TCHAR name[20];
+      TCHAR points[20];
 
       _stprintf_s(nome, 20, TEXT("Daniel"));
-      _stprintf_s(pontos, 20, TEXT("%d"), 10);
+      _stprintf_s(points, 20, TEXT("%d"), 10);
 
-      SendDlgItemMessage(hDlg, IDC_LIST3, LB_ADDSTRING, NULL, (LPARAM)nome);
-      SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, NULL, (LPARAM)pontos);
+      SendDlgItemMessage(hDlg, IDC_LIST3, LB_ADDSTRING, NULL, (LPARAM)name);
+      SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, NULL, (LPARAM)points);
     }
     return (INT_PTR)TRUE;
 
@@ -529,4 +387,22 @@ INT_PTR CALLBACK Score(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     break;
   }
   return 0;
+}
+
+void drawGame(RECT r) {
+  HDC hdcBuff;
+
+  for (int i = 0; i < 10; i++) {
+    hdcBuff = CreateCompatibleDC(auxDC);
+    SelectObject(hdcBuff, bitmaps[0]);
+
+    StretchBlt(auxDC, 50 * i, 0, 50, 50, hdcBuff, 0, 0, 50, 50, SRCCOPY);
+
+    DeleteObject(hdcBuff);
+  }
+}
+
+void loadBitmaps() {
+  bitmaps[0] =
+      LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_BOMBS));
 }

@@ -11,6 +11,10 @@
 - [x] Client doesn't start without gateway
 - [x] Add registry keys to store players points, etc...
 - [x] Close client pipe when he exists
-- [ ] Add Gui to server
+- [x] Add Gui to server
 - [ ] Store needed keys in registry
-- [ ] Finish login
+- [x] Finish login
+- [ ] Finish game logic
+- [ ] Show top 10 on client
+- [ ] Improve game start (if's)
+- [ ] Finish client interface
