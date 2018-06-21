@@ -95,7 +95,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>PhoenixLibrary.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PhoenixLibrary.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -175,6 +175,12 @@
     <ResourceCompile Include="PhoenixClient.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="background.bmp" />
+    <Image Include="bitmap1.bmp" />
+    <Image Include="bmp00001.bmp" />
+    <Image Include="enemyship_basic.bmp" />
+    <Image Include="enemyship_dodge.bmp" />
+    <Image Include="enemyship_superbad.bmp" />
     <Image Include="tiro.bmp" />
     <Image Include="bitmap2.bmp" />
     <Image Include="bom.bmp" />

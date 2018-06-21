@@ -93,5 +93,23 @@
     <Image Include="tiro.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bmp00001.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="background.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="enemyship_basic.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="enemyship_dodge.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="enemyship_superbad.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

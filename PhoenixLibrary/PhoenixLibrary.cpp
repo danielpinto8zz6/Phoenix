@@ -214,8 +214,7 @@ BOOL readDataFromPipeAsync(HANDLE hPipe, HANDLE hEvent, LPVOID data,
   ResetEvent(hEvent);
   OverlRd.hEvent = hEvent;
 
-  ReadFile(hPipe, data, size, &nBytes,
-                      &OverlRd);
+  ReadFile(hPipe, data, size, &nBytes, &OverlRd);
 
   WaitForSingleObject(hEvent, INFINITE);
 
@@ -223,6 +222,6 @@ BOOL readDataFromPipeAsync(HANDLE hPipe, HANDLE hEvent, LPVOID data,
   if (nBytes < size) {
     return FALSE;
   }
-  
+
   return TRUE;
 }

@@ -1,3 +1,3 @@
 ﻿#pragma once
 
-BOOL startGame(Client *client);
+int getPlayerScore(Client *client);

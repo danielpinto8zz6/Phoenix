@@ -11,6 +11,8 @@
 
 #define MAX_LOADSTRING 100
 
+#define START_HEIGHT 20
+
 // Global Variables:
 HINSTANCE hInst;                     // current instance
 WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
@@ -25,6 +27,8 @@ HBITMAP hPower1 = NULL;
 HBITMAP hPower2 = NULL;
 HBITMAP hPower3 = NULL;
 HBITMAP hPower4 = NULL;
+HBITMAP hBackground = NULL;
+HBITMAP hShipSuperBad = NULL;
 
 int x, y;
 HDC hdc = NULL, auxDC = NULL;
@@ -159,7 +163,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   HWND hWnd = CreateWindowW(
       szWindowClass, szTitle,
       WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, CW_USEDEFAULT, 0,
-      1000, 850, nullptr, nullptr, hInstance, nullptr);
+      1020, 700, nullptr, nullptr, hInstance, nullptr);
 
   if (!hWnd) {
     return FALSE;
@@ -185,6 +189,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                          LPARAM lParam) {
+  TCHAR text[20];
+
   static BITMAP bmNaveBasic;
   static HDC hdcNaveBasic;
   static BITMAP bmNaveDefender;
@@ -203,12 +209,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   static HDC hdcPower4;
   static BITMAP bmShot;
   static HDC hdcShot;
+  static BITMAP bmBackground;
+  static HDC hdcBackground;
+  static BITMAP bmShipSuperBad;
+  static HDC hdcShipSuperBad;
 
   switch (message) {
   case WM_CREATE:
-    hNaveBasic = (HBITMAP)LoadImage(
-        GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_ENEMY_SHIPS_BASIC),
-        IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+    hBackground = (HBITMAP)LoadImage(GetModuleHandle(NULL),
+                                     MAKEINTRESOURCE(IDB_BITMAP_BACKGROUND),
+                                     IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+    hdc = GetDC(hWnd);
+    GetObject(hBackground, sizeof(bmBackground), &bmBackground);
+    hdcBackground = CreateCompatibleDC(hdc);
+    SelectObject(hdcBackground, hBackground);
+    ReleaseDC(hWnd, hdc);
+
+    hNaveBasic = (HBITMAP)LoadImage(GetModuleHandle(NULL),
+                                    MAKEINTRESOURCE(IDB_BITMAP_ENEMYSHIP_BASIC),
+                                    IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
     hdc = GetDC(hWnd);
     GetObject(hNaveBasic, sizeof(bmNaveBasic), &bmNaveBasic);
     hdcNaveBasic = CreateCompatibleDC(hdc);
@@ -225,12 +244,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     ReleaseDC(hWnd, hdc);
 
     hNaveDodge = (HBITMAP)LoadImage(
-        GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_ENEMY_SHIPS_DODGE),
+        GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_ENEMY_SHIP_DODGE),
         IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
     hdc = GetDC(hWnd);
     GetObject(hNaveDodge, sizeof(bmNaveDodge), &bmNaveDodge);
     hdcNaveDodge = CreateCompatibleDC(hdc);
     SelectObject(hdcNaveDodge, hNaveDodge);
+    ReleaseDC(hWnd, hdc);
+
+    hShipSuperBad = (HBITMAP)LoadImage(
+        GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_ENEMY_SHIP_SUPERBAD),
+        IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+    hdc = GetDC(hWnd);
+    GetObject(hShipSuperBad, sizeof(bmShipSuperBad), &bmShipSuperBad);
+    hdcShipSuperBad = CreateCompatibleDC(hdc);
+    SelectObject(hdcShipSuperBad, hShipSuperBad);
     ReleaseDC(hWnd, hdc);
 
     hBomb = (HBITMAP)LoadImage(GetModuleHandle(NULL),
@@ -297,10 +325,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     auxDC = CreateCompatibleDC(hdc);
     auxBM = CreateCompatibleBitmap(hdc, nX, nY);
     SelectObject(auxDC, auxBM);
-    SelectObject(auxDC, GetStockObject(GRAY_BRUSH));
+    SelectObject(auxDC, GetStockObject(BLACK_BRUSH));
     PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
     ReleaseDC(hWnd, hdc);
 
+    SetTextColor(auxDC, RGB(255, 255, 255));
+    SetBkColor(auxDC, RGB(0, 0, 0));
     break;
   case WM_COMMAND: {
     int wmId = LOWORD(wParam);
@@ -387,16 +417,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
 
     if (client.gameStarted) {
 
+      StretchBlt(auxDC, 0, 0, 1000, 850, hdcBackground, 0, 0,
+                 bmBackground.bmWidth, bmBackground.bmHeight, SRCCOPY);
+
+      _stprintf_s(text, 20, TEXT("SCORE : %d"), getPlayerScore(&client));
+
+      TextOut(auxDC, 450, 0, text, _tcslen(text));
+
+      HICON icon = LoadIcon(hInst, TEXT("PhoenixClient.ico"));
+
+      DrawIcon(auxDC, 500, 500, icon);
+
       for (int i = 0; i < client.game.totalEnemyShips; i++) {
-        if (client.game.enemyShip[i].type == BASIC) {
-          StretchBlt(auxDC, client.game.enemyShip[i].position.x,
-                     client.game.enemyShip[i].position.y, 50, 50, hdcNaveBasic,
-                     0, 0, bmNaveBasic.bmWidth, bmNaveBasic.bmHeight, SRCCOPY);
-        } else {
-          StretchBlt(auxDC, client.game.enemyShip[i].position.x,
-                     client.game.enemyShip[i].position.y, 50, 50,
-                     hdcNaveDefender, 0, 0, bmNaveDefender.bmWidth,
-                     bmNaveDefender.bmHeight, SRCCOPY);
+        switch (client.game.enemyShip[i].type) {
+        case BASIC:
+          TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
+                         client.game.enemyShip[i].position.y + START_HEIGHT, 50,
+                         50, hdcNaveBasic, 0, 0, bmNaveBasic.bmWidth,
+                         bmNaveBasic.bmHeight, RGB(255, 255, 255));
+          break;
+        case DODGE:
+          TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
+                         client.game.enemyShip[i].position.y + START_HEIGHT, 50,
+                         50, hdcNaveDodge, 0, 0, bmNaveDodge.bmWidth,
+                         bmNaveDodge.bmHeight, RGB(255, 255, 255));
+          break;
+        case SUPERBAD:
+          TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
+                         client.game.enemyShip[i].position.y + START_HEIGHT, 50,
+                         50, hdcShipSuperBad, 0, 0, bmShipSuperBad.bmWidth,
+                         bmShipSuperBad.bmHeight, RGB(255, 255, 255));
+          break;
         }
       }
     }

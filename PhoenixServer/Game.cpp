@@ -3,6 +3,7 @@
 #include "Clients.h"
 #include "Game.h"
 #include "GameZone.h"
+#include <time.h>
 
 #define ENEMYSHIP_WIDTH 50
 #define ENEMYSHIP_HEIGHT 50
@@ -17,7 +18,7 @@ Coordinates getFirstEmptyPosition(Game *game) {
 
   for (int i = 0; i < game->totalEnemyShips; i++, j++) {
     coordinates.x = ENEMYSHIP_WIDTH * j;
-    if (coordinates.x == 500) {
+    if (coordinates.x == 1000) {
       j = 0;
       coordinates.x = 0;
       coordinates.y += ENEMYSHIP_HEIGHT + 5;
@@ -108,11 +109,15 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   }
 
   gameData->game.enemyShip[position].position = c;
-  if (gameData->game.totalEnemyShips > 9) {
+
+  if (position < 7) {
     gameData->game.enemyShip[position].type = BASIC;
-  } else {
+  } else if (position >= 7 && position < 14) {
     gameData->game.enemyShip[position].type = DODGE;
+  } else {
+    gameData->game.enemyShip[position].type = SUPERBAD;
   }
+
   sendGameToGateway(gameData, &gameData->game);
 
   ReleaseMutex(hMutexManageEnemyShips);

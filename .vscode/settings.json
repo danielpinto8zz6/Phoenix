@@ -16,7 +16,9 @@
         "communication.h": "c",
         "game.h": "c",
         "phoenixclient.h": "c",
-        "clients.h": "c"
+        "clients.h": "c",
+        "windowsx.h": "c",
+        "process.h": "c"
     },
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {
