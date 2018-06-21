@@ -60,7 +60,7 @@ typedef struct {
   int id;
   TCHAR username[50];
   DefenderShip ship;
-  int lifes;
+  int lives;
   int score;
 } Player;
 
