@@ -265,12 +265,85 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
 INT_PTR CALLBACK Configure(HWND hDlg, UINT message, WPARAM wParam,
                            LPARAM lParam) {
   UNREFERENCED_PARAMETER(lParam);
+
+  int eN, eV, pN, pD, pOc, maxP, eL;
+  BOOL fSuccess;
+
   switch (message) {
   case WM_INITDIALOG:
     return (INT_PTR)TRUE;
 
   case WM_COMMAND:
-    if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+    switch (LOWORD(wParam)) {
+    case IDOK:
+      eN = GetDlgItemInt(hDlg, IDC_EDIT5, &fSuccess, TRUE);
+      if (eN != 0) {
+        if (eN > MAX_ENEMY_SHIPS) {
+          MessageBox(hDlg, TEXT("Please input a number between 1 & 20!"),
+                     TEXT("Enemy Ships number"), MB_OK | MB_ICONINFORMATION);
+          break;
+        }
+        data.gameData->game.maxEnemyShips = eN;
+      }
+
+      eV = GetDlgItemInt(hDlg, IDC_EDIT4, &fSuccess, TRUE);
+      if (eV != 0) {
+        if (eV > 10) {
+          MessageBox(hDlg, TEXT("Please input a number between 1 & 10!"),
+                     TEXT("Enemy Ships velocity"), MB_OK | MB_ICONINFORMATION);
+          break;
+        }
+        data.gameData->game.velocityEnemyShips = eV;
+      }
+
+      maxP = GetDlgItemInt(hDlg, IDC_EDIT6, &fSuccess, TRUE);
+      if (maxP != 0) {
+        if (maxP > 5) {
+          MessageBox(hDlg, TEXT("Please input a number between 1 & 5!"),
+                     TEXT("Enemy Ships velocity"), MB_OK | MB_ICONINFORMATION);
+          break;
+        }
+        data.gameData->game.maxPlayers = maxP;
+      }
+
+      eL = GetDlgItemInt(hDlg, IDC_EDIT7, &fSuccess, TRUE);
+      if (eL != 0) {
+        data.gameData->game.earlyLives = eL;
+      }
+
+      pN = GetDlgItemInt(hDlg, IDC_EDIT3, &fSuccess, TRUE);
+      if (pN != 0) {
+        if (pN > 20) {
+          MessageBox(hDlg, TEXT("Please input a number between 1 & 20!"),
+                     TEXT("Number of Powerups"), MB_OK | MB_ICONINFORMATION);
+          break;
+        }
+        data.gameData->game.maxPowerups = pN;
+      }
+
+      pD = GetDlgItemInt(hDlg, IDC_EDIT2, &fSuccess, TRUE);
+      if (pD != 0) {
+        if (pD > 5) {
+          MessageBox(hDlg, TEXT("Please input a number between 1 & 5!"),
+                     TEXT("Powerups duration"), MB_OK | MB_ICONINFORMATION);
+          break;
+        }
+        data.gameData->game.maxPowerups = pD;
+      }
+
+      pOc = GetDlgItemInt(hDlg, IDC_EDIT1, &fSuccess, TRUE);
+      if (pOc != 0) {
+        if (pOc > 10) {
+          MessageBox(hDlg, TEXT("Please input a number between 1 & 10!"),
+                     TEXT("Powerups occurrence probability"), MB_OK | MB_ICONINFORMATION);
+          break;
+        }
+        data.gameData->game.powerupsProbabilityOccurrence = pOc;
+      }
+
+      EndDialog(hDlg, LOWORD(wParam));
+      return (INT_PTR)TRUE;
+    case IDCANCEL:
       EndDialog(hDlg, LOWORD(wParam));
       return (INT_PTR)TRUE;
     }
@@ -299,4 +372,9 @@ VOID initGameVariables(Game *game) {
   game->maxPlayers = MAX_PLAYERS;
 
   game->started = FALSE;
+
+  for (int i = 0; i < 10; i++) {
+    _stprintf_s(game->topTen[i].username, 50, TEXT("Daniel"));
+    game->topTen[i].score = 0;
+  }
 }

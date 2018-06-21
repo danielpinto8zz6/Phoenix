@@ -61,7 +61,7 @@ typedef struct {
   TCHAR username[50];
   DefenderShip ship;
   int lifes;
-  int points;
+  int score;
 } Player;
 
 typedef struct {
@@ -101,6 +101,12 @@ typedef struct {
   int clientId;
 } Message;
 
+
+typedef struct {
+  TCHAR username[50];
+  int score;
+} Top;
+
 typedef struct {
   int level;
   Player player[PLAYERS];
@@ -109,8 +115,14 @@ typedef struct {
   EnemyShip enemyShip[ENEMYSHIPS];
   int totalEnemyShips;
   int maxEnemyShips;
+  int velocityEnemyShips;
+  int earlyLives;
+  int maxPowerups;
+  int powerupsDuration;
+  int powerupsProbabilityOccurrence;
   BOOL started;
   Message message;
+  Top topTen[10];
 } Game;
 
 typedef struct {

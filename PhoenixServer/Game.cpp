@@ -239,3 +239,23 @@ BOOL joinGame(Data *data, int id) {
 
   return TRUE;
 }
+
+int compare(const void *a, const void *b) {
+  return (*(int *)a > *(int *)b) - (*(int *)a < *(int *)b);
+}
+
+void sort(int *arr, size_t len) { qsort(arr, len, sizeof(int), compare); }
+
+void setupTopTen(Game *game) {
+  for (int i = 0; i < game->totalPlayers; i++) {
+    for (int j = 0; j < 10; j++) {
+      if (game->player[i].score > game->topTen[j].score) {
+        for (int k = j; k < 10; k++) {
+          game->topTen[k] = game->topTen[k + 1];
+        }
+        game->topTen[j].score = game->player[i].score;
+        _tcscpy_s(game->topTen[j].username, game->player[i].username);
+      }
+    }
+  }
+}

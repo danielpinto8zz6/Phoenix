@@ -311,22 +311,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
     case ID_FILE_JOINGAME:
       if (client.inGame) {
-        MessageBox(NULL, TEXT("In Game"), TEXT("Already in game!"),
+        MessageBox(hWnd, TEXT("Already in game!"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         return 0;
       }
       if (!client.logged) {
-        MessageBox(NULL, TEXT("Login!"), TEXT("Please login first"),
+        MessageBox(hWnd, TEXT("Please login first"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         return 0;
       }
       if (client.gameStarted) {
-        MessageBox(NULL, TEXT("Can't join!"), TEXT("Game already started!"),
+        MessageBox(hWnd, TEXT("Game already started!"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         return 0;
       }
       if (!joinGame(&client)) {
-        MessageBox(NULL, TEXT("Can't join!"), TEXT("Error"),
+        MessageBox(hWnd, TEXT("Can't join!"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         return 0;
       }
@@ -449,7 +449,7 @@ BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
     case IDOK:
       GetDlgItemText(hWnd, IDC_EDIT_USERNAME, message.text, 50);
       if (_tcslen(message.text) == 0) {
-        MessageBox(NULL, TEXT("Fill in all the fields first!"),
+        MessageBox(hWnd, TEXT("Fill in all the fields first!"),
                    TEXT("Missing fields"), MB_OK | MB_ICONINFORMATION);
         break;
       }
@@ -459,7 +459,7 @@ BOOL CALLBACK Login(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lParam) {
 
       if (!writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &message,
                                 sizeof(Message))) {
-        MessageBox(NULL, TEXT("Can't communicate with gateway!"), TEXT("Error"),
+        MessageBox(hWnd, TEXT("Can't communicate with gateway!"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         break;
       }
@@ -479,15 +479,21 @@ INT_PTR CALLBACK Score(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
   UNREFERENCED_PARAMETER(lParam);
   switch (message) {
   case WM_INITDIALOG:
-    for (int i = 0; i < 10; i++) {
-      TCHAR name[20];
-      TCHAR points[20];
+    if (client.gameStarted) {
+      for (int i = 0; i < 10; i++) {
+        if (client.game.topTen[i].score != 0) {
+          TCHAR points[20];
+          TCHAR username[50];
 
-      _stprintf_s(name, 20, TEXT("Daniel"));
-      _stprintf_s(points, 20, TEXT("%d"), 10);
+          _stprintf_s(points, 20, TEXT("%d"), client.game.topTen[i].score);
+          _stprintf_s(username, 50, TEXT("%s"), client.game.topTen[i].username);
 
-      SendDlgItemMessage(hDlg, IDC_LIST3, LB_ADDSTRING, NULL, (LPARAM)name);
-      SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, NULL, (LPARAM)points);
+          SendDlgItemMessage(hDlg, IDC_LIST3, LB_ADDSTRING, NULL,
+                             (LPARAM)username);
+          SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, NULL,
+                             (LPARAM)points);
+        }
+      }
     }
     return (INT_PTR)TRUE;
 
