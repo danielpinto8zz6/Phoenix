@@ -442,7 +442,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
 
     if (client.game.started) {
 
-      StretchBlt(auxDC, 0, 0, 1000, 850, hdcBackground, 0, 0,
+      StretchBlt(auxDC, 0, 0, 1000, 700, hdcBackground, 0, 0,
                  bmBackground.bmWidth, bmBackground.bmHeight, SRCCOPY);
 
       _stprintf_s(text, 20, TEXT("SCORE : %d"), getPlayerScore(&client));
@@ -486,7 +486,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
         }
       }
     } else if (client.logged && client.inGame) {
-      StretchBlt(auxDC, 0, 0, 1000, 850, hdcLoading, 0, 0, bmLoading.bmWidth,
+      StretchBlt(auxDC, 0, 0, 1000, 700, hdcLoading, 0, 0, bmLoading.bmWidth,
                  bmLoading.bmHeight, SRCCOPY);
     }
 

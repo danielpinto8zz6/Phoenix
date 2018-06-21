@@ -112,10 +112,20 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   if (position < 7) {
     gameData->game.enemyShip[position].type = BASIC;
+	gameData->game.enemyShip[position].strenght = 1;
+	gameData->game.enemyShip[position].velocity = gameData->game.velocityEnemyShips;
+	gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
   } else if (position >= 7 && position < 14) {
     gameData->game.enemyShip[position].type = DODGE;
+	gameData->game.enemyShip[position].strenght = 3;
+	gameData->game.enemyShip[position].velocity = gameData->game.velocityEnemyShips;
+	gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
+
   } else {
     gameData->game.enemyShip[position].type = SUPERBAD;
+	gameData->game.enemyShip[position].strenght = 4;
+	gameData->game.enemyShip[position].velocity = gameData->game.velocityEnemyShips;
+	gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
   }
 
   sendGameToGateway(gameData, &gameData->game);
@@ -287,6 +297,7 @@ void setUpPlayers(GameData *data) {
 
     data->game.player[i].ship.position.x = dist * (i + 1);
     data->game.player[i].ship.position.y = 550;
+	data->game.player[i].lifes = data->game.earlyLives;
   }
 }
 BOOL startGame(Data *data) {
@@ -314,11 +325,12 @@ void movePlayer(GameData *gameData, int id, Command m) {
   Size s;
   s.height = 50;
   s.width = 50;
+  num = getPlayerIndex(game, id);
+  c1 = game->player[num].ship.position;
 
   switch (m) {
   case KEYLEFT:
-    num = getPlayerIndex(game, id);
-    c1 = game->player[num].ship.position;
+
     c1.x -= 2;
     if (game->totalPlayers > 1) {
       for (i = 0; i < game->totalPlayers; i++) {
@@ -337,8 +349,6 @@ void movePlayer(GameData *gameData, int id, Command m) {
 
     break;
   case KEYRIGHT:
-    num = getPlayerIndex(game, id);
-    c1 = game->player[num].ship.position;
     c1.x += 2;
     if (game->totalPlayers > 1) {
       for (i = 0; i < game->totalPlayers; i++) {
@@ -356,6 +366,46 @@ void movePlayer(GameData *gameData, int id, Command m) {
     game->player[num].ship.position.x += 2;
     sendGameToGateway(gameData, game);
     break;
+  case KEYUP:
+	  c1.y -= 2;
+	  if (c1.y < 530) return;
+
+	  if (game->totalPlayers > 1) {
+		  for (i = 0; i < game->totalPlayers; i++) {
+			  if (i != num) {
+
+				  overlaping =
+					  isRectangleOverlapping(c1, s, game->player[i].ship.position, s);
+
+				  if (overlaping)
+					  return;
+			  }
+		  }
+	  }
+
+	  game->player[num].ship.position.y -= 2;
+	  sendGameToGateway(gameData, game);
+	  break;
+  case KEYDOWN:
+	  c1.y += 2;
+	  if ( c1.y > (700 - 115 + 2))return;
+
+	  if (game->totalPlayers > 1) {
+		  for (i = 0; i < game->totalPlayers; i++) {
+			  if (i != num) {
+
+				  overlaping =
+					  isRectangleOverlapping(c1, s, game->player[i].ship.position, s);
+
+				  if (overlaping )
+					  return;
+			  }
+		  }
+	  }
+
+	  game->player[num].ship.position.y += 2;
+	  sendGameToGateway(gameData, game);
+	  break;
   case KEYSPACE:
     num = getPlayerIndex(game, id);
     break;
