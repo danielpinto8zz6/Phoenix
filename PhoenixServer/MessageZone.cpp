@@ -3,6 +3,7 @@
 #include "Clients.h"
 #include "Game.h"
 #include "MessageZone.h"
+#include "GameZone.h"
 
 DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
   Data *data = (Data *)lpParam;
@@ -48,10 +49,16 @@ void handleCommand(Data *data, Message message) {
   case KEYUP:
     break;
   case KEYLEFT:
+	  movePlayer(data->gameData, message.clientId, KEYLEFT);
     break;
   case KEYRIGHT:
+	  movePlayer(data->gameData, message.clientId, KEYRIGHT);
     break;
   case KEYSPACE:
+	  movePlayer(data->gameData, message.clientId, KEYSPACE);
+
     break;
   }
 }
+
+

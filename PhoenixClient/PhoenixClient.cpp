@@ -450,6 +450,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
           break;
         }
       }
+	  for (int i = 0; i < (client.game.totalPlayers +1 ); i++) {
+		  StretchBlt(auxDC, client.game.player[i].ship.position.x,
+			  client.game.player[i].ship.position.y, 50, 50,
+			  hdcPower1, 0, 0, bmPower1.bmWidth,
+			  bmPower1.bmHeight, SRCCOPY);
+	  }
     }
 
     hdc = BeginPaint(hWnd, &ps);

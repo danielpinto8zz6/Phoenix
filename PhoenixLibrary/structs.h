@@ -101,7 +101,6 @@ typedef struct {
   int clientId;
 } Message;
 
-
 typedef struct {
   TCHAR username[50];
   int score;

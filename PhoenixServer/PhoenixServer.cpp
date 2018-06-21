@@ -229,7 +229,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                               sizeof(Message), data.messageData->hMutex,
                               data.messageData->gatewayMessageUpdateEvent);
       startGame(&data);
-
       break;
     case IDM_ABOUT:
       DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);

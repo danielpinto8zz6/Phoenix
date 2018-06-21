@@ -15,3 +15,5 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam);
 BOOL joinGame(Data *data, int id);
 void setupTopTen(Game *game);
 BOOL startGame(Data *data);
+void setUpPlayers(Data *data);
+void movePlayer(GameData *gameData, int id, Command m);
