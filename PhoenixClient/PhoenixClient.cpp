@@ -496,6 +496,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                  bmLoading.bmHeight, SRCCOPY);
     }
 
+    StretchBlt(auxDC, 300, 300, 5, 10, hdcShot, 0, 0, bmShot.bmWidth,
+               bmShot.bmHeight, SRCCOPY);
+
     hdc = BeginPaint(hWnd, &ps);
     BitBlt(hdc, 0, 0, nX, nY, auxDC, 0, 0, SRCCOPY);
     EndPaint(hWnd, &ps);

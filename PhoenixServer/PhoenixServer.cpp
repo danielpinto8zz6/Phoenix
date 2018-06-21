@@ -128,6 +128,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   handleClose(data.messageData);
 
+  
+  CloseHandle(gameData.hMapFile);
+  CloseHandle(gameData.hMutex);
+  CloseHandle(gameData.gameUpdateEvent);
+  UnmapViewOfFile(gameData.sharedGame);
+
+  CloseHandle(messageData.hMutex);
+  CloseHandle(messageData.hMapFile);
+  CloseHandle(messageData.gatewayMessageUpdateEvent);
+  CloseHandle(messageData.serverMessageUpdateEvent);
+  CloseHandle(hThreadReceiveMessagesFromGateway);
+  UnmapViewOfFile(messageData.sharedMessage);
+
   return (int)msg.wParam;
 }
 

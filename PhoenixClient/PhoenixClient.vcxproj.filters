@@ -117,5 +117,8 @@
     <Image Include="other_defender_ship.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="loading.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
