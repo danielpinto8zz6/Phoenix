@@ -40,6 +40,12 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
                                &message, sizeof(Message));
         }
         break;
+      case SERVER_DISCONNECTED:
+        error(TEXT(
+            "Server disconnected! Closing gateway & informing clients..."));
+        broadcastMessageToClients(data, &message);
+        return 0;
+        break;
       default:
         broadcastMessageToClients(data, &message);
         break;

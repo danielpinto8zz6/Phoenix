@@ -116,11 +116,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   // Main message loop:
   while (GetMessage(&msg, nullptr, 0, 0)) {
+    if (msg.message == WM_DESTROY) {
+      break;
+    }
+
     if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
   }
+
+  handleClose(data.messageData);
 
   return (int)msg.wParam;
 }
@@ -296,6 +302,7 @@ INT_PTR CALLBACK Configure(HWND hDlg, UINT message, WPARAM wParam,
             hDlg,
             TEXT("Game already started! Configurations won't take effect!"),
             TEXT("Game started"), MB_OK | MB_ICONINFORMATION);
+        break;
       }
 
       eN = GetDlgItemInt(hDlg, IDC_EDIT5, &fSuccess, TRUE);

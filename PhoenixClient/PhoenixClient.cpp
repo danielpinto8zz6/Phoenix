@@ -115,10 +115,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   // Main message loop:
   while (GetMessage(&msg, nullptr, 0, 0)) {
     if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+      if (msg.message == WM_DESTROY) {
+        break;
+      }
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
   }
+
+  CloseHandle(hThreadGameReceiver);
+  CloseHandle(hThreadMessageReceiver);
 
   return (int)msg.wParam;
 }
@@ -495,16 +501,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     EndPaint(hWnd, &ps);
     break;
   case WM_DESTROY:
-    PostQuitMessage(0);
-    // DeleteObject(hNave);
-    // DeleteDC(hdcNave);
-
     /**
      * Release resources in memory
      */
     DeleteObject(bg);
     DeleteObject(auxBM);
     DeleteDC(auxDC);
+    DeleteObject(hdcNaveBasic);
+    DeleteObject(hdcNaveDodge);
+    DeleteObject(hdcBomb);
+    DeleteObject(hdcPower1);
+    DeleteObject(hdcPower2);
+    DeleteObject(hdcPower3);
+    DeleteObject(hdcPower4);
+    DeleteObject(hdcShot);
+    DeleteObject(hdcBackground);
+    DeleteObject(hdcShipSuperBad);
+    DeleteObject(hdcMyDefenderShip);
+    DeleteObject(hdcOtherDefenderShip);
+    DeleteObject(hdcLoading);
+    DeleteObject(hNaveBasic);
+    DeleteObject(hNaveDodge);
+    DeleteObject(hBomb);
+    DeleteObject(hShot);
+    DeleteObject(hPower1);
+    DeleteObject(hPower2);
+    DeleteObject(hPower3);
+    DeleteObject(hPower4);
+    DeleteObject(hBackground);
+    DeleteObject(hShipSuperBad);
+    DeleteObject(hMyDefenderShip);
+    DeleteObject(hOtherDefenderShip);
+    DeleteObject(hLoading);
+
+    PostQuitMessage(0);
     break;
   default:
     return DefWindowProc(hWnd, message, wParam, lParam);

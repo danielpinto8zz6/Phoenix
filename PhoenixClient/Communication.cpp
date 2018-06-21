@@ -107,7 +107,9 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
       break;
     }
 
-    handleCommand(client, message);
+    if (!handleCommand(client, message)) {
+      break;
+    }
   }
 
   client->readerAlive = FALSE;
@@ -115,7 +117,7 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
   return TRUE;
 }
 
-void handleCommand(Client *client, Message message) {
+BOOL handleCommand(Client *client, Message message) {
   switch (message.cmd) {
   // case GAME_STARTED:
   //   client->gameStarted = TRUE;
@@ -140,7 +142,17 @@ void handleCommand(Client *client, Message message) {
                MB_OK | MB_ICONINFORMATION);
     client->inGame = TRUE;
     break;
+  case SERVER_DISCONNECTED:
+    if (MessageBox(client->hWnd,
+                   TEXT("Server disconnected! Unable to receive data! Exit?"),
+                   TEXT("Error"),
+                   MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
+      PostMessage(client->hWnd, WM_DESTROY, 0, 0);
+    }
+    break;
   }
+
+  return TRUE;
 }
 
 BOOL joinGame(Client *client) {
