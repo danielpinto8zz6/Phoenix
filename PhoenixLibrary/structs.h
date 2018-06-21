@@ -14,6 +14,9 @@
 
 typedef enum { SHIELD, ICE, BATTERY, PLUS, ALCOOL } PowerupType;
 
+typedef enum { LEFT, RIGHT, SHOT } MovType;
+
+
 typedef enum { BASIC, DODGE } EnemyType;
 
 typedef enum { NONE } PowerupEffect;

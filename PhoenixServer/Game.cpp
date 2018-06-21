@@ -72,7 +72,6 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
       errorGui(TEXT("Creating enemy ship thread"));
       return 1;
     }
-    Sleep(500);
   }
 
   // Wait for all threads to terminate
@@ -175,6 +174,7 @@ BOOL isRectangleOverlapping(Coordinates rect1Coord, Size rect1Sz,
   return FALSE;
 }
 
+
 BOOL isPointInsideRect(Coordinates rect1Coord, Size rect1Sz,
                        Coordinates point) {
   Coordinates totalRect1;
@@ -274,13 +274,22 @@ void setupTopTen(Game *game) {
     }
   }
 }
+void setUpPlayers(GameData *data) {
+	int dist;
+	
+	dist = 950 / (data->game.totalPlayers + 1);
+	for (int i = 0; i < data->game.totalPlayers;i++) {
 
+		data->game.player[i].ship.position.x =  dist * (i+1);
+		data->game.player[i].ship.position.y = 550;
+	}
+}
 BOOL startGame(Data *data) {
   DWORD threadManageEnemyShipsId;
   HANDLE hThreadManageEnemyShips;
 
   GameData *gameData = data->gameData;
-
+  setUpPlayers(gameData);
   hThreadManageEnemyShips =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadManageEnemyShips,
                    gameData, 0, &threadManageEnemyShipsId);
@@ -290,4 +299,62 @@ BOOL startGame(Data *data) {
   }
 
   return TRUE;
+}
+
+void movePlayer(GameData *gameData, int id, MovType m) {
+	Game *game = &gameData->game;
+	int num, i;
+	Coordinates c1;
+	BOOL overlaping;
+	Size s;
+	s.height = 50;
+	s.width = 50;
+
+	switch (m) {
+	case LEFT:
+		num = getPlayerIndex(game, id);
+		c1 = game->player[num].ship.position;
+		c1.x-=2;
+		if (game->totalPlayers > 1) {
+			for (i = 0; i < game->totalPlayers; i++) {
+				if (i != num) {
+
+					overlaping = isRectangleOverlapping(c1, s,
+						game->player[i].ship.position, s);
+
+					if (overlaping)return;
+				}
+			}
+		}
+		game->player[num].ship.position.x -= 2;
+		sendGameToGateway(gameData, game);
+
+		break;
+	case RIGHT:
+		num = getPlayerIndex(game, id);
+		c1 = game->player[num].ship.position;
+		c1.x+=2;
+		if (game->totalPlayers > 1) {
+			for (i = 0; i < game->totalPlayers; i++) {
+				if (i != num) {
+
+					overlaping = isRectangleOverlapping(c1, s,
+						game->player[i].ship.position, s);
+
+					if (overlaping)return;
+				}
+			}
+		}
+
+		game->player[num].ship.position.x += 2;
+		sendGameToGateway(gameData, game);
+		break;
+	case SHOT:
+		num = getPlayerIndex(game, id);
+		break;
+	default:
+
+		break;
+	}
+
 }
