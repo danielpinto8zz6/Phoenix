@@ -287,6 +287,7 @@ void setUpPlayers(GameData *data) {
 
     data->game.player[i].ship.position.x = dist * (i + 1);
     data->game.player[i].ship.position.y = 550;
+    data->game.player[i].score = 0;
   }
 }
 BOOL startGame(Data *data) {
