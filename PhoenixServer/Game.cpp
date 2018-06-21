@@ -47,6 +47,8 @@ BOOL isCoordinatesValid(Coordinates coordinates) {
 DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
   GameData *gameData = (GameData *)lpParam;
 
+  Game *game = &gameData->game;
+
   HANDLE aThread[ENEMYSHIPS];
   DWORD ThreadID = 0;
 
@@ -61,7 +63,7 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
   }
 
   // Create Enemy Ships threads
-  for (int i = 0; i < ENEMYSHIPS; i++) {
+  for (int i = 0; i < game->maxEnemyShips; i++) {
     gameData->position = i;
     aThread[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadEnemyShip,
                               gameData, 0, &ThreadID);
@@ -114,6 +116,19 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
   sendGameToGateway(gameData, &gameData->game);
 
   ReleaseMutex(hMutexManageEnemyShips);
+
+  // TODO: WIP
+  while (TRUE) {
+    WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
+
+    gameData->game.enemyShip[position].position.y++;
+
+    sendGameToGateway(gameData, &gameData->game);
+
+    ReleaseMutex(hMutexManageEnemyShips);
+
+    Sleep(100);
+  }
 
   return TRUE;
 }
@@ -258,4 +273,21 @@ void setupTopTen(Game *game) {
       }
     }
   }
+}
+
+BOOL startGame(Data *data) {
+  DWORD threadManageEnemyShipsId;
+  HANDLE hThreadManageEnemyShips;
+
+  GameData *gameData = data->gameData;
+
+  hThreadManageEnemyShips =
+      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadManageEnemyShips,
+                   gameData, 0, &threadManageEnemyShipsId);
+  if (hThreadManageEnemyShips == NULL) {
+    errorGui(TEXT("Creating thread to manage enemy ships"));
+    return FALSE;
+  }
+
+  return TRUE;
 }

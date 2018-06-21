@@ -55,9 +55,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return FALSE;
   }
 
-  DWORD threadManageEnemyShipsId;
-  HANDLE hThreadManageEnemyShips;
-
   if (!initGameZone(&gameData)) {
     errorGui(TEXT("Can't connect game data with server. Exiting..."));
     return FALSE;
@@ -97,14 +94,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                    &data, 0, &threadReceiveMessagesFromServerId);
   if (hThreadReceiveMessagesFromGateway == NULL) {
     errorGui(TEXT("Creating thread to receive data from server"));
-    return FALSE;
-  }
-
-  hThreadManageEnemyShips =
-      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadManageEnemyShips,
-                   &gameData, 0, &threadManageEnemyShipsId);
-  if (hThreadManageEnemyShips == NULL) {
-    errorGui(TEXT("Creating thread to manage enemy ships"));
     return FALSE;
   }
 
@@ -202,7 +191,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                          LPARAM lParam) {
   static HWND hwndButton;
-  
+
   switch (message) {
   case WM_CREATE:
     hwndButton = CreateWindow(
@@ -210,11 +199,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
         TEXT("Start Game"), // Button text
         WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, // Styles
         150,                                                   // x position
-        50,                                                   // y position
+        50,                                                    // y position
         200,                                                   // Button width
         100,                                                   // Button height
         hWnd,                                                  // Parent window
-        (HMENU)IDC_START_GAME,                                                  // No menu.
+        (HMENU)IDC_START_GAME,                                 // No menu.
         (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
         NULL); // Pointer not needed.
     break;
@@ -226,12 +215,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_CONFIGURATION), hWnd,
                 Configure);
       break;
+    case IDC_START_GAME:
     case ID_FILE_STARTGAME:
+      if (data.gameData->game.started) {
+        MessageBox(hWnd, TEXT("Game already started!"), TEXT("Error"),
+                   MB_OK | MB_ICONINFORMATION);
+        return FALSE;
+      }
       Message msg;
       msg.cmd = GAME_STARTED;
+      data.gameData->game.started = TRUE;
       writeDataToSharedMemory(data.messageData->sharedMessage, &msg,
                               sizeof(Message), data.messageData->hMutex,
                               data.messageData->gatewayMessageUpdateEvent);
+      startGame(&data);
 
       break;
     case IDM_ABOUT:

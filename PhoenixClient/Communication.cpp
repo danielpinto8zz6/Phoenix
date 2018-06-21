@@ -178,7 +178,7 @@ DWORD WINAPI gameReceiver(LPVOID lpParam) {
         break;
       }
 
-      InvalidateRect(client->hWnd, NULL, TRUE);
+      InvalidateRect(client->hWnd, NULL, FALSE);
     }
   }
 
