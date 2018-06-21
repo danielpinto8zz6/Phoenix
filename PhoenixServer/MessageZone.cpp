@@ -47,8 +47,10 @@ void handleCommand(Data *data, Message message) {
   case GATEWAY_DISCONNECTED:
     break;
   case KEYDOWN:
+	  movePlayer(data->gameData, message.clientId, KEYDOWN);
     break;
   case KEYUP:
+	  movePlayer(data->gameData, message.clientId, KEYUP);
     break;
   case KEYLEFT:
 	  movePlayer(data->gameData, message.clientId, KEYLEFT);

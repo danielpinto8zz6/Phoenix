@@ -300,7 +300,7 @@ INT_PTR CALLBACK Configure(HWND hDlg, UINT message, WPARAM wParam,
                            LPARAM lParam) {
   UNREFERENCED_PARAMETER(lParam);
 
-  int eN, eV, pN, pD, pOc, maxP, eL;
+  int eN, eV, pN, pD, pOc, maxP, eL,eD;
   BOOL fSuccess;
 
   switch (message) {
@@ -347,6 +347,15 @@ INT_PTR CALLBACK Configure(HWND hDlg, UINT message, WPARAM wParam,
         }
         data.gameData->game.maxPlayers = maxP;
       }
+	  eD = GetDlgItemInt(hDlg, IDC_EDIT8, &fSuccess, TRUE);
+	  if (maxP != 0) {
+		  if (maxP > 5) {
+			  MessageBox(hDlg, TEXT("Please input a number between 1 & 5!"),
+				  TEXT("Enemy Ships difficulty"), MB_OK | MB_ICONINFORMATION);
+			  break;
+		  }
+		  data.gameData->game.maxPlayers = eD;
+	  }
 
       eL = GetDlgItemInt(hDlg, IDC_EDIT7, &fSuccess, TRUE);
       if (eL != 0) {
@@ -408,9 +417,19 @@ VOID initGameVariables(Game *game) {
 
   game->totalPlayers = 0;
 
+  game->earlyLives = 2;
+
   game->totalEnemyShips = 0;
 
   game->maxEnemyShips = MAX_ENEMY_SHIPS;
+
+  game->velocityEnemyShips = 1;
+
+  game->powerupsDuration = 10;
+
+  game->powerupsProbabilityOccurrence = 1;
+
+  game->difficulty = 1;
 
   game->maxPlayers = MAX_PLAYERS;
 

@@ -72,6 +72,8 @@ typedef struct {
   Coordinates position;
   int points;
   int velocity;
+  int strenght;
+  int fireRate;
   Size size;
   EnemyType type;
   Bomb bombs[50];
@@ -119,6 +121,7 @@ typedef struct {
   int maxPowerups;
   int powerupsDuration;
   int powerupsProbabilityOccurrence;
+  int difficulty;
   BOOL started;
   Message message;
   Top topTen[10];
