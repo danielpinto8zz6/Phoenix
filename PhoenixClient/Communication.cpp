@@ -132,6 +132,7 @@ void handleCommand(Client *client, Message message) {
     MessageBox(NULL, TEXT("Joined to game!"), TEXT("Joined"),
                MB_OK | MB_ICONINFORMATION);
     client->inGame = TRUE;
+    InvalidateRect(client->hWnd, NULL, TRUE);
     break;
 
   case CANT_JOIN:

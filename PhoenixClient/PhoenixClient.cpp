@@ -30,6 +30,7 @@ HBITMAP hBackground = NULL;
 HBITMAP hShipSuperBad = NULL;
 HBITMAP hMyDefenderShip = NULL;
 HBITMAP hOtherDefenderShip = NULL;
+HBITMAP hLoading = NULL;
 
 int x, y;
 HDC hdc = NULL, auxDC = NULL;
@@ -215,6 +216,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   static HDC hdcMyDefenderShip;
   static BITMAP bmOtherDefenderShip;
   static HDC hdcOtherDefenderShip;
+  static BITMAP bmLoading;
+  static HDC hdcLoading;
 
   switch (message) {
   case WM_CREATE:
@@ -225,6 +228,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     GetObject(hBackground, sizeof(bmBackground), &bmBackground);
     hdcBackground = CreateCompatibleDC(hdc);
     SelectObject(hdcBackground, hBackground);
+    ReleaseDC(hWnd, hdc);
+
+    hLoading = (HBITMAP)LoadImage(GetModuleHandle(NULL),
+                                  MAKEINTRESOURCE(IDB_BITMAP_LOADING),
+                                  IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+    hdc = GetDC(hWnd);
+    GetObject(hLoading, sizeof(bmLoading), &bmLoading);
+    hdcLoading = CreateCompatibleDC(hdc);
+    SelectObject(hdcLoading, hLoading);
     ReleaseDC(hWnd, hdc);
 
     hNaveBasic = (HBITMAP)LoadImage(GetModuleHandle(NULL),
@@ -437,10 +449,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
 
       TextOut(auxDC, 450, 0, text, _tcslen(text));
 
-      HICON icon = LoadIcon(hInst, TEXT("PhoenixClient.ico"));
-
-      DrawIcon(auxDC, 500, 500, icon);
-
       for (int i = 0; i < client.game.totalEnemyShips; i++) {
         switch (client.game.enemyShip[i].type) {
         case BASIC:
@@ -477,6 +485,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                          bmOtherDefenderShip.bmHeight, RGB(255, 255, 255));
         }
       }
+    } else if (client.logged && client.inGame) {
+      StretchBlt(auxDC, 0, 0, 1000, 850, hdcLoading, 0, 0, bmLoading.bmWidth,
+                 bmLoading.bmHeight, SRCCOPY);
     }
 
     hdc = BeginPaint(hWnd, &ps);
