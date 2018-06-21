@@ -156,7 +156,6 @@ typedef struct {
   HANDLE hEvent;
   BOOL readerAlive;
   Game game;
-  BOOL gameStarted;
   BOOL logged;
   BOOL inGame;
   HWND hWnd;

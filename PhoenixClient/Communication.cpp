@@ -117,10 +117,10 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
 
 void handleCommand(Client *client, Message message) {
   switch (message.cmd) {
-  case GAME_STARTED:
-    client->gameStarted = TRUE;
-    InvalidateRect(client->hWnd, NULL, TRUE);
-    break;
+  // case GAME_STARTED:
+  //   client->gameStarted = TRUE;
+  //   InvalidateRect(client->hWnd, NULL, TRUE);
+  //   break;
   case LOGGED:
     MessageBox(NULL, message.text, TEXT("Login succeed"),
                MB_OK | MB_ICONINFORMATION);
@@ -166,7 +166,7 @@ DWORD WINAPI gameReceiver(LPVOID lpParam) {
   }
 
   while (client->threadContinue) {
-    if (client->gameStarted) {
+    if (client->logged) {
       fSuccess = readDataFromPipe(client->hPipeGame, game, sizeof(Game));
 
       if (!fSuccess) {

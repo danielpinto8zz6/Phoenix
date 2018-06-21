@@ -34,7 +34,9 @@ void handleCommand(Data *data, Message message) {
     clientLogin(data, message);
     break;
   case CLIENT_DISCONNECTED:
-    removeClient(data, message.clientId);
+    if (removeClient(data, message.clientId)){
+      sendGameToGateway(data->gameData, &data->gameData->game);
+    }
     break;
   case JOIN_GAME:
     joinGame(data, message.clientId);

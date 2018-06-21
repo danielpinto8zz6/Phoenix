@@ -66,7 +66,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   client.logged = FALSE;
   client.inGame = FALSE;
-  client.gameStarted = FALSE;
 
   if (!isGatewayRunning()) {
     errorGui(TEXT("There's no gateway instance running! Start gateway first!"));
@@ -364,7 +363,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                    MB_OK | MB_ICONINFORMATION);
         return 0;
       }
-      if (client.gameStarted) {
+      if (client.game.started) {
         MessageBox(hWnd, TEXT("Game already started!"), TEXT("Error"),
                    MB_OK | MB_ICONINFORMATION);
         return 0;
@@ -391,7 +390,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_KEYDOWN:
     Message msg;
 
-    if (client.gameStarted && client.inGame) {
+    if (client.game.started && client.inGame) {
       if (wParam == VK_RIGHT) {
         msg.cmd = KEYRIGHT;
         writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
@@ -429,7 +428,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     PatBlt(auxDC, 0, 0, nX, nY, PATCOPY);
     SetStretchBltMode(auxDC, BLACKONWHITE);
 
-    if (client.gameStarted) {
+    if (client.game.started) {
 
       StretchBlt(auxDC, 0, 0, 1000, 850, hdcBackground, 0, 0,
                  bmBackground.bmWidth, bmBackground.bmHeight, SRCCOPY);
@@ -558,7 +557,7 @@ INT_PTR CALLBACK Score(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
   UNREFERENCED_PARAMETER(lParam);
   switch (message) {
   case WM_INITDIALOG:
-    if (client.gameStarted) {
+    if (client.game.started) {
       for (int i = 0; i < 10; i++) {
         if (client.game.topTen[i].score != 0) {
           TCHAR points[20];
