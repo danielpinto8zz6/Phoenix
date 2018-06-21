@@ -170,7 +170,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   HWND hWnd = CreateWindowW(
       szWindowClass, szTitle,
       WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, CW_USEDEFAULT, 0,
-      1020, 700, nullptr, nullptr, hInstance, nullptr);
+      WINDOW_WIDTH, WINDOW_HEIGHT, nullptr, nullptr, hInstance, nullptr);
 
   if (!hWnd) {
     return FALSE;
@@ -448,7 +448,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
 
     if (client.game.started) {
 
-      StretchBlt(auxDC, 0, 0, 1000, 700, hdcBackground, 0, 0,
+      StretchBlt(auxDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcBackground, 0, 0,
                  bmBackground.bmWidth, bmBackground.bmHeight, SRCCOPY);
 
       _stprintf_s(text, 20, TEXT("SCORE : %d"), getPlayerScore(&client));
@@ -459,40 +459,50 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
         switch (client.game.enemyShip[i].type) {
         case BASIC:
           TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
-                         client.game.enemyShip[i].position.y + START_HEIGHT, 50,
-                         50, hdcNaveBasic, 0, 0, bmNaveBasic.bmWidth,
-                         bmNaveBasic.bmHeight, RGB(255, 255, 255));
+                         client.game.enemyShip[i].position.y + START_HEIGHT,
+                         client.game.enemyShip[i].size.width,
+                         client.game.enemyShip[i].size.height, hdcNaveBasic, 0,
+                         0, bmNaveBasic.bmWidth, bmNaveBasic.bmHeight,
+                         RGB(255, 255, 255));
           break;
         case DODGE:
           TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
-                         client.game.enemyShip[i].position.y + START_HEIGHT, 50,
-                         50, hdcNaveDodge, 0, 0, bmNaveDodge.bmWidth,
-                         bmNaveDodge.bmHeight, RGB(255, 255, 255));
+                         client.game.enemyShip[i].position.y + START_HEIGHT,
+                         client.game.enemyShip[i].size.width,
+                         client.game.enemyShip[i].size.height, hdcNaveDodge, 0,
+                         0, bmNaveDodge.bmWidth, bmNaveDodge.bmHeight,
+                         RGB(255, 255, 255));
           break;
         case SUPERBAD:
           TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
-                         client.game.enemyShip[i].position.y + START_HEIGHT, 50,
-                         50, hdcShipSuperBad, 0, 0, bmShipSuperBad.bmWidth,
-                         bmShipSuperBad.bmHeight, RGB(255, 255, 255));
+                         client.game.enemyShip[i].position.y + START_HEIGHT,
+                         client.game.enemyShip[i].size.width,
+                         client.game.enemyShip[i].size.height, hdcShipSuperBad,
+                         0, 0, bmShipSuperBad.bmWidth, bmShipSuperBad.bmHeight,
+                         RGB(255, 255, 255));
           break;
         }
       }
       for (int i = 0; i < (client.game.totalPlayers + 1); i++) {
         if (client.game.player[i].id == client.id) {
           TransparentBlt(auxDC, client.game.player[i].ship.position.x,
-                         client.game.player[i].ship.position.y, 50, 50,
+                         client.game.player[i].ship.position.y,
+                         client.game.player[i].ship.size.width,
+                         client.game.player[i].ship.size.height,
                          hdcMyDefenderShip, 0, 0, bmMyDefenderShip.bmWidth,
                          bmMyDefenderShip.bmHeight, RGB(255, 255, 255));
         } else {
           TransparentBlt(auxDC, client.game.player[i].ship.position.x,
-                         client.game.player[i].ship.position.y, 50, 50,
+                         client.game.player[i].ship.position.y,
+                         client.game.player[i].ship.size.width,
+                         client.game.player[i].ship.size.height,
                          hdcOtherDefenderShip, 0, 0,
                          bmOtherDefenderShip.bmWidth,
                          bmOtherDefenderShip.bmHeight, RGB(255, 255, 255));
         }
       }
     } else if (client.logged && client.inGame) {
-      StretchBlt(auxDC, 0, 0, 1000, 700, hdcLoading, 0, 0, bmLoading.bmWidth,
+      StretchBlt(auxDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcLoading, 0, 0, bmLoading.bmWidth,
                  bmLoading.bmHeight, SRCCOPY);
     }
 

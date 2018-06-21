@@ -8,6 +8,11 @@
 #define PHOENIXLIBRARY_API __declspec(dllimport)
 #endif
 
+#define WINDOW_WIDTH 1020
+#define WINDOW_HEIGHT 700
+
+#define SCORE_BOARD_HEIGHT 20
+
 #define MAX_ENEMY_SHIPS 20
 #define MAX_PLAYERS 5
 #define MAX_CLIENTS 10

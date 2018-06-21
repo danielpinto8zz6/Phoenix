@@ -72,7 +72,7 @@ typedef struct {
   Coordinates position;
   int points;
   int velocity;
-  int strenght;
+  int strength;
   int fireRate;
   Size size;
   EnemyType type;

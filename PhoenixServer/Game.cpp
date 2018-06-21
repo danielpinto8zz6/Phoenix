@@ -110,22 +110,28 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   gameData->game.enemyShip[position].position = c;
 
+  gameData->game.enemyShip[position].size.height = 50;
+  gameData->game.enemyShip[position].size.width = 50;
+
   if (position < 7) {
     gameData->game.enemyShip[position].type = BASIC;
-	gameData->game.enemyShip[position].strenght = 1;
-	gameData->game.enemyShip[position].velocity = gameData->game.velocityEnemyShips;
-	gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
+    gameData->game.enemyShip[position].strength = 1;
+    gameData->game.enemyShip[position].velocity =
+        gameData->game.velocityEnemyShips;
+    gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
   } else if (position >= 7 && position < 14) {
     gameData->game.enemyShip[position].type = DODGE;
-	gameData->game.enemyShip[position].strenght = 3;
-	gameData->game.enemyShip[position].velocity = gameData->game.velocityEnemyShips;
-	gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
+    gameData->game.enemyShip[position].strength = 3;
+    gameData->game.enemyShip[position].velocity =
+        gameData->game.velocityEnemyShips;
+    gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
 
   } else {
     gameData->game.enemyShip[position].type = SUPERBAD;
-	gameData->game.enemyShip[position].strenght = 4;
-	gameData->game.enemyShip[position].velocity = gameData->game.velocityEnemyShips;
-	gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
+    gameData->game.enemyShip[position].strength = 4;
+    gameData->game.enemyShip[position].velocity =
+        gameData->game.velocityEnemyShips;
+    gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
   }
 
   sendGameToGateway(gameData, &gameData->game);
@@ -213,8 +219,13 @@ BOOL addPlayer(Game *game, TCHAR username[50], int id) {
     return FALSE;
   }
 
-  _tcscpy_s(game->player[game->totalPlayers].username, username);
-  game->player[game->totalPlayers].id = id;
+  int i = game->totalPlayers;
+
+  _tcscpy_s(game->player[i].username, username);
+  game->player[i].id = id;
+
+  game->player[i].ship.size.width = 50;
+  game->player[i].ship.size.height = 50;
 
   game->totalPlayers++;
 
@@ -289,6 +300,7 @@ void setupTopTen(Game *game) {
     }
   }
 }
+
 void setUpPlayers(GameData *data) {
   int dist;
 
@@ -301,6 +313,7 @@ void setUpPlayers(GameData *data) {
     data->game.player[i].lives = data->game.earlyLives;
   }
 }
+
 BOOL startGame(Data *data) {
   DWORD threadManageEnemyShipsId;
   HANDLE hThreadManageEnemyShips;
@@ -333,6 +346,10 @@ void movePlayer(GameData *gameData, int id, Command m) {
   case KEYLEFT:
 
     c1.x -= 2;
+
+    if (c1.x < 1)
+      return;
+
     if (game->totalPlayers > 1) {
       for (i = 0; i < game->totalPlayers; i++) {
         if (i != num) {
@@ -351,6 +368,10 @@ void movePlayer(GameData *gameData, int id, Command m) {
     break;
   case KEYRIGHT:
     c1.x += 2;
+
+    if (c1.x > WINDOW_WIDTH - 1)
+      return;
+
     if (game->totalPlayers > 1) {
       for (i = 0; i < game->totalPlayers; i++) {
         if (i != num) {
@@ -368,45 +389,47 @@ void movePlayer(GameData *gameData, int id, Command m) {
     sendGameToGateway(gameData, game);
     break;
   case KEYUP:
-	  c1.y -= 2;
-	  if (c1.y < 530) return;
+    c1.y -= 2;
+    if (c1.y < 530)
+      return;
 
-	  if (game->totalPlayers > 1) {
-		  for (i = 0; i < game->totalPlayers; i++) {
-			  if (i != num) {
+    if (game->totalPlayers > 1) {
+      for (i = 0; i < game->totalPlayers; i++) {
+        if (i != num) {
 
-				  overlaping =
-					  isRectangleOverlapping(c1, s, game->player[i].ship.position, s);
+          overlaping =
+              isRectangleOverlapping(c1, s, game->player[i].ship.position, s);
 
-				  if (overlaping)
-					  return;
-			  }
-		  }
-	  }
+          if (overlaping)
+            return;
+        }
+      }
+    }
 
-	  game->player[num].ship.position.y -= 2;
-	  sendGameToGateway(gameData, game);
-	  break;
+    game->player[num].ship.position.y -= 2;
+    sendGameToGateway(gameData, game);
+    break;
   case KEYDOWN:
-	  c1.y += 2;
-	  if ( c1.y > (700 - 115 + 2))return;
+    c1.y += 2;
+    if (c1.y > (WINDOW_HEIGHT - 115 + 2))
+      return;
 
-	  if (game->totalPlayers > 1) {
-		  for (i = 0; i < game->totalPlayers; i++) {
-			  if (i != num) {
+    if (game->totalPlayers > 1) {
+      for (i = 0; i < game->totalPlayers; i++) {
+        if (i != num) {
 
-				  overlaping =
-					  isRectangleOverlapping(c1, s, game->player[i].ship.position, s);
+          overlaping =
+              isRectangleOverlapping(c1, s, game->player[i].ship.position, s);
 
-				  if (overlaping )
-					  return;
-			  }
-		  }
-	  }
+          if (overlaping)
+            return;
+        }
+      }
+    }
 
-	  game->player[num].ship.position.y += 2;
-	  sendGameToGateway(gameData, game);
-	  break;
+    game->player[num].ship.position.y += 2;
+    sendGameToGateway(gameData, game);
+    break;
   case KEYSPACE:
     num = getPlayerIndex(game, id);
     break;
