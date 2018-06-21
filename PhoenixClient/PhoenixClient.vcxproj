@@ -181,6 +181,8 @@
     <Image Include="enemyship_basic.bmp" />
     <Image Include="enemyship_dodge.bmp" />
     <Image Include="enemyship_superbad.bmp" />
+    <Image Include="my_defender_ship.bmp" />
+    <Image Include="other_defender_ship.bmp" />
     <Image Include="tiro.bmp" />
     <Image Include="bitmap2.bmp" />
     <Image Include="bom.bmp" />

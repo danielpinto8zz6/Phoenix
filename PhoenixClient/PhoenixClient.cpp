@@ -19,7 +19,6 @@ WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
 
 HBITMAP hNaveBasic = NULL;
-HBITMAP hNaveDefender = NULL;
 HBITMAP hNaveDodge = NULL;
 HBITMAP hBomb = NULL;
 HBITMAP hShot = NULL;
@@ -29,6 +28,8 @@ HBITMAP hPower3 = NULL;
 HBITMAP hPower4 = NULL;
 HBITMAP hBackground = NULL;
 HBITMAP hShipSuperBad = NULL;
+HBITMAP hMyDefenderShip = NULL;
+HBITMAP hOtherDefenderShip = NULL;
 
 int x, y;
 HDC hdc = NULL, auxDC = NULL;
@@ -193,8 +194,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
 
   static BITMAP bmNaveBasic;
   static HDC hdcNaveBasic;
-  static BITMAP bmNaveDefender;
-  static HDC hdcNaveDefender;
   static BITMAP bmNaveDodge;
   static HDC hdcNaveDodge;
   static BITMAP bmBomb;
@@ -213,6 +212,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   static HDC hdcBackground;
   static BITMAP bmShipSuperBad;
   static HDC hdcShipSuperBad;
+  static BITMAP bmMyDefenderShip;
+  static HDC hdcMyDefenderShip;
+  static BITMAP bmOtherDefenderShip;
+  static HDC hdcOtherDefenderShip;
 
   switch (message) {
   case WM_CREATE:
@@ -232,15 +235,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     GetObject(hNaveBasic, sizeof(bmNaveBasic), &bmNaveBasic);
     hdcNaveBasic = CreateCompatibleDC(hdc);
     SelectObject(hdcNaveBasic, hNaveBasic);
-    ReleaseDC(hWnd, hdc);
-
-    hNaveDefender = (HBITMAP)LoadImage(GetModuleHandle(NULL),
-                                       MAKEINTRESOURCE(IDB_BITMAP_DEFENDERS),
-                                       IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
-    hdc = GetDC(hWnd);
-    GetObject(hNaveDefender, sizeof(bmNaveDefender), &bmNaveDefender);
-    hdcNaveDefender = CreateCompatibleDC(hdc);
-    SelectObject(hdcNaveDefender, hNaveDefender);
     ReleaseDC(hWnd, hdc);
 
     hNaveDodge = (HBITMAP)LoadImage(
@@ -300,6 +294,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     hPower4 = (HBITMAP)LoadImage(GetModuleHandle(NULL),
                                  MAKEINTRESOURCE(IDB_BITMAP_POWERUP_4),
                                  IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+
+    hMyDefenderShip = (HBITMAP)LoadImage(
+        GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_MY_DEFENDER_SHIP),
+        IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+    hdc = GetDC(hWnd);
+    GetObject(hMyDefenderShip, sizeof(bmMyDefenderShip), &bmMyDefenderShip);
+    hdcMyDefenderShip = CreateCompatibleDC(hdc);
+    SelectObject(hdcMyDefenderShip, hMyDefenderShip);
+    ReleaseDC(hWnd, hdc);
+
+    hOtherDefenderShip = (HBITMAP)LoadImage(
+        GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_OTHER_DEFENDER_SHIP),
+        IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+    hdc = GetDC(hWnd);
+    GetObject(hOtherDefenderShip, sizeof(bmOtherDefenderShip),
+              &bmOtherDefenderShip);
+    hdcOtherDefenderShip = CreateCompatibleDC(hdc);
+    SelectObject(hdcOtherDefenderShip, hOtherDefenderShip);
+    ReleaseDC(hWnd, hdc);
+
     hdc = GetDC(hWnd);
     GetObject(hPower4, sizeof(bmPower4), &bmPower4);
     hdcPower4 = CreateCompatibleDC(hdc);
@@ -450,12 +464,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
           break;
         }
       }
-	  for (int i = 0; i < (client.game.totalPlayers +1 ); i++) {
-		  StretchBlt(auxDC, client.game.player[i].ship.position.x,
-			  client.game.player[i].ship.position.y, 50, 50,
-			  hdcPower1, 0, 0, bmPower1.bmWidth,
-			  bmPower1.bmHeight, SRCCOPY);
-	  }
+      for (int i = 0; i < (client.game.totalPlayers + 1); i++) {
+        if (client.game.player[i].id == client.id) {
+          TransparentBlt(auxDC, client.game.player[i].ship.position.x,
+                         client.game.player[i].ship.position.y, 50, 50,
+                         hdcMyDefenderShip, 0, 0, bmMyDefenderShip.bmWidth,
+                         bmMyDefenderShip.bmHeight, RGB(255, 255, 255));
+        } else {
+          TransparentBlt(auxDC, client.game.player[i].ship.position.x,
+                         client.game.player[i].ship.position.y, 50, 50,
+                         hdcOtherDefenderShip, 0, 0,
+                         bmOtherDefenderShip.bmWidth,
+                         bmOtherDefenderShip.bmHeight, RGB(255, 255, 255));
+        }
+      }
     }
 
     hdc = BeginPaint(hWnd, &ps);

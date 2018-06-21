@@ -111,5 +111,11 @@
     <Image Include="enemyship_superbad.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="my_defender_ship.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="other_defender_ship.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

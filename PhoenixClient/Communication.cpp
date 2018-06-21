@@ -125,6 +125,7 @@ void handleCommand(Client *client, Message message) {
     MessageBox(NULL, message.text, TEXT("Login succeed"),
                MB_OK | MB_ICONINFORMATION);
     client->logged = TRUE;
+    client->id = message.clientId;
     break;
 
   case IN_GAME:

@@ -31,6 +31,9 @@
 #define IDB_BITMAP_ENEMYSHIP_BASIC      146
 #define IDB_BITMAP1                     148
 #define IDB_BITMAP_ENEMY_SHIP_SUPERBAD  149
+#define IDB_BITMAP_MY_DEFENDER_SHIP     150
+#define IDB_BITMAP2                     151
+#define IDB_BITMAP_OTHER_DEFENDER_SHIP  151
 #define IDC_EDIT1                       1000
 #define IDC_EDIT_USERNAME               1000
 #define IDC_BUTTON1                     1001
@@ -51,7 +54,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        150
+#define _APS_NEXT_RESOURCE_VALUE        152
 #define _APS_NEXT_COMMAND_VALUE         32772
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           110
