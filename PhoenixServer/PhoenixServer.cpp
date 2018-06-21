@@ -276,6 +276,11 @@ INT_PTR CALLBACK Configure(HWND hDlg, UINT message, WPARAM wParam,
   case WM_COMMAND:
     switch (LOWORD(wParam)) {
     case IDOK:
+      if (data.gameData->game.started) {
+        MessageBox(hDlg, TEXT("Game already started! Configurations won't take effect!"),
+                   TEXT("Game started"), MB_OK | MB_ICONINFORMATION);
+      }
+
       eN = GetDlgItemInt(hDlg, IDC_EDIT5, &fSuccess, TRUE);
       if (eN != 0) {
         if (eN > MAX_ENEMY_SHIPS) {
@@ -335,7 +340,8 @@ INT_PTR CALLBACK Configure(HWND hDlg, UINT message, WPARAM wParam,
       if (pOc != 0) {
         if (pOc > 10) {
           MessageBox(hDlg, TEXT("Please input a number between 1 & 10!"),
-                     TEXT("Powerups occurrence probability"), MB_OK | MB_ICONINFORMATION);
+                     TEXT("Powerups occurrence probability"),
+                     MB_OK | MB_ICONINFORMATION);
           break;
         }
         data.gameData->game.powerupsProbabilityOccurrence = pOc;
