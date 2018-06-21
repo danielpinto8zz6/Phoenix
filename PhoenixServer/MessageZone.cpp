@@ -60,7 +60,6 @@ void handleCommand(Data *data, Message message) {
     break;
   case KEYSPACE:
 	  movePlayer(data->gameData, message.clientId, KEYSPACE);
-
     break;
   }
 }

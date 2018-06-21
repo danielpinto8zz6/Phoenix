@@ -8,6 +8,8 @@
 #define ENEMYSHIP_WIDTH 50
 #define ENEMYSHIP_HEIGHT 50
 
+#define TOTAL_SHOTS 50;
+
 Coordinates getFirstEmptyPosition(Game *game) {
   Coordinates coordinates;
 
@@ -55,6 +57,16 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
 
   HANDLE hMutexManageEnemyShips;
 
+  HANDLE startEnemyShipsEvent;
+
+  startEnemyShipsEvent =
+      CreateEvent(NULL, TRUE, FALSE, TEXT("phoenix_start_enemy_ships_event"));
+
+  if (startEnemyShipsEvent == NULL) {
+    errorGui(TEXT("Error creating enemy ships start event"));
+    return FALSE;
+  }
+
   // Create a mutex with no initial owner
   hMutexManageEnemyShips = CreateMutex(NULL, FALSE, ENEMYSHIPS_MUTEX);
 
@@ -73,7 +85,25 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
       errorGui(TEXT("Creating enemy ship thread"));
       return 1;
     }
-    Sleep(500);
+  }
+
+  // Wait a bit
+  Sleep(500);
+
+  /**
+   * Enemy ships positioned, show to clients
+   */
+  sendGameToGateway(gameData, &gameData->game);
+
+  /**
+   * Now that threads are all up, let enemy ships move
+   */
+  Sleep(2000);
+  SetEvent(startEnemyShipsEvent);
+
+  while (TRUE) {
+    Sleep(100);
+    sendGameToGateway(gameData, &gameData->game);
   }
 
   // Wait for all threads to terminate
@@ -95,11 +125,11 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   hMutexManageEnemyShips = OpenMutex(MUTEX_ALL_ACCESS, FALSE, ENEMYSHIPS_MUTEX);
 
-  int position = gameData->position;
-
-  gameData->game.totalEnemyShips = position + 1;
+  HANDLE startEnemyShipsEvent;
 
   WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
+
+  int position = gameData->game.totalEnemyShips++;
 
   // Place ship...hNaveBasichNaveDodge
   Coordinates c = getFirstEmptyPosition(&gameData->game);
@@ -134,17 +164,27 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
     gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
   }
 
-  sendGameToGateway(gameData, &gameData->game);
+  // sendGameToGateway(gameData, &gameData->game);
 
   ReleaseMutex(hMutexManageEnemyShips);
+
+  startEnemyShipsEvent = OpenEventW(EVENT_ALL_ACCESS, FALSE,
+                                    TEXT("phoenix_start_enemy_ships_event"));
+  if (startEnemyShipsEvent == NULL) {
+    errorGui(TEXT("Failed to open enemy ship start event"));
+    return FALSE;
+  }
+
+  WaitForSingleObject(startEnemyShipsEvent, INFINITE);
 
   // TODO: WIP
   while (TRUE) {
     WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
 
-    gameData->game.enemyShip[position].position.y++;
+    gameData->game.enemyShip[position].position.y +=
+        gameData->game.enemyShip[position].velocity;
 
-    sendGameToGateway(gameData, &gameData->game);
+    // sendGameToGateway(gameData, &gameData->game);
 
     ReleaseMutex(hMutexManageEnemyShips);
 
@@ -226,6 +266,12 @@ BOOL addPlayer(Game *game, TCHAR username[50], int id) {
 
   game->player[i].ship.size.width = 50;
   game->player[i].ship.size.height = 50;
+
+  game->player[i].ship.velocity = game->velocityDefenderShips;
+
+  for (int j = 0; j < 50; j++) {
+    game->player[i].ship.shots[j].isEmpty = TRUE;
+  }
 
   game->totalPlayers++;
 
@@ -311,6 +357,7 @@ void setUpPlayers(GameData *data) {
     data->game.player[i].ship.position.y = 550;
     data->game.player[i].score = 0;
     data->game.player[i].lives = data->game.earlyLives;
+    data->game.player[i].ship.velocity = data->game.velocityDefenderShips;
   }
 }
 
@@ -318,8 +365,17 @@ BOOL startGame(Data *data) {
   DWORD threadManageEnemyShipsId;
   HANDLE hThreadManageEnemyShips;
 
+  HANDLE hMutexShot;
+
   GameData *gameData = data->gameData;
   setUpPlayers(gameData);
+
+  hMutexShot = CreateMutex(NULL, FALSE, SHOTS_MUTEX);
+  if (hMutexShot == NULL) {
+    error(TEXT("Creating shots mutex"));
+    return FALSE;
+  }
+
   hThreadManageEnemyShips =
       CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadManageEnemyShips,
                    gameData, 0, &threadManageEnemyShipsId);
@@ -337,6 +393,9 @@ void movePlayer(GameData *gameData, int id, Command m) {
   Coordinates c1;
   BOOL overlaping;
   Size s;
+
+  HANDLE hThreadShot;
+
   s.height = 50;
   s.width = 50;
   num = getPlayerIndex(game, id);
@@ -345,7 +404,7 @@ void movePlayer(GameData *gameData, int id, Command m) {
   switch (m) {
   case KEYLEFT:
 
-    c1.x -= 2;
+    c1.x -= game->player[num].ship.velocity;
 
     if (c1.x < 1)
       return;
@@ -362,14 +421,14 @@ void movePlayer(GameData *gameData, int id, Command m) {
         }
       }
     }
-    game->player[num].ship.position.x -= 2;
+    game->player[num].ship.position.x -= game->player[num].ship.velocity;
     sendGameToGateway(gameData, game);
 
     break;
   case KEYRIGHT:
-    c1.x += 2;
+    c1.x += game->player[num].ship.velocity;
 
-    if (c1.x > WINDOW_WIDTH - 1)
+    if (c1.x > GAME_WIDTH - (game->player[num].ship.size.width + 1))
       return;
 
     if (game->totalPlayers > 1) {
@@ -385,12 +444,12 @@ void movePlayer(GameData *gameData, int id, Command m) {
       }
     }
 
-    game->player[num].ship.position.x += 2;
+    game->player[num].ship.position.x += game->player[num].ship.velocity;
     sendGameToGateway(gameData, game);
     break;
   case KEYUP:
-    c1.y -= 2;
-    if (c1.y < 530)
+    c1.y -= game->player[num].ship.velocity;
+    if (c1.y < (GAME_HEIGHT - (GAME_HEIGHT * 0.2)) - SCORE_BOARD_HEIGHT)
       return;
 
     if (game->totalPlayers > 1) {
@@ -406,12 +465,13 @@ void movePlayer(GameData *gameData, int id, Command m) {
       }
     }
 
-    game->player[num].ship.position.y -= 2;
+    game->player[num].ship.position.y -= game->player[num].ship.velocity;
     sendGameToGateway(gameData, game);
     break;
   case KEYDOWN:
-    c1.y += 2;
-    if (c1.y > (WINDOW_HEIGHT - 115 + 2))
+    c1.y += game->player[num].ship.velocity;
+    if (c1.y > (GAME_HEIGHT -
+                (game->player[num].ship.size.height + SCORE_BOARD_HEIGHT + 1)))
       return;
 
     if (game->totalPlayers > 1) {
@@ -427,14 +487,88 @@ void movePlayer(GameData *gameData, int id, Command m) {
       }
     }
 
-    game->player[num].ship.position.y += 2;
+    game->player[num].ship.position.y += game->player[num].ship.velocity;
     sendGameToGateway(gameData, game);
     break;
   case KEYSPACE:
-    num = getPlayerIndex(game, id);
+    hThreadShot =
+        CreateThread(NULL, 0, manageShot, &game->player[num].ship, 0, NULL);
+    if (hThreadShot == NULL) {
+      errorGui(TEXT("Creating shot moving thread"));
+      return;
+    }
     break;
   default:
 
     break;
   }
+}
+
+int addShot(DefenderShip *defenderShip) {
+  HANDLE hMutexShot;
+
+  hMutexShot = OpenMutex(MUTEX_ALL_ACCESS, FALSE, SHOTS_MUTEX);
+
+  WaitForSingleObject(hMutexShot, INFINITE);
+
+  int position = -1;
+
+  for (int i = 0; i < 50; i++) {
+    if (defenderShip->shots[i].isEmpty) {
+      position = i;
+      break;
+    }
+  }
+
+  if (position == -1) {
+    return position;
+  }
+
+  defenderShip->shots[position].position.x = defenderShip->position.x + 24;
+  defenderShip->shots[position].position.y = defenderShip->position.y + 1;
+  defenderShip->shots[position].isEmpty = FALSE;
+
+  ReleaseMutex(hMutexShot);
+
+  return position;
+}
+
+BOOL removeShot(DefenderShip *defenderShip, int position) {
+  HANDLE hMutexShot;
+
+  hMutexShot = OpenMutex(MUTEX_ALL_ACCESS, FALSE, SHOTS_MUTEX);
+
+  WaitForSingleObject(hMutexShot, INFINITE);
+
+  defenderShip->shots[position] = {};
+  defenderShip->shots[position].isEmpty = TRUE;
+
+  ReleaseMutex(hMutexShot);
+
+  return TRUE;
+}
+
+DWORD WINAPI manageShot(LPVOID lParam) {
+  DefenderShip *defenderShip = (DefenderShip *)lParam;
+
+  int position;
+
+  position = addShot(defenderShip);
+
+  while (position == -1) {
+    position = addShot(defenderShip);
+    Sleep(100);
+  }
+
+  /**
+   * Perform shot move
+   */
+  while (defenderShip->shots[position].position.y > 20) {
+    defenderShip->shots[position].position.y -= 8;
+    Sleep(100);
+  }
+
+  removeShot(defenderShip, position);
+
+  return TRUE;
 }

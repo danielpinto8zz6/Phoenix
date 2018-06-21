@@ -8,8 +8,8 @@
 #define PHOENIXLIBRARY_API __declspec(dllimport)
 #endif
 
-#define WINDOW_WIDTH 1020
-#define WINDOW_HEIGHT 700
+#define GAME_WIDTH 1000
+#define GAME_HEIGHT 700
 
 #define SCORE_BOARD_HEIGHT 20
 
@@ -45,7 +45,9 @@
 
 #define SERVER_CLOSE_EVENT TEXT("phoenix_server_close_event")
 
-#define CLIENT_CLOSE_EVENT TEXT("phoenix_clinet_close_event")
+#define CLIENT_CLOSE_EVENT TEXT("phoenix_client_close_event")
+
+#define SHOTS_MUTEX TEXT("phoenix_shots_mutex")
 
 #define BUFSIZE sizeof(Message)
 

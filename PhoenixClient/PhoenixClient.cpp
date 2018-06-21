@@ -167,10 +167,15 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   hInst = hInstance; // Store instance handle in our global variable
 
-  HWND hWnd = CreateWindowW(
-      szWindowClass, szTitle,
-      WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, CW_USEDEFAULT, 0,
-      WINDOW_WIDTH, WINDOW_HEIGHT, nullptr, nullptr, hInstance, nullptr);
+  RECT wr = {0, 0, GAME_WIDTH,
+             GAME_HEIGHT}; // set the size, but not the position
+  AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE); // adjust the size
+
+  HWND hWnd =
+      CreateWindowW(szWindowClass, szTitle,
+                    WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,
+                    CW_USEDEFAULT, 0, wr.right - wr.left, wr.bottom - wr.top,
+                    nullptr, nullptr, hInstance, nullptr);
 
   if (!hWnd) {
     return FALSE;
@@ -448,7 +453,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
 
     if (client.game.started) {
 
-      StretchBlt(auxDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcBackground, 0, 0,
+      StretchBlt(auxDC, 0, 0, GAME_WIDTH, GAME_HEIGHT, hdcBackground, 0, 0,
                  bmBackground.bmWidth, bmBackground.bmHeight, SRCCOPY);
 
       _stprintf_s(text, 20, TEXT("SCORE : %d"), getPlayerScore(&client));
@@ -500,14 +505,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                          bmOtherDefenderShip.bmWidth,
                          bmOtherDefenderShip.bmHeight, RGB(255, 255, 255));
         }
+        
+        for (int j = 0; j < 50; j++) {
+          if (!client.game.player[i].ship.shots[j].isEmpty) {
+            StretchBlt(auxDC, client.game.player[i].ship.shots[j].position.x,
+                       client.game.player[i].ship.shots[j].position.y, 5, 10,
+                       hdcShot, 0, 0, bmShot.bmWidth, bmShot.bmHeight, SRCCOPY);
+          }
+        }
       }
     } else if (client.logged && client.inGame) {
-      StretchBlt(auxDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcLoading, 0, 0, bmLoading.bmWidth,
-                 bmLoading.bmHeight, SRCCOPY);
+      StretchBlt(auxDC, 0, 0, GAME_WIDTH, GAME_HEIGHT, hdcLoading, 0, 0,
+                 bmLoading.bmWidth, bmLoading.bmHeight, SRCCOPY);
     }
-
-    // StretchBlt(auxDC, 300, 300, 5, 10, hdcShot, 0, 0, bmShot.bmWidth,
-    //            bmShot.bmHeight, SRCCOPY);
 
     hdc = BeginPaint(hWnd, &ps);
     BitBlt(hdc, 0, 0, nX, nY, auxDC, 0, 0, SRCCOPY);
