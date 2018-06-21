@@ -11,6 +11,8 @@
 
 #define MAX_LOADSTRING 100
 
+#define IDC_START_GAME 101
+
 Data data;
 
 // Global Variables:
@@ -172,9 +174,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   hInst = hInstance; // Store instance handle in our global variable
 
-  HWND hWnd =
-      CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-                    0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+  HWND hWnd = CreateWindowW(
+      szWindowClass, szTitle,
+      WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, CW_USEDEFAULT, 0,
+      500, 350, nullptr, nullptr, hInstance, nullptr);
 
   if (!hWnd) {
     return FALSE;
@@ -198,7 +201,23 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                          LPARAM lParam) {
+  static HWND hwndButton;
+  
   switch (message) {
+  case WM_CREATE:
+    hwndButton = CreateWindow(
+        TEXT("BUTTON"),     // Predefined class; Unicode assumed
+        TEXT("Start Game"), // Button text
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, // Styles
+        150,                                                   // x position
+        50,                                                   // y position
+        200,                                                   // Button width
+        100,                                                   // Button height
+        hWnd,                                                  // Parent window
+        (HMENU)IDC_START_GAME,                                                  // No menu.
+        (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
+        NULL); // Pointer not needed.
+    break;
   case WM_COMMAND: {
     int wmId = LOWORD(wParam);
     // Parse the menu selections:
@@ -277,8 +296,10 @@ INT_PTR CALLBACK Configure(HWND hDlg, UINT message, WPARAM wParam,
     switch (LOWORD(wParam)) {
     case IDOK:
       if (data.gameData->game.started) {
-        MessageBox(hDlg, TEXT("Game already started! Configurations won't take effect!"),
-                   TEXT("Game started"), MB_OK | MB_ICONINFORMATION);
+        MessageBox(
+            hDlg,
+            TEXT("Game already started! Configurations won't take effect!"),
+            TEXT("Game started"), MB_OK | MB_ICONINFORMATION);
       }
 
       eN = GetDlgItemInt(hDlg, IDC_EDIT5, &fSuccess, TRUE);
