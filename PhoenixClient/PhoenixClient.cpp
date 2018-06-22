@@ -488,6 +488,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                            bmShipSuperBad.bmHeight, RGB(255, 255, 255));
             break;
           }
+          for (int j = 0; j < 50; j++) {
+            if (! client.game.enemyShip[i].bombs[j].isEmpty) {
+              StretchBlt(auxDC, client.game.enemyShip[i].bombs[j].position.x,
+                         client.game.enemyShip[i].bombs[j].position.y, 5, 10,
+                         hdcShot, 0, 0, bmShot.bmWidth, bmShot.bmHeight,
+                         SRCCOPY);
+            }
+          }
         }
         for (int i = 0; i < client.game.maxPlayers; i++) {
           if (!client.game.player[i].isEmpty) {

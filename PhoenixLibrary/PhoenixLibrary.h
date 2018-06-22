@@ -47,6 +47,8 @@
 
 #define SHOTS_MUTEX TEXT("phoenix_shots_mutex")
 
+#define BOMBS_MUTEX TEXT("phoenix_bombs_mutex")
+
 #define PLAYERS_MUTEX TEXT("phoenix_players_mutex")
 
 #define ENEMY_SHIPS_MUTEX TEXT("phoenix_enemy_ships_mutex")

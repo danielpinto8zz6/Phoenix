@@ -127,6 +127,8 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   HANDLE hMutexManageEnemyShips;
 
+  HANDLE hThreadDropBombs;
+
   hMutexManageEnemyShips =
       OpenMutex(MUTEX_ALL_ACCESS, FALSE, ENEMY_SHIPS_MUTEX);
 
@@ -146,6 +148,15 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
     return FALSE;
   }
 
+  hThreadDropBombs = CreateThread(NULL, 0, dropBombs,
+                                  &gameData->game.enemyShip[position], 0, NULL);
+  if (hThreadDropBombs == NULL) {
+    errorGui(TEXT("Creating bomb moving thread"));
+    return FALSE;
+  } else {
+    CloseHandle(hThreadDropBombs);
+  }
+
   WaitForSingleObject(startEnemyShipsEvent, INFINITE);
 
   // TODO: WIP
@@ -159,7 +170,7 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
     ReleaseMutex(hMutexManageEnemyShips);
 
-    Sleep(100);
+    Sleep(300);
   }
 
   return TRUE;
@@ -260,6 +271,8 @@ BOOL addPlayer(Game *game, TCHAR username[50], int id) {
   for (int j = 0; j < 50; j++) {
     game->player[position].ship.shots[j].isEmpty = TRUE;
   }
+
+  game->player[position].ship.shotVelocity = 10;
 
   ReleaseMutex(hMutexPlayer);
 
@@ -377,6 +390,7 @@ BOOL startGame(Data *data) {
 
   HANDLE hMutexShot;
   HANDLE hMutexPlayer;
+  HANDLE hMutexBomb;
 
   GameData *gameData = data->gameData;
   setUpPlayers(gameData);
@@ -389,6 +403,12 @@ BOOL startGame(Data *data) {
 
   hMutexPlayer = CreateMutex(NULL, FALSE, PLAYERS_MUTEX);
   if (hMutexPlayer == NULL) {
+    error(TEXT("Creating players mutex"));
+    return FALSE;
+  }
+
+  hMutexBomb = CreateMutex(NULL, FALSE, BOMBS_MUTEX);
+  if (hMutexBomb == NULL) {
     error(TEXT("Creating players mutex"));
     return FALSE;
   }
@@ -528,6 +548,8 @@ void movePlayer(GameData *gameData, int id, Command m) {
     if (hThreadShot == NULL) {
       errorGui(TEXT("Creating shot moving thread"));
       return;
+    } else {
+      CloseHandle(hThreadShot);
     }
     break;
   default:
@@ -596,7 +618,7 @@ DWORD WINAPI manageShot(LPVOID lParam) {
    * Perform shot move
    */
   while (defenderShip->shots[position].position.y > 20) {
-    defenderShip->shots[position].position.y -= 8;
+    defenderShip->shots[position].position.y -= defenderShip->shotVelocity;
     Sleep(100);
   }
 
@@ -656,6 +678,12 @@ int addEnemyShip(Game *game) {
     game->enemyShip[position].fireRate = 1 * game->difficulty;
   }
 
+  for (int j = 0; j < 50; j++) {
+    game->enemyShip[position].bombs[j].isEmpty = TRUE;
+  }
+
+  game->enemyShip[position].BombVelocity = 8;
+
   ReleaseMutex(hMutexEnemyShip);
 
   return position;
@@ -673,5 +701,106 @@ BOOL removeEnemyShip(Game *game, int position) {
 
   ReleaseMutex(hMutexEnemyShip);
 
+  return TRUE;
+}
+
+int addBomb(EnemyShip *enemyShip) {
+  HANDLE hMutexBomb;
+
+  hMutexBomb = OpenMutex(MUTEX_ALL_ACCESS, FALSE, BOMBS_MUTEX);
+
+  WaitForSingleObject(hMutexBomb, INFINITE);
+
+  int position = -1;
+
+  for (int i = 0; i < 50; i++) {
+    if (enemyShip->bombs[i].isEmpty) {
+      position = i;
+      break;
+    }
+  }
+
+  if (position == -1) {
+    return position;
+  }
+
+  enemyShip->bombs[position].position.x = enemyShip->position.x + 24;
+  enemyShip->bombs[position].position.y = enemyShip->position.y + 51;
+  enemyShip->bombs[position].isEmpty = FALSE;
+
+  ReleaseMutex(hMutexBomb);
+
+  return position;
+}
+
+BOOL removeBomb(EnemyShip *enemyShip, int position) {
+  HANDLE hMutexBomb;
+
+  hMutexBomb = OpenMutex(MUTEX_ALL_ACCESS, FALSE, BOMBS_MUTEX);
+
+  WaitForSingleObject(hMutexBomb, INFINITE);
+
+  enemyShip->bombs[position] = {};
+  enemyShip->bombs[position].isEmpty = TRUE;
+
+  ReleaseMutex(hMutexBomb);
+
+  return TRUE;
+}
+
+DWORD WINAPI manageBomb(LPVOID lParam) {
+  EnemyShip *enemyShip = (EnemyShip *)lParam;
+
+  int position;
+
+  position = addBomb(enemyShip);
+
+  while (position == -1) {
+    position = addBomb(enemyShip);
+    Sleep(100);
+  }
+
+  /**
+   * Perform bomb move
+   */
+  while (enemyShip->bombs[position].position.y <
+             GAME_HEIGHT - SCORE_BOARD_HEIGHT &&
+         enemyShip->bombs[position].position.x > 1 &&
+         enemyShip->bombs[position].position.x < GAME_WIDTH) {
+    enemyShip->bombs[position].position.y += enemyShip->BombVelocity;
+    enemyShip->bombs[position].position.x += enemyShip->BombVelocity;
+    Sleep(100);
+  }
+
+  removeBomb(enemyShip, position);
+
+  return TRUE;
+}
+
+DWORD WINAPI dropBombs(LPVOID lParam) {
+  EnemyShip *enemyShip = (EnemyShip *)lParam;
+
+  HANDLE hThreadBomb;
+
+  while (TRUE) {
+    hThreadBomb = CreateThread(NULL, 0, manageBomb, enemyShip, 0, NULL);
+    if (hThreadBomb == NULL) {
+      return FALSE;
+    } else {
+      CloseHandle(hThreadBomb);
+    }
+
+    switch (enemyShip->type) {
+    case DODGE:
+      Sleep(2000);
+      break;
+    case BASIC:
+      Sleep(2000);
+      break;
+    case SUPERBAD:
+      Sleep(2000);
+      break;
+    }
+  }
   return TRUE;
 }

@@ -51,9 +51,13 @@ typedef struct {
 
 typedef struct {
   Coordinates position;
-  int velocity;
   BOOL isEmpty;
 } Shot;
+
+typedef struct {
+  Coordinates position;
+  BOOL isEmpty;
+} Bomb;
 
 typedef struct {
   Coordinates position;
@@ -61,6 +65,7 @@ typedef struct {
   Size size;
   int firingRate;
   Shot shots[50];
+  int shotVelocity;
 } DefenderShip;
 
 typedef struct {
@@ -74,10 +79,6 @@ typedef struct {
 
 typedef struct {
   Coordinates position;
-} Bomb;
-
-typedef struct {
-  Coordinates position;
   int points;
   int velocity;
   int strength;
@@ -86,6 +87,7 @@ typedef struct {
   EnemyType type;
   Bomb bombs[50];
   BOOL isEmpty;
+  int BombVelocity;
 } EnemyShip;
 
 typedef struct {
@@ -93,6 +95,7 @@ typedef struct {
   int velocity;
   PowerupType type;
   PowerupEffect effect;
+  BOOL isEmpty;
 } Powerup;
 
 typedef struct {
