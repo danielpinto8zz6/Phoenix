@@ -151,6 +151,8 @@ BOOL handleCommand(Client *client, Message message) {
       PostMessage(client->hWnd, WM_DESTROY, 0, 0);
     }
     break;
+  case GAME_OVER:
+    break;
   }
 
   return TRUE;

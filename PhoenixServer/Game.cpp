@@ -134,6 +134,10 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   HANDLE startEnemyShipsEvent;
 
+  BOOL isOverlapping;
+
+  Coordinates c1;
+
   int position = addEnemyShip(&gameData->game);
 
   if (position == -1) {
@@ -147,6 +151,8 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
     errorGui(TEXT("Failed to open enemy ship start event"));
     return FALSE;
   }
+
+  gameData->game.enemyShip[position].gameData = gameData;
 
   hThreadDropBombs = CreateThread(NULL, 0, dropBombs,
                                   &gameData->game.enemyShip[position], 0, NULL);
@@ -166,12 +172,54 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
     gameData->game.enemyShip[position].position.y +=
         gameData->game.enemyShip[position].velocity;
 
+    c1 = gameData->game.enemyShip[position].position;
+    c1.y += SCORE_BOARD_HEIGHT;
+
+    for (int i = 0; i < gameData->game.maxPlayers + 1; i++) {
+      if (!gameData->game.player[i].isEmpty) {
+        isOverlapping =
+            isRectangleOverlapping(c1, gameData->game.enemyShip[position].size,
+                                   gameData->game.player[i].ship.position,
+                                   gameData->game.player[i].ship.size);
+
+        if (isOverlapping) {
+          ReleaseMutex(hMutexManageEnemyShips);
+          removeEnemyShip(&gameData->game, position);
+          removePlayer(&gameData->game, gameData->game.player[i].id);
+          return FALSE;
+        }
+
+        for (int j = 0; j < 50; j++) {
+          if (!gameData->game.player[i].ship.shots[j].isEmpty) {
+
+            isOverlapping = isRectangleOverlapping(
+                c1, gameData->game.enemyShip[position].size,
+                gameData->game.player[i].ship.shots[j].position,
+                gameData->game.player[i].ship.size);
+
+            if (isOverlapping) {
+              gameData->game.enemyShip[position].strength--;
+              if (gameData->game.enemyShip[position].strength < 1) {
+                ReleaseMutex(hMutexManageEnemyShips);
+                removeEnemyShip(&gameData->game, position);
+                removeShot(&gameData->game.player[i].ship, j);
+                return FALSE;
+              }
+              removeShot(&gameData->game.player[i].ship, j);
+              break;
+            }
+          }
+        }
+      }
+    }
     // sendGameToGateway(gameData, &gameData->game);
 
     ReleaseMutex(hMutexManageEnemyShips);
 
     Sleep(300);
   }
+
+  removeEnemyShip(&gameData->game, position);
 
   return TRUE;
 }
@@ -751,9 +799,18 @@ BOOL removeBomb(EnemyShip *enemyShip, int position) {
 DWORD WINAPI manageBomb(LPVOID lParam) {
   EnemyShip *enemyShip = (EnemyShip *)lParam;
 
+  GameData *gameData = (GameData *)enemyShip->gameData;
+
   int position;
 
   position = addBomb(enemyShip);
+
+  BOOL isOverlapping;
+  Coordinates c1;
+  Size size;
+
+  size.width = 5;
+  size.height = 10;
 
   while (position == -1) {
     position = addBomb(enemyShip);
@@ -769,6 +826,28 @@ DWORD WINAPI manageBomb(LPVOID lParam) {
          enemyShip->bombs[position].position.x < GAME_WIDTH) {
     enemyShip->bombs[position].position.y += enemyShip->BombVelocity;
     enemyShip->bombs[position].position.x += enemyShip->BombVelocity;
+
+    c1 = enemyShip->bombs[position].position;
+    c1.y += 20;
+
+    for (int i = 0; i < gameData->game.maxPlayers; i++) {
+      if (!gameData->game.player[i].isEmpty) {
+        isOverlapping = isRectangleOverlapping(
+            c1, size, gameData->game.player[i].ship.position,
+            gameData->game.player[i].ship.size);
+
+        if (isOverlapping) {
+          gameData->game.player[i].lives--;
+          if (gameData->game.player[i].lives < 1){
+          removePlayer(&gameData->game, gameData->game.player[i].id);
+          removeBomb(enemyShip, position);
+          return FALSE;
+          }
+                    removeBomb(enemyShip, position);
+break;
+        }
+      }
+    }
     Sleep(100);
   }
 

@@ -36,7 +36,7 @@ typedef enum {
   JOIN_GAME,
   IN_GAME,
   CANT_JOIN,
-  PLAYER_LOST
+  GAME_OVER
 } Command;
 
 typedef struct {
@@ -88,6 +88,10 @@ typedef struct {
   Bomb bombs[50];
   BOOL isEmpty;
   int BombVelocity;
+  /**
+   * Hack
+   */
+  LPVOID gameData;
 } EnemyShip;
 
 typedef struct {

@@ -442,9 +442,9 @@ VOID initGameVariables(Game *game) {
 
   game->maxEnemyShips = MAX_ENEMY_SHIPS;
 
-  game->velocityEnemyShips = 2;
+  game->velocityEnemyShips = 8;
 
-  game->velocityDefenderShips = 4;
+  game->velocityDefenderShips = 8;
 
   game->powerupsDuration = 10;
 
