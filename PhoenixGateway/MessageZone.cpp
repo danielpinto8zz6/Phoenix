@@ -20,12 +20,9 @@ DWORD WINAPI receiveMessagesFromServer(LPVOID lpParam) {
     if (dwWaitResult == WAIT_OBJECT_0) {
       readDataFromSharedMemory(messageData->sharedMessage, &message,
                                sizeof(Message), &messageData->hMutex);
-      /**
-       * TODO: Perform actions related to info received
-       */
-      debug(TEXT("%d Bytes received"), sizeof(Message));
 
       switch (message.cmd) {
+      case GAME_OVER:
       case IN_GAME:
       case LOGGED:
         position = getClientIndex(data, message.clientId);

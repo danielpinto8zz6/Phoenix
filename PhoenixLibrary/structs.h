@@ -144,10 +144,6 @@ typedef struct {
   HANDLE hMapFile;
   HANDLE hMutex;
   HANDLE gameUpdateEvent;
-  /**
-   * Hack
-   */
-  int position;
 } GameData;
 
 typedef struct {
@@ -191,3 +187,8 @@ typedef struct {
   HANDLE tmpPipeGame;
   HANDLE hEvent;
 } Data;
+
+typedef struct {
+  int score;
+  int lives;
+} ScoreBoard;

@@ -203,7 +203,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
                          LPARAM lParam) {
-  TCHAR text[20];
+  TCHAR text[40];
+  ScoreBoard scoreBoard;
 
   static BITMAP bmNaveBasic;
   static HDC hdcNaveBasic;
@@ -475,7 +476,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       StretchBlt(auxDC, 0, 0, GAME_WIDTH, GAME_HEIGHT, hdcBackground, 0, 0,
                  bmBackground.bmWidth, bmBackground.bmHeight, SRCCOPY);
 
-      _stprintf_s(text, 20, TEXT("SCORE : %d"), getPlayerScore(&client));
+      scoreBoard = getPlayerScoreBoard(&client);
+
+      if (scoreBoard.score == -1) {
+        _stprintf_s(text, 40, TEXT("GAME OVER"));
+      } else {
+        _stprintf_s(text, 40, TEXT("SCORE : %d  LIVES : %d"), scoreBoard.score,
+                    scoreBoard.lives);
+        TextOut(auxDC, (GAME_WIDTH / 2) - (_tcslen(text) / 2), 0, text,
+                _tcslen(text));
+      }
+
+      TextOut(auxDC, 450, 0, TEXT("GAME OVER"), _tcslen(text));
 
       TextOut(auxDC, 450, 0, text, _tcslen(text));
 

@@ -81,7 +81,6 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
 
   // Create Enemy Ships threads
   for (int i = 0; i < game->maxEnemyShips; i++) {
-    gameData->position = i;
     aThread[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadEnemyShip,
                               gameData, 0, &ThreadID);
 
@@ -102,12 +101,12 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
   /**
    * Now that threads are all up, let enemy ships move
    */
-  Sleep(2000);
+  Sleep(500);
   SetEvent(startEnemyShipsEvent);
 
-  while (TRUE) {
-    Sleep(100);
-    sendGameToGateway(gameData, &gameData->game);
+   while (TRUE) {
+     Sleep(100);
+     sendGameToGateway(gameData, &gameData->game);
   }
 
   // Wait for all threads to terminate
@@ -192,6 +191,8 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
         for (int j = 0; j < 50; j++) {
           if (!gameData->game.player[i].ship.shots[j].isEmpty) {
 
+            c1 = gameData->game.enemyShip[position].bombs[j].position;
+
             isOverlapping = isRectangleOverlapping(
                 c1, gameData->game.enemyShip[position].size,
                 gameData->game.player[i].ship.shots[j].position,
@@ -203,6 +204,7 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
                 ReleaseMutex(hMutexManageEnemyShips);
                 removeEnemyShip(&gameData->game, position);
                 removeShot(&gameData->game.player[i].ship, j);
+                gameData->game.player[i].score++;
                 return FALSE;
               }
               removeShot(&gameData->game.player[i].ship, j);
@@ -811,7 +813,7 @@ DWORD WINAPI manageBomb(LPVOID lParam) {
 
   size.width = 5;
   size.height = 10;
-
+  
   while (position == -1) {
     position = addBomb(enemyShip);
     Sleep(100);
@@ -871,13 +873,13 @@ DWORD WINAPI dropBombs(LPVOID lParam) {
 
     switch (enemyShip->type) {
     case DODGE:
-      Sleep(2000);
+      Sleep(3000);
       break;
     case BASIC:
-      Sleep(2000);
+      Sleep(4000);
       break;
     case SUPERBAD:
-      Sleep(2000);
+      Sleep(5000);
       break;
     }
   }

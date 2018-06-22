@@ -1,3 +1,3 @@
 ﻿#pragma once
 
-int getPlayerScore(Client *client);
+ScoreBoard getPlayerScoreBoard(Client *client);

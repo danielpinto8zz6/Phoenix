@@ -7,6 +7,7 @@ int addShot(DefenderShip *defenderShip);
 int compare(const void *a, const void *b);
 BOOL coordinatesEqual(Coordinates c1, Coordinates c2);
 DWORD WINAPI dropBombs(LPVOID lParam);
+DWORD WINAPI gameManager(LPARAM lParam);
 Coordinates getFirstEmptyPosition(Game *game);
 BOOL isCoordinatesValid(Coordinates coordinates);
 BOOL isPointInsideRect(Coordinates rect1Coord, Size rect1Sz, Coordinates point);

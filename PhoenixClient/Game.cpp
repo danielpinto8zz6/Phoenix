@@ -3,12 +3,20 @@
 #include "Communication.h"
 #include "Game.h"
 
-int getPlayerScore(Client *client) {
+ScoreBoard getPlayerScoreBoard(Client *client) {
+  ScoreBoard scoreBoard;
   for (int i = 0; i < client->game.maxPlayers; i++) {
-    if (client->game.player[i].id == client->id) {
-      return client->game.player[i].score;
+    if (!client->game.player[i].isEmpty) {
+      if (client->game.player[i].id == client->id) {
+        scoreBoard.score = client->game.player[i].score;
+        scoreBoard.lives = client->game.player[i].lives;
+        return scoreBoard;
+      }
     }
   }
 
-  return -1;
+  scoreBoard.score = -1;
+  scoreBoard.lives = -1;
+
+  return scoreBoard;
 }

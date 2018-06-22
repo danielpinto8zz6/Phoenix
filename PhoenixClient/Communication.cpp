@@ -152,6 +152,8 @@ BOOL handleCommand(Client *client, Message message) {
     }
     break;
   case GAME_OVER:
+    MessageBox(NULL, TEXT("You losted"), TEXT("Game Over"),
+               MB_OK | MB_ICONINFORMATION);
     break;
   }
 
