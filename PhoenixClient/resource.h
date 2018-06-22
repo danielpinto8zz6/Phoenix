@@ -34,7 +34,6 @@
 #define IDB_BITMAP_MY_DEFENDER_SHIP     150
 #define IDB_BITMAP_OTHER_DEFENDER_SHIP  151
 #define IDB_BITMAP_LOADING              152
-#define IDB_BITMAP2                     153
 #define IDC_EDIT1                       1000
 #define IDC_EDIT_USERNAME               1000
 #define IDC_BUTTON1                     1001
@@ -48,6 +47,10 @@
 #define ID_FILE_LOGIN                   32771
 #define ID_FILE_JOINGAME                32772
 #define ID_FILE_TOP10                   32773
+#define ID_FILE_STOPMUSIC               32773
+#define ID_FILE_STOP_MUSIC              32774
+#define ID_FILE_PLAYMUSIC               32775
+#define ID_FILE_PLAY_MUSIC              32776
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -55,8 +58,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        154
-#define _APS_NEXT_COMMAND_VALUE         32772
+#define _APS_NEXT_RESOURCE_VALUE        156
+#define _APS_NEXT_COMMAND_VALUE         32777
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

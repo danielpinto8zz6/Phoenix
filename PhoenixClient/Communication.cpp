@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "PhoenixClient.h"
 #include "resource.h"
+#include <Mmsystem.h>
 #include <process.h>
 
 BOOL connectPipes(Client *client) {
@@ -119,10 +120,10 @@ DWORD WINAPI messageReceiver(LPVOID lpParam) {
 
 BOOL handleCommand(Client *client, Message message) {
   switch (message.cmd) {
-  // case GAME_STARTED:
-  //   client->gameStarted = TRUE;
-  //   InvalidateRect(client->hWnd, NULL, TRUE);
-  //   break;
+  case GAME_STARTED:
+    PlaySound(TEXT("music.wav"), NULL, SND_LOOP | SND_ASYNC);
+    client->isMusicPlaying = TRUE;
+    break;
   case LOGGED:
     MessageBox(NULL, message.text, TEXT("Login succeed"),
                MB_OK | MB_ICONINFORMATION);

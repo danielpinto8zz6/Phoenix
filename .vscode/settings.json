@@ -18,7 +18,8 @@
         "phoenixclient.h": "c",
         "clients.h": "c",
         "windowsx.h": "c",
-        "process.h": "c"
+        "process.h": "c",
+        "mmsystem.h": "c"
     },
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {

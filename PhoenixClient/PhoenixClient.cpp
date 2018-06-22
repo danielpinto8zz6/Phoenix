@@ -6,6 +6,7 @@
 #include "Communication.h"
 #include "Game.h"
 #include "PhoenixClient.h"
+#include <Mmsystem.h>
 #include <process.h>
 #include <windowsx.h>
 
@@ -67,6 +68,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   client.logged = FALSE;
   client.inGame = FALSE;
+  client.isMusicPlaying = FALSE;
 
   if (!isGatewayRunning()) {
     errorGui(TEXT("There's no gateway instance running! Start gateway first!"));
@@ -373,6 +375,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     // Parse the menu selections:
     switch (wmId) {
     case ID_FILE_LOGIN:
+      if (client.logged) {
+        MessageBox(hWnd, TEXT("You are already logged"), TEXT("Info"),
+                   MB_OK | MB_ICONINFORMATION);
+        return 0;
+      }
       DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_LOGIN), hWnd, Login);
       break;
     case ID_FILE_JOINGAME:
@@ -399,6 +406,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
     case ID_FILE_TOP10:
       DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_SCORE), hWnd, Score);
+      break;
+    case ID_FILE_STOP_MUSIC:
+      if (client.isMusicPlaying) {
+        PlaySound(NULL, NULL, 0);
+        client.isMusicPlaying = FALSE;
+      }
+      break;
+    case ID_FILE_PLAY_MUSIC:
+      if (!client.isMusicPlaying) {
+        PlaySound(TEXT("music.wav"), NULL, SND_LOOP | SND_ASYNC);
+        client.isMusicPlaying = FALSE;
+      }
       break;
     case IDM_ABOUT:
       DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
@@ -489,10 +508,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
             break;
           }
           for (int j = 0; j < 50; j++) {
-            if (! client.game.enemyShip[i].bombs[j].isEmpty) {
+            if (!client.game.enemyShip[i].bombs[j].isEmpty) {
               StretchBlt(auxDC, client.game.enemyShip[i].bombs[j].position.x,
                          client.game.enemyShip[i].bombs[j].position.y, 5, 10,
-                         hdcShot, 0, 0, bmShot.bmWidth, bmShot.bmHeight,
+                         hdcBomb, 0, 0, bmBomb.bmWidth, bmBomb.bmHeight,
                          SRCCOPY);
             }
           }

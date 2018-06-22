@@ -169,6 +169,7 @@ typedef struct {
   BOOL inGame;
   HWND hWnd;
   BOOL isEmpty;
+  BOOL isMusicPlaying;
 } Client;
 
 typedef struct {
