@@ -18,12 +18,14 @@ Coordinates getFirstEmptyPosition(Game *game) {
 
   int j = 0;
 
-  for (int i = 0; i < game->totalEnemyShips; i++, j++) {
-    coordinates.x = ENEMYSHIP_WIDTH * j;
-    if (coordinates.x == 1000) {
-      j = 0;
-      coordinates.x = 0;
-      coordinates.y += ENEMYSHIP_HEIGHT + 5;
+  for (int i = 0; i < game->maxEnemyShips; i++, j++) {
+    if (!game->enemyShip[i].isEmpty) {
+      coordinates.x = ENEMYSHIP_WIDTH * j;
+      if (coordinates.x == 1000) {
+        j = 0;
+        coordinates.x = 0;
+        coordinates.y += ENEMYSHIP_HEIGHT + 5;
+      }
     }
   }
 
@@ -31,9 +33,11 @@ Coordinates getFirstEmptyPosition(Game *game) {
 }
 
 BOOL isPositionOccupied(Game *game, Coordinates coordinates) {
-  for (int i = 0; i < game->totalEnemyShips; i++) {
-    if (coordinatesEqual(coordinates, game->enemyShip[i].position)) {
-      return TRUE;
+  for (int i = 0; i < game->maxEnemyShips; i++) {
+    if (!game->enemyShip[i].isEmpty) {
+      if (coordinatesEqual(coordinates, game->enemyShip[i].position)) {
+        return TRUE;
+      }
     }
   }
   return FALSE;
@@ -68,7 +72,7 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
   }
 
   // Create a mutex with no initial owner
-  hMutexManageEnemyShips = CreateMutex(NULL, FALSE, ENEMYSHIPS_MUTEX);
+  hMutexManageEnemyShips = CreateMutex(NULL, FALSE, ENEMY_SHIPS_MUTEX);
 
   if (hMutexManageEnemyShips == NULL) {
     errorGui(TEXT("Creating enemy ships mutex"));
@@ -123,50 +127,17 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
   HANDLE hMutexManageEnemyShips;
 
-  hMutexManageEnemyShips = OpenMutex(MUTEX_ALL_ACCESS, FALSE, ENEMYSHIPS_MUTEX);
+  hMutexManageEnemyShips =
+      OpenMutex(MUTEX_ALL_ACCESS, FALSE, ENEMY_SHIPS_MUTEX);
 
   HANDLE startEnemyShipsEvent;
 
-  WaitForSingleObject(hMutexManageEnemyShips, INFINITE);
+  int position = addEnemyShip(&gameData->game);
 
-  int position = gameData->game.totalEnemyShips++;
-
-  // Place ship...hNaveBasichNaveDodge
-  Coordinates c = getFirstEmptyPosition(&gameData->game);
-  if (!isCoordinatesValid(c)) {
-    errorGui(TEXT("Can't find an empty position"));
+  if (position == -1) {
+    // Can't add more enemy ships
     return FALSE;
   }
-
-  gameData->game.enemyShip[position].position = c;
-
-  gameData->game.enemyShip[position].size.height = 50;
-  gameData->game.enemyShip[position].size.width = 50;
-
-  if (position < 7) {
-    gameData->game.enemyShip[position].type = BASIC;
-    gameData->game.enemyShip[position].strength = 1;
-    gameData->game.enemyShip[position].velocity =
-        gameData->game.velocityEnemyShips;
-    gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
-  } else if (position >= 7 && position < 14) {
-    gameData->game.enemyShip[position].type = DODGE;
-    gameData->game.enemyShip[position].strength = 3;
-    gameData->game.enemyShip[position].velocity =
-        gameData->game.velocityEnemyShips;
-    gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
-
-  } else {
-    gameData->game.enemyShip[position].type = SUPERBAD;
-    gameData->game.enemyShip[position].strength = 4;
-    gameData->game.enemyShip[position].velocity =
-        gameData->game.velocityEnemyShips;
-    gameData->game.enemyShip[position].fireRate = 1 * gameData->game.difficulty;
-  }
-
-  // sendGameToGateway(gameData, &gameData->game);
-
-  ReleaseMutex(hMutexManageEnemyShips);
 
   startEnemyShipsEvent = OpenEventW(EVENT_ALL_ACCESS, FALSE,
                                     TEXT("phoenix_start_enemy_ships_event"));
@@ -255,50 +226,68 @@ BOOL isPointInsideRect(Coordinates rect1Coord, Size rect1Sz,
 }
 
 BOOL addPlayer(Game *game, TCHAR username[50], int id) {
-  if (game->totalPlayers >= MAX_PLAYERS) {
+  HANDLE hMutexPlayer;
+
+  hMutexPlayer = OpenMutex(MUTEX_ALL_ACCESS, FALSE, PLAYERS_MUTEX);
+
+  WaitForSingleObject(hMutexPlayer, INFINITE);
+
+  int position = -1;
+
+  for (int i = 0; i < game->maxPlayers; i++) {
+    if (game->player[i].isEmpty) {
+      position = i;
+      break;
+    }
+  }
+
+  if (position == -1) {
+    errorGui(TEXT("Can't add more players"));
     return FALSE;
   }
 
-  int i = game->totalPlayers;
+  game->player[position].isEmpty = FALSE;
 
-  _tcscpy_s(game->player[i].username, username);
-  game->player[i].id = id;
+  _tcscpy_s(game->player[position].username, username);
 
-  game->player[i].ship.size.width = 50;
-  game->player[i].ship.size.height = 50;
+  game->player[position].id = id;
 
-  game->player[i].ship.velocity = game->velocityDefenderShips;
+  game->player[position].ship.size.width = 50;
+  game->player[position].ship.size.height = 50;
+
+  game->player[position].ship.velocity = game->velocityDefenderShips;
 
   for (int j = 0; j < 50; j++) {
-    game->player[i].ship.shots[j].isEmpty = TRUE;
+    game->player[position].ship.shots[j].isEmpty = TRUE;
   }
 
-  game->totalPlayers++;
+  ReleaseMutex(hMutexPlayer);
 
   return TRUE;
 }
 
-int getPlayerIndex(Game *game, int id) {
-  for (int i = 0; i < game->totalPlayers; i++) {
+BOOL removePlayer(Game *game, int id) {
+  HANDLE hMutexPlayer;
+  BOOL fSuccess = FALSE;
+
+  hMutexPlayer = OpenMutex(MUTEX_ALL_ACCESS, FALSE, PLAYERS_MUTEX);
+
+  WaitForSingleObject(hMutexPlayer, INFINITE);
+
+  for (int i = 0; i < game->maxPlayers; i++) {
     if (game->player[i].id == id) {
-      return i;
+      game->player[i] = {};
+      game->player[i].isEmpty = TRUE;
+      fSuccess = TRUE;
+      break;
     }
   }
-  return -1;
-}
 
-BOOL removePlayer(Game *game, int id) {
-  int n = getPlayerIndex(game, id);
-
-  if (n == -1) {
+  if (!fSuccess) {
     return FALSE;
   }
 
-  for (int i = n; i < game->totalPlayers; i++) {
-    game->player[i] = game->player[i + 1];
-  }
-
-  game->totalPlayers--;
+  ReleaseMutex(hMutexPlayer);
 
   return TRUE;
 }
@@ -334,14 +323,16 @@ int compare(const void *a, const void *b) {
 void sort(int *arr, size_t len) { qsort(arr, len, sizeof(int), compare); }
 
 void setupTopTen(Game *game) {
-  for (int i = 0; i < game->totalPlayers; i++) {
-    for (int j = 0; j < 10; j++) {
-      if (game->player[i].score > game->topTen[j].score) {
-        for (int k = j; k < 10; k++) {
-          game->topTen[k] = game->topTen[k + 1];
+  for (int i = 0; i < game->maxPlayers; i++) {
+    if (!game->player[i].isEmpty) {
+      for (int j = 0; j < 10; j++) {
+        if (game->player[i].score > game->topTen[j].score) {
+          for (int k = j; k < 10; k++) {
+            game->topTen[k] = game->topTen[k + 1];
+          }
+          game->topTen[j].score = game->player[i].score;
+          _tcscpy_s(game->topTen[j].username, game->player[i].username);
         }
-        game->topTen[j].score = game->player[i].score;
-        _tcscpy_s(game->topTen[j].username, game->player[i].username);
       }
     }
   }
@@ -350,14 +341,23 @@ void setupTopTen(Game *game) {
 void setUpPlayers(GameData *data) {
   int dist;
 
-  dist = 950 / (data->game.totalPlayers + 1);
-  for (int i = 0; i < data->game.totalPlayers; i++) {
+  int totalPlayers = 0;
 
-    data->game.player[i].ship.position.x = dist * (i + 1);
-    data->game.player[i].ship.position.y = 550;
-    data->game.player[i].score = 0;
-    data->game.player[i].lives = data->game.earlyLives;
-    data->game.player[i].ship.velocity = data->game.velocityDefenderShips;
+  for (int i = 0; i < data->game.maxPlayers; i++) {
+    if (!data->game.player[i].isEmpty) {
+      totalPlayers++;
+    }
+  }
+
+  dist = 950 / (totalPlayers + 1);
+  for (int i = 0; i < data->game.maxPlayers; i++) {
+    if (!data->game.player[i].isEmpty) {
+      data->game.player[i].ship.position.x = dist * (i + 1);
+      data->game.player[i].ship.position.y = 550;
+      data->game.player[i].score = 0;
+      data->game.player[i].lives = data->game.earlyLives;
+      data->game.player[i].ship.velocity = data->game.velocityDefenderShips;
+    }
   }
 }
 
@@ -366,6 +366,7 @@ BOOL startGame(Data *data) {
   HANDLE hThreadManageEnemyShips;
 
   HANDLE hMutexShot;
+  HANDLE hMutexPlayer;
 
   GameData *gameData = data->gameData;
   setUpPlayers(gameData);
@@ -373,6 +374,12 @@ BOOL startGame(Data *data) {
   hMutexShot = CreateMutex(NULL, FALSE, SHOTS_MUTEX);
   if (hMutexShot == NULL) {
     error(TEXT("Creating shots mutex"));
+    return FALSE;
+  }
+
+  hMutexPlayer = CreateMutex(NULL, FALSE, PLAYERS_MUTEX);
+  if (hMutexPlayer == NULL) {
+    error(TEXT("Creating players mutex"));
     return FALSE;
   }
 
@@ -387,6 +394,15 @@ BOOL startGame(Data *data) {
   return TRUE;
 }
 
+int getPlayerIndex(Game *game, int id) {
+  for (int i = 0; i < game->maxPlayers; i++) {
+    if (game->player[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 void movePlayer(GameData *gameData, int id, Command m) {
   Game *game = &gameData->game;
   int num, i;
@@ -398,7 +414,13 @@ void movePlayer(GameData *gameData, int id, Command m) {
 
   s.height = 50;
   s.width = 50;
+
   num = getPlayerIndex(game, id);
+
+  if (num == -1) {
+    return;
+  }
+
   c1 = game->player[num].ship.position;
 
   switch (m) {
@@ -409,8 +431,8 @@ void movePlayer(GameData *gameData, int id, Command m) {
     if (c1.x < 1)
       return;
 
-    if (game->totalPlayers > 1) {
-      for (i = 0; i < game->totalPlayers; i++) {
+    for (i = 0; i < game->maxPlayers; i++) {
+      if (!game->player[i].isEmpty) {
         if (i != num) {
 
           overlaping =
@@ -421,6 +443,7 @@ void movePlayer(GameData *gameData, int id, Command m) {
         }
       }
     }
+
     game->player[num].ship.position.x -= game->player[num].ship.velocity;
     sendGameToGateway(gameData, game);
 
@@ -431,8 +454,8 @@ void movePlayer(GameData *gameData, int id, Command m) {
     if (c1.x > GAME_WIDTH - (game->player[num].ship.size.width + 1))
       return;
 
-    if (game->totalPlayers > 1) {
-      for (i = 0; i < game->totalPlayers; i++) {
+    for (i = 0; i < game->maxPlayers; i++) {
+      if (!game->player[i].isEmpty) {
         if (i != num) {
 
           overlaping =
@@ -452,8 +475,8 @@ void movePlayer(GameData *gameData, int id, Command m) {
     if (c1.y < (GAME_HEIGHT - (GAME_HEIGHT * 0.2)) - SCORE_BOARD_HEIGHT)
       return;
 
-    if (game->totalPlayers > 1) {
-      for (i = 0; i < game->totalPlayers; i++) {
+    for (i = 0; i < game->maxPlayers; i++) {
+      if (!game->player[i].isEmpty) {
         if (i != num) {
 
           overlaping =
@@ -474,8 +497,8 @@ void movePlayer(GameData *gameData, int id, Command m) {
                 (game->player[num].ship.size.height + SCORE_BOARD_HEIGHT + 1)))
       return;
 
-    if (game->totalPlayers > 1) {
-      for (i = 0; i < game->totalPlayers; i++) {
+    for (i = 0; i < game->maxPlayers; i++) {
+      if (!game->player[i].isEmpty) {
         if (i != num) {
 
           overlaping =
@@ -569,6 +592,77 @@ DWORD WINAPI manageShot(LPVOID lParam) {
   }
 
   removeShot(defenderShip, position);
+
+  return TRUE;
+}
+
+int addEnemyShip(Game *game) {
+  HANDLE hMutexEnemyShip;
+
+  hMutexEnemyShip = OpenMutex(MUTEX_ALL_ACCESS, FALSE, ENEMY_SHIPS_MUTEX);
+
+  WaitForSingleObject(hMutexEnemyShip, INFINITE);
+
+  int position = -1;
+
+  for (int i = 0; i < game->maxEnemyShips; i++) {
+    if (game->enemyShip[i].isEmpty) {
+      position = i;
+      break;
+    }
+  }
+
+  if (position == -1) {
+    return position;
+  }
+
+  game->enemyShip[position].isEmpty = FALSE;
+
+  Coordinates c = getFirstEmptyPosition(game);
+  if (!isCoordinatesValid(c)) {
+    errorGui(TEXT("Can't find an empty position"));
+    return FALSE;
+  }
+
+  game->enemyShip[position].position = c;
+
+  game->enemyShip[position].size.height = 50;
+  game->enemyShip[position].size.width = 50;
+
+  if (position < 7) {
+    game->enemyShip[position].type = BASIC;
+    game->enemyShip[position].strength = 1;
+    game->enemyShip[position].velocity = game->velocityEnemyShips;
+    game->enemyShip[position].fireRate = 1 * game->difficulty;
+  } else if (position >= 7 && position < 14) {
+    game->enemyShip[position].type = DODGE;
+    game->enemyShip[position].strength = 3;
+    game->enemyShip[position].velocity = game->velocityEnemyShips;
+    game->enemyShip[position].fireRate = 1 * game->difficulty;
+
+  } else {
+    game->enemyShip[position].type = SUPERBAD;
+    game->enemyShip[position].strength = 4;
+    game->enemyShip[position].velocity = game->velocityEnemyShips;
+    game->enemyShip[position].fireRate = 1 * game->difficulty;
+  }
+
+  ReleaseMutex(hMutexEnemyShip);
+
+  return position;
+}
+
+BOOL removeEnemyShip(Game *game, int position) {
+  HANDLE hMutexEnemyShip;
+
+  hMutexEnemyShip = OpenMutex(MUTEX_ALL_ACCESS, FALSE, ENEMY_SHIPS_MUTEX);
+
+  WaitForSingleObject(hMutexEnemyShip, INFINITE);
+
+  game->enemyShip[position] = {};
+  game->enemyShip[position].isEmpty = TRUE;
+
+  ReleaseMutex(hMutexEnemyShip);
 
   return TRUE;
 }

@@ -460,57 +460,62 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
 
       TextOut(auxDC, 450, 0, text, _tcslen(text));
 
-      for (int i = 0; i < client.game.totalEnemyShips; i++) {
-        switch (client.game.enemyShip[i].type) {
-        case BASIC:
-          TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
-                         client.game.enemyShip[i].position.y + START_HEIGHT,
-                         client.game.enemyShip[i].size.width,
-                         client.game.enemyShip[i].size.height, hdcNaveBasic, 0,
-                         0, bmNaveBasic.bmWidth, bmNaveBasic.bmHeight,
-                         RGB(255, 255, 255));
-          break;
-        case DODGE:
-          TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
-                         client.game.enemyShip[i].position.y + START_HEIGHT,
-                         client.game.enemyShip[i].size.width,
-                         client.game.enemyShip[i].size.height, hdcNaveDodge, 0,
-                         0, bmNaveDodge.bmWidth, bmNaveDodge.bmHeight,
-                         RGB(255, 255, 255));
-          break;
-        case SUPERBAD:
-          TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
-                         client.game.enemyShip[i].position.y + START_HEIGHT,
-                         client.game.enemyShip[i].size.width,
-                         client.game.enemyShip[i].size.height, hdcShipSuperBad,
-                         0, 0, bmShipSuperBad.bmWidth, bmShipSuperBad.bmHeight,
-                         RGB(255, 255, 255));
-          break;
+      for (int i = 0; i < client.game.maxEnemyShips; i++) {
+        if (!client.game.enemyShip[i].isEmpty) {
+          switch (client.game.enemyShip[i].type) {
+          case BASIC:
+            TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
+                           client.game.enemyShip[i].position.y + START_HEIGHT,
+                           client.game.enemyShip[i].size.width,
+                           client.game.enemyShip[i].size.height, hdcNaveBasic,
+                           0, 0, bmNaveBasic.bmWidth, bmNaveBasic.bmHeight,
+                           RGB(255, 255, 255));
+            break;
+          case DODGE:
+            TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
+                           client.game.enemyShip[i].position.y + START_HEIGHT,
+                           client.game.enemyShip[i].size.width,
+                           client.game.enemyShip[i].size.height, hdcNaveDodge,
+                           0, 0, bmNaveDodge.bmWidth, bmNaveDodge.bmHeight,
+                           RGB(255, 255, 255));
+            break;
+          case SUPERBAD:
+            TransparentBlt(auxDC, client.game.enemyShip[i].position.x,
+                           client.game.enemyShip[i].position.y + START_HEIGHT,
+                           client.game.enemyShip[i].size.width,
+                           client.game.enemyShip[i].size.height,
+                           hdcShipSuperBad, 0, 0, bmShipSuperBad.bmWidth,
+                           bmShipSuperBad.bmHeight, RGB(255, 255, 255));
+            break;
+          }
         }
-      }
-      for (int i = 0; i < (client.game.totalPlayers + 1); i++) {
-        if (client.game.player[i].id == client.id) {
-          TransparentBlt(auxDC, client.game.player[i].ship.position.x,
-                         client.game.player[i].ship.position.y,
-                         client.game.player[i].ship.size.width,
-                         client.game.player[i].ship.size.height,
-                         hdcMyDefenderShip, 0, 0, bmMyDefenderShip.bmWidth,
-                         bmMyDefenderShip.bmHeight, RGB(255, 255, 255));
-        } else {
-          TransparentBlt(auxDC, client.game.player[i].ship.position.x,
-                         client.game.player[i].ship.position.y,
-                         client.game.player[i].ship.size.width,
-                         client.game.player[i].ship.size.height,
-                         hdcOtherDefenderShip, 0, 0,
-                         bmOtherDefenderShip.bmWidth,
-                         bmOtherDefenderShip.bmHeight, RGB(255, 255, 255));
-        }
-        
-        for (int j = 0; j < 50; j++) {
-          if (!client.game.player[i].ship.shots[j].isEmpty) {
-            StretchBlt(auxDC, client.game.player[i].ship.shots[j].position.x,
-                       client.game.player[i].ship.shots[j].position.y, 5, 10,
-                       hdcShot, 0, 0, bmShot.bmWidth, bmShot.bmHeight, SRCCOPY);
+        for (int i = 0; i < client.game.maxPlayers; i++) {
+          if (!client.game.player[i].isEmpty) {
+            if (client.game.player[i].id == client.id) {
+              TransparentBlt(auxDC, client.game.player[i].ship.position.x,
+                             client.game.player[i].ship.position.y,
+                             client.game.player[i].ship.size.width,
+                             client.game.player[i].ship.size.height,
+                             hdcMyDefenderShip, 0, 0, bmMyDefenderShip.bmWidth,
+                             bmMyDefenderShip.bmHeight, RGB(255, 255, 255));
+            } else {
+              TransparentBlt(auxDC, client.game.player[i].ship.position.x,
+                             client.game.player[i].ship.position.y,
+                             client.game.player[i].ship.size.width,
+                             client.game.player[i].ship.size.height,
+                             hdcOtherDefenderShip, 0, 0,
+                             bmOtherDefenderShip.bmWidth,
+                             bmOtherDefenderShip.bmHeight, RGB(255, 255, 255));
+            }
+
+            for (int j = 0; j < 50; j++) {
+              if (!client.game.player[i].ship.shots[j].isEmpty) {
+                StretchBlt(
+                    auxDC, client.game.player[i].ship.shots[j].position.x,
+                    client.game.player[i].ship.shots[j].position.y, 5, 10,
+                    hdcShot, 0, 0, bmShot.bmWidth, bmShot.bmHeight, SRCCOPY);
+              }
+            }
           }
         }
       }

@@ -41,13 +41,15 @@
 #define SERVER_RUNNING_EVENT TEXT("Global\\phoenix_server_running")
 #define GATEWAY_RUNNING_EVENT TEXT("Global\\phoenix_gateway_running")
 
-#define ENEMYSHIPS_MUTEX TEXT("phoenix_enemyships_mutex")
-
 #define SERVER_CLOSE_EVENT TEXT("phoenix_server_close_event")
 
 #define CLIENT_CLOSE_EVENT TEXT("phoenix_client_close_event")
 
 #define SHOTS_MUTEX TEXT("phoenix_shots_mutex")
+
+#define PLAYERS_MUTEX TEXT("phoenix_players_mutex")
+
+#define ENEMY_SHIPS_MUTEX TEXT("phoenix_enemy_ships_mutex")
 
 #define BUFSIZE sizeof(Message)
 

@@ -426,11 +426,7 @@ VOID handleClose(MessageData *messageData) {
 VOID initGameVariables(Game *game) {
   game->level = 1;
 
-  game->totalPlayers = 0;
-
   game->earlyLives = 2;
-
-  game->totalEnemyShips = 0;
 
   game->maxEnemyShips = MAX_ENEMY_SHIPS;
 
@@ -451,5 +447,9 @@ VOID initGameVariables(Game *game) {
   for (int i = 0; i < 10; i++) {
     _stprintf_s(game->topTen[i].username, 50, TEXT("Daniel"));
     game->topTen[i].score = 0;
+  }
+
+  for (int i = 0; i < PLAYERS; i++){
+    game->player[i].isEmpty = TRUE;
   }
 }

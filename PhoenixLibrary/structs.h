@@ -69,6 +69,7 @@ typedef struct {
   DefenderShip ship;
   int lives;
   int score;
+  BOOL isEmpty;
 } Player;
 
 typedef struct {
@@ -84,6 +85,7 @@ typedef struct {
   Size size;
   EnemyType type;
   Bomb bombs[50];
+  BOOL isEmpty;
 } EnemyShip;
 
 typedef struct {
@@ -113,10 +115,8 @@ typedef struct {
 typedef struct {
   int level;
   Player player[PLAYERS];
-  int totalPlayers;
   int maxPlayers;
   EnemyShip enemyShip[ENEMYSHIPS];
-  int totalEnemyShips;
   int maxEnemyShips;
   int velocityEnemyShips;
   int velocityDefenderShips;
