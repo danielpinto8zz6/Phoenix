@@ -5,39 +5,60 @@
 #include "MessageZone.h"
 
 BOOL addClient(Data *data, TCHAR username[50], int id) {
-  if (data->totalClients >= MAX_CLIENTS) {
+  HANDLE hMutexClient;
+
+  hMutexClient = OpenMutex(MUTEX_ALL_ACCESS, FALSE, CLIENTS_MUTEX);
+
+  WaitForSingleObject(hMutexClient, INFINITE);
+
+  int position = -1;
+
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    if (data->clients[i].isEmpty) {
+      position = i;
+      break;
+    }
+  }
+
+  if (position == -1) {
+    errorGui(TEXT("Clients full"));
+    ReleaseMutex(hMutexClient);
     return FALSE;
   }
 
-  _tcscpy_s(data->clients[data->totalClients].username, username);
-  data->clients[data->totalClients].id = id;
+  data->clients[position].isEmpty = FALSE;
+  _tcscpy_s(data->clients[position].username, username);
+  data->clients[position].id = id;
 
-  data->totalClients++;
+  ReleaseMutex(hMutexClient);
 
   return TRUE;
 }
 
-int getClientIndex(Data *data, int id) {
-  for (int i = 0; i < data->totalClients; i++) {
-    if (data->clients[i].id == id) {
-      return i;
+BOOL removeClient(Data *data, int id) {
+  HANDLE hMutexClient;
+  BOOL fSuccess = FALSE;
+
+  hMutexClient = OpenMutex(MUTEX_ALL_ACCESS, FALSE, CLIENTS_MUTEX);
+
+  WaitForSingleObject(hMutexClient, INFINITE);
+
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    if (!data->clients[i].isEmpty) {
+      if (data->clients[i].id == id) {
+        data->clients[i] = {};
+        data->clients[i].isEmpty = TRUE;
+        fSuccess = TRUE;
+        break;
+      }
     }
   }
-  return -1;
-}
 
-BOOL removeClient(Data *data, int id) {
-  int n = getClientIndex(data, id);
+  ReleaseMutex(hMutexClient);
 
-  if (n == -1) {
+  if (!fSuccess) {
     return FALSE;
   }
-
-  for (int i = n; i < data->totalClients; i++) {
-    data->clients[i] = data->clients[i + 1];
-  }
-
-  data->totalClients--;
 
   removePlayer(&data->gameData->game, id);
 

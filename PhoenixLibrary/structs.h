@@ -165,11 +165,13 @@ typedef struct {
   BOOL logged;
   BOOL inGame;
   HWND hWnd;
+  BOOL isEmpty;
 } Client;
 
 typedef struct {
   int id;
   TCHAR username[50];
+  BOOL isEmpty;
 } Clients;
 
 typedef struct {
@@ -177,7 +179,6 @@ typedef struct {
   GameData *gameData;
   Client client[MAXCLIENTS];
   Clients clients[MAXCLIENTS];
-  int totalClients;
   HANDLE tmpPipeMessage;
   HANDLE tmpPipeGame;
   HANDLE hEvent;

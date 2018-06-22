@@ -51,6 +51,10 @@
 
 #define ENEMY_SHIPS_MUTEX TEXT("phoenix_enemy_ships_mutex")
 
+#define CLIENTS_MUTEX TEXT("phoenix_clients_mutex")
+
+#define GATEWAY_CLIENTS_MUTEX TEXT("phoenix_gateway_clients_mutex")
+
 #define BUFSIZE sizeof(Message)
 
 #ifdef __cplusplus

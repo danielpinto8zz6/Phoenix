@@ -6,7 +6,6 @@ int addShot(DefenderShip *defenderShip);
 int compare(const void *a, const void *b);
 BOOL coordinatesEqual(Coordinates c1, Coordinates c2);
 Coordinates getFirstEmptyPosition(Game *game);
-int getPlayerIndex(Game *game, int id);
 BOOL isCoordinatesValid(Coordinates coordinates);
 BOOL isPointInsideRect(Coordinates rect1Coord, Size rect1Sz, Coordinates point);
 BOOL isPositionOccupied(Game *game, Coordinates coordinates);

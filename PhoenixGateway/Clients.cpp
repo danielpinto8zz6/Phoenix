@@ -3,36 +3,49 @@
 #include "Clients.h"
 #include "MessageZone.h"
 
-int getClientIndex(Data *data, int clientId) {
-  for (int i = 0; i < data->totalClients; i++) {
-    if (data->client[i].id == clientId) {
-      return i;
+int getClientIndex(Data *data, int id) {
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    if (!data->client[i].isEmpty) {
+      if (data->client[i].id == id) {
+        return i;
+      }
     }
   }
   return -1;
 }
 
-BOOL removeClient(Data *data, int clientId) {
+BOOL removeClient(Data *data, int id) {
+  HANDLE hMutexClient;
+  BOOL fSuccess = FALSE;
   Message message;
 
-  int n = getClientIndex(data, clientId);
+  hMutexClient = OpenMutex(MUTEX_ALL_ACCESS, FALSE, GATEWAY_CLIENTS_MUTEX);
 
-  if (n == -1) {
+  WaitForSingleObject(hMutexClient, INFINITE);
+
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    if (!data->client[i].isEmpty) {
+      if (data->client[i].id == id) {
+        data->client[i] = {};
+        data->client[i].isEmpty = TRUE;
+        fSuccess = TRUE;
+        break;
+      }
+    }
+  }
+
+  ReleaseMutex(hMutexClient);
+
+  if (!fSuccess) {
     return FALSE;
   }
-
-  message.cmd = CLIENT_DISCONNECTED;
-  message.clientId = clientId;
-
-  for (int i = n; i < data->totalClients; i++) {
-    data->client[i] = data->client[i + 1];
-  }
-
-  data->totalClients--;
 
   /**
    * Inform server
    */
+  message.cmd = CLIENT_DISCONNECTED;
+  message.clientId = id;
+
   writeDataToSharedMemory(data->messageData->sharedMessage, &message,
                           sizeof(Message), data->messageData->hMutex,
                           data->messageData->serverMessageUpdateEvent);
@@ -42,20 +55,25 @@ BOOL removeClient(Data *data, int clientId) {
 
 int broadcastGameToClients(Data *data, Game *game) {
   int nWrites = 0;
-  for (int i = 0; i < data->totalClients; i++) {
-    if (writeDataToPipeAsync(data->client[i].hPipeGame, data->hEvent, game,
-                             sizeof(Game)))
-      nWrites++;
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    if (!data->client[i].isEmpty) {
+      if (writeDataToPipeAsync(data->client[i].hPipeGame, data->hEvent, game,
+                               sizeof(Game)))
+        nWrites++;
+    }
   }
   return nWrites;
 }
 
 int broadcastMessageToClients(Data *data, Message *message) {
   int nWrites = 0;
-  for (int i = 0; i < data->totalClients; i++) {
-    if (writeDataToPipeAsync(data->client[i].hPipeMessage, data->hEvent,
-                             message, sizeof(Message)))
-      nWrites++;
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    if (!data->client[i].isEmpty) {
+
+      if (writeDataToPipeAsync(data->client[i].hPipeMessage, data->hEvent,
+                               message, sizeof(Message)))
+        nWrites++;
+    }
   }
   return nWrites;
 }
@@ -67,8 +85,6 @@ DWORD WINAPI manageClients(LPVOID lpParam) {
     error(TEXT("Can't receive data"));
     return FALSE;
   }
-
-  data->totalClients = 0;
 
   BOOL fConnectedGame = FALSE;
   BOOL fConnectedMessage = FALSE;
@@ -145,21 +161,22 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
     return FALSE;
   }
 
-  int i = data->totalClients;
-  Client *client = &data->client[i];
-  data->totalClients++;
+  int id = GetCurrentThreadId();
 
-  client->id = GetCurrentThreadId();
+  int position = addClient(data, id, data->tmpPipeMessage, data->tmpPipeGame);
 
-  client->hPipeGame = data->tmpPipeGame;
-  client->hPipeMessage = data->tmpPipeMessage;
+  if (position == -1) {
+    error(TEXT("Can't find a valid slot"));
+    return FALSE;
+  }
 
   DWORD nBytes = 0;
   BOOL fSuccess = FALSE;
 
   Message message;
 
-  if (client->hPipeGame == NULL || client->hPipeMessage == NULL) {
+  if (data->client[position].hPipeGame == NULL ||
+      data->client[position].hPipeGame == NULL) {
     error(TEXT("Can't access client pipe"));
     return FALSE;
   }
@@ -171,12 +188,12 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
   }
 
   while (TRUE) {
-    fSuccess = readDataFromPipeAsync(client->hPipeMessage, readReady, &message,
-                                     sizeof(Message));
+    fSuccess = readDataFromPipeAsync(data->client[position].hPipeMessage,
+                                     readReady, &message, sizeof(Message));
 
     if (!fSuccess) {
       if (GetLastError() == ERROR_BROKEN_PIPE) {
-        error(TEXT("Client %d disconnected! Removing him..."), client->id);
+        error(TEXT("Client %d disconnected! Removing him..."), id);
       } else {
         error(TEXT("Can't read message data"));
       }
@@ -187,7 +204,7 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
      * We identify each client with unique id, to generate that id we use the
      * gateway client thread id. Each client thread has different thread id
      */
-    message.clientId = client->id;
+    message.clientId = id;
 
     writeDataToSharedMemory(data->messageData->sharedMessage, &message,
                             sizeof(Message), data->messageData->hMutex,
@@ -198,13 +215,45 @@ DWORD WINAPI manageClient(LPVOID lpParam) {
     }
   }
 
-  removeClient(data, client->id);
-  FlushFileBuffers(client->hPipeMessage);
-  DisconnectNamedPipe(client->hPipeMessage);
-  CloseHandle(client->hPipeMessage);
-  FlushFileBuffers(client->hPipeGame);
-  DisconnectNamedPipe(client->hPipeGame);
-  CloseHandle(client->hPipeGame);
+  FlushFileBuffers(data->client[position].hPipeMessage);
+  DisconnectNamedPipe(data->client[position].hPipeMessage);
+  CloseHandle(data->client[position].hPipeMessage);
+  FlushFileBuffers(data->client[position].hPipeGame);
+  DisconnectNamedPipe(data->client[position].hPipeGame);
+  CloseHandle(data->client[position].hPipeGame);
+  removeClient(data, id);
 
   return TRUE;
+}
+
+int addClient(Data *data, int id, HANDLE hPipeMessage, HANDLE hPipeGame) {
+  HANDLE hMutexClient;
+
+  hMutexClient = OpenMutex(MUTEX_ALL_ACCESS, FALSE, GATEWAY_CLIENTS_MUTEX);
+
+  WaitForSingleObject(hMutexClient, INFINITE);
+
+  int position = -1;
+
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    if (data->client[i].isEmpty) {
+      position = i;
+      break;
+    }
+  }
+
+  if (position == -1) {
+    error(TEXT("Can't connect client! Clients full"));
+    ReleaseMutex(hMutexClient);
+    return -1;
+  }
+
+  data->client[position].isEmpty = FALSE;
+  data->client[position].id = id;
+  data->client[position].hPipeMessage = hPipeMessage;
+  data->client[position].hPipeGame = hPipeGame;
+
+  ReleaseMutex(hMutexClient);
+
+  return position;
 }

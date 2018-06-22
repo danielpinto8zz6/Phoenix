@@ -29,9 +29,21 @@ int _tmain() {
   GameData gameData;
   MessageData messageData;
 
+  HANDLE hMutexClients;
+
   Data data;
   data.gameData = &gameData;
   data.messageData = &messageData;
+
+  hMutexClients = CreateMutex(NULL, FALSE, GATEWAY_CLIENTS_MUTEX);
+  if (hMutexClients == NULL) {
+    error(TEXT("Creating clients mutex"));
+    return FALSE;
+  }
+
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    data.clients[i].isEmpty = TRUE;
+  }
 
   if (isGatewayRunning()) {
     error(
@@ -140,6 +152,8 @@ int _tmain() {
   CloseHandle(hThreadReceiveMessagesFromServer);
 
   UnmapViewOfFile(messageData.sharedMessage);
+
+  CloseHandle(hMutexClients);
 
   return 0;
 }

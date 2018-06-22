@@ -283,11 +283,11 @@ BOOL removePlayer(Game *game, int id) {
     }
   }
 
+  ReleaseMutex(hMutexPlayer);
+
   if (!fSuccess) {
     return FALSE;
   }
-
-  ReleaseMutex(hMutexPlayer);
 
   return TRUE;
 }
@@ -295,14 +295,24 @@ BOOL removePlayer(Game *game, int id) {
 BOOL joinGame(Data *data, int id) {
   Message message;
 
-  int i = getClientIndex(data, id);
+  int position = -1;
 
-  if (i == -1) {
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    if (!data->clients[i].isEmpty) {
+      if (data->clients[i].id == id) {
+        position = i;
+        break;
+      }
+    }
+  }
+
+  if (position == -1) {
+    errorGui(TEXT("Client not found!"));
     return FALSE;
   }
 
-  if (!addPlayer(&data->gameData->game, data->clients[i].username,
-                 data->clients[i].id)) {
+  if (!addPlayer(&data->gameData->game, data->clients[position].username,
+                 data->clients[position].id)) {
     return FALSE;
   }
 
@@ -394,15 +404,6 @@ BOOL startGame(Data *data) {
   return TRUE;
 }
 
-int getPlayerIndex(Game *game, int id) {
-  for (int i = 0; i < game->maxPlayers; i++) {
-    if (game->player[i].id == id) {
-      return i;
-    }
-  }
-  return -1;
-}
-
 void movePlayer(GameData *gameData, int id, Command m) {
   Game *game = &gameData->game;
   int num, i;
@@ -415,7 +416,15 @@ void movePlayer(GameData *gameData, int id, Command m) {
   s.height = 50;
   s.width = 50;
 
-  num = getPlayerIndex(game, id);
+  num = -1;
+
+  for (int i = 0; i < game->maxPlayers; i++) {
+    if (!game->player[i].isEmpty) {
+      if (game->player[i].id == id) {
+        num = i;
+      }
+    }
+  }
 
   if (num == -1) {
     return;

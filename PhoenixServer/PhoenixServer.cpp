@@ -32,6 +32,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   DWORD threadReceiveMessagesFromServerId;
   HANDLE hThreadReceiveMessagesFromGateway;
 
+  HANDLE hMutexClients;
+
 #ifdef UNICODE
   _setmode(_fileno(stdin), _O_WTEXT);
   _setmode(_fileno(stdout), _O_WTEXT);
@@ -40,9 +42,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   data.gameData = &gameData;
   data.messageData = &messageData;
 
-  data.totalClients = 0;
-
   initGameVariables(&data.gameData->game);
+
+  hMutexClients = CreateMutex(NULL, FALSE, CLIENTS_MUTEX);
+  if (hMutexClients == NULL) {
+    error(TEXT("Creating clients mutex"));
+    return FALSE;
+  }
+
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    data.clients[i].isEmpty = TRUE;
+  }
 
   /**
    * Use an event to check if the program is running
@@ -139,6 +149,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   CloseHandle(messageData.serverMessageUpdateEvent);
   CloseHandle(hThreadReceiveMessagesFromGateway);
   UnmapViewOfFile(messageData.sharedMessage);
+
+  CloseHandle(hMutexClients);
 
   return (int)msg.wParam;
 }
@@ -449,7 +461,7 @@ VOID initGameVariables(Game *game) {
     game->topTen[i].score = 0;
   }
 
-  for (int i = 0; i < PLAYERS; i++){
+  for (int i = 0; i < PLAYERS; i++) {
     game->player[i].isEmpty = TRUE;
   }
 }
