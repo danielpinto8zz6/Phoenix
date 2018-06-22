@@ -481,13 +481,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       if (scoreBoard.score == -1) {
         _stprintf_s(text, 40, TEXT("GAME OVER"));
       } else {
-        _stprintf_s(text, 40, TEXT("SCORE : %d  LIVES : %d"), scoreBoard.score,
-                    scoreBoard.lives);
-        TextOut(auxDC, (GAME_WIDTH / 2) - (_tcslen(text) / 2), 0, text,
-                _tcslen(text));
+        _stprintf_s(text, 40, TEXT("SCORE : %d | LIVES : %d | LEVEL : %d"), scoreBoard.score,
+                    scoreBoard.lives, scoreBoard.level);
       }
-
-      TextOut(auxDC, 450, 0, TEXT("GAME OVER"), _tcslen(text));
 
       TextOut(auxDC, 450, 0, text, _tcslen(text));
 

@@ -10,6 +10,7 @@ ScoreBoard getPlayerScoreBoard(Client *client) {
       if (client->game.player[i].id == client->id) {
         scoreBoard.score = client->game.player[i].score;
         scoreBoard.lives = client->game.player[i].lives;
+        scoreBoard.level = client->game.level;
         return scoreBoard;
       }
     }
@@ -17,6 +18,7 @@ ScoreBoard getPlayerScoreBoard(Client *client) {
 
   scoreBoard.score = -1;
   scoreBoard.lives = -1;
+  scoreBoard.level = -1;
 
   return scoreBoard;
 }

@@ -104,9 +104,9 @@ DWORD WINAPI threadManageEnemyShips(LPVOID lpParam) {
   Sleep(500);
   SetEvent(startEnemyShipsEvent);
 
-   while (TRUE) {
-     Sleep(100);
-     sendGameToGateway(gameData, &gameData->game);
+  while (TRUE) {
+    Sleep(100);
+    sendGameToGateway(gameData, &gameData->game);
   }
 
   // Wait for all threads to terminate
@@ -813,7 +813,7 @@ DWORD WINAPI manageBomb(LPVOID lParam) {
 
   size.width = 5;
   size.height = 10;
-  
+
   while (position == -1) {
     position = addBomb(enemyShip);
     Sleep(100);
@@ -840,13 +840,13 @@ DWORD WINAPI manageBomb(LPVOID lParam) {
 
         if (isOverlapping) {
           gameData->game.player[i].lives--;
-          if (gameData->game.player[i].lives < 1){
-          removePlayer(&gameData->game, gameData->game.player[i].id);
-          removeBomb(enemyShip, position);
-          return FALSE;
+          if (gameData->game.player[i].lives < 1) {
+            removePlayer(&gameData->game, gameData->game.player[i].id);
+            removeBomb(enemyShip, position);
+            return FALSE;
           }
-                    removeBomb(enemyShip, position);
-break;
+          removeBomb(enemyShip, position);
+          break;
         }
       }
     }
@@ -884,4 +884,10 @@ DWORD WINAPI dropBombs(LPVOID lParam) {
     }
   }
   return TRUE;
+}
+
+void nextLevel(Game *game) {
+  game->level++;
+  game->velocityDefenderShips += 2;
+  game->difficulty++;
 }

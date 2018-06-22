@@ -191,4 +191,5 @@ typedef struct {
 typedef struct {
   int score;
   int lives;
+  int level;
 } ScoreBoard;
