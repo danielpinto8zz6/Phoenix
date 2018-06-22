@@ -27,3 +27,4 @@ void sort(int *arr, size_t len);
 BOOL startGame(Data *data);
 DWORD WINAPI threadEnemyShip(LPVOID lpParam);
 DWORD WINAPI threadManageEnemyShips(LPVOID lpParam);
+void nextLevel(Game *game);

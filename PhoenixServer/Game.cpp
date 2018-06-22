@@ -188,30 +188,31 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
           return FALSE;
         }
 
-        for (int j = 0; j < 50; j++) {
-          if (!gameData->game.player[i].ship.shots[j].isEmpty) {
+        // for (int j = 0; j < 50; j++) {
+        //   if (!gameData->game.player[i].ship.shots[j].isEmpty) {
 
-            c1 = gameData->game.enemyShip[position].bombs[j].position;
+        //     c1 = gameData->game.enemyShip[position].bombs[j].position;
 
-            isOverlapping = isRectangleOverlapping(
-                c1, gameData->game.enemyShip[position].size,
-                gameData->game.player[i].ship.shots[j].position,
-                gameData->game.player[i].ship.size);
+        //     isOverlapping = isRectangleOverlapping(
+        //         c1, gameData->game.enemyShip[position].size,
+        //         gameData->game.player[i].ship.shots[j].position,
+        //         gameData->game.player[i].ship.size);
 
-            if (isOverlapping) {
-              gameData->game.enemyShip[position].strength--;
-              if (gameData->game.enemyShip[position].strength < 1) {
-                ReleaseMutex(hMutexManageEnemyShips);
-                removeEnemyShip(&gameData->game, position);
-                removeShot(&gameData->game.player[i].ship, j);
-                gameData->game.player[i].score++;
-                return FALSE;
-              }
-              removeShot(&gameData->game.player[i].ship, j);
-              break;
-            }
-          }
-        }
+        //     if (isOverlapping) {
+        //       gameData->game.enemyShip[position].strength--;
+        //       if (gameData->game.enemyShip[position].strength < 1) {
+        //         ReleaseMutex(hMutexManageEnemyShips);
+        //         removeEnemyShip(&gameData->game, position);
+        //         removeShot(&gameData->game.player[i].ship, j);
+        //         gameData->game.player[i].score++;
+        //         return FALSE;
+        //       }
+        //       removeShot(&gameData->game.player[i].ship, j);
+        //       ReleaseMutex(hMutexManageEnemyShips);
+        //       break;
+        //     }
+        //   }
+        // }
       }
     }
     // sendGameToGateway(gameData, &gameData->game);
@@ -659,9 +660,8 @@ DWORD WINAPI manageShot(LPVOID lParam) {
 
   position = addShot(defenderShip);
 
-  while (position == -1) {
-    position = addShot(defenderShip);
-    Sleep(100);
+  if(position == -1){
+    return FALSE;
   }
 
   /**
@@ -814,9 +814,8 @@ DWORD WINAPI manageBomb(LPVOID lParam) {
   size.width = 5;
   size.height = 10;
 
-  while (position == -1) {
-    position = addBomb(enemyShip);
-    Sleep(100);
+  if (position == -1) {
+    return FALSE;
   }
 
   /**
