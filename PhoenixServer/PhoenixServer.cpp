@@ -202,6 +202,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     return FALSE;
   }
 
+  data.hWnd = hWnd;
+
   ShowWindow(hWnd, nCmdShow);
   UpdateWindow(hWnd);
 

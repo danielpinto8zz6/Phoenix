@@ -193,10 +193,13 @@ DWORD WINAPI threadEnemyShip(LPVOID lpParam) {
 
             c1 = gameData->game.enemyShip[position].position;
 
+            Size sz;
+            sz.height = 10;
+            sz.width = 5;
+
             isOverlapping = isRectangleOverlapping(
                 c1, gameData->game.enemyShip[position].size,
-                gameData->game.player[i].ship.shots[j].position,
-                gameData->game.player[i].ship.size);
+                gameData->game.player[i].ship.shots[j].position,sz);
 
             if (isOverlapping) {
               /** 
@@ -833,24 +836,24 @@ DWORD WINAPI manageBomb(LPVOID lParam) {
     c1 = enemyShip->bombs[position].position;
     c1.y += 20;
 
-    for (int i = 0; i < gameData->game.maxPlayers; i++) {
-      if (!gameData->game.player[i].isEmpty) {
-        isOverlapping = isRectangleOverlapping(
-            c1, size, gameData->game.player[i].ship.position,
-            gameData->game.player[i].ship.size);
+    // for (int i = 0; i < gameData->game.maxPlayers; i++) {
+    //   if (!gameData->game.player[i].isEmpty) {
+    //     isOverlapping = isRectangleOverlapping(
+    //         c1, size, gameData->game.player[i].ship.position,
+    //         gameData->game.player[i].ship.size);
 
-        if (isOverlapping) {
-          gameData->game.player[i].lives--;
-          if (gameData->game.player[i].lives < 1) {
-            removePlayer(&gameData->game, gameData->game.player[i].id);
-            removeBomb(enemyShip, position);
-            return FALSE;
-          }
-          removeBomb(enemyShip, position);
-          break;
-        }
-      }
-    }
+    //     if (isOverlapping) {
+    //       gameData->game.player[i].lives--;
+    //       if (gameData->game.player[i].lives < 1) {
+    //         removePlayer(&gameData->game, gameData->game.player[i].id);
+    //         removeBomb(enemyShip, position);
+    //         return FALSE;
+    //       }
+    //       removeBomb(enemyShip, position);
+    //       break;
+    //     }
+    //   }
+    // }
     Sleep(100);
   }
 

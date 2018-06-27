@@ -2,8 +2,8 @@
 
 #include "Clients.h"
 #include "Game.h"
-#include "MessageZone.h"
 #include "GameZone.h"
+#include "MessageZone.h"
 
 DWORD WINAPI receiveMessagesFromGateway(LPVOID lpParam) {
   Data *data = (Data *)lpParam;
@@ -34,7 +34,7 @@ void handleCommand(Data *data, Message message) {
     clientLogin(data, message);
     break;
   case CLIENT_DISCONNECTED:
-    if (removeClient(data, message.clientId)){
+    if (removeClient(data, message.clientId)) {
       sendGameToGateway(data->gameData, &data->gameData->game);
     }
     break;
@@ -44,21 +44,24 @@ void handleCommand(Data *data, Message message) {
   case GATEWAY_DISCONNECTED:
     break;
   case KEYDOWN:
-	  movePlayer(data->gameData, message.clientId, KEYDOWN);
+    movePlayer(data->gameData, message.clientId, KEYDOWN);
     break;
   case KEYUP:
-	  movePlayer(data->gameData, message.clientId, KEYUP);
+    movePlayer(data->gameData, message.clientId, KEYUP);
     break;
   case KEYLEFT:
-	  movePlayer(data->gameData, message.clientId, KEYLEFT);
+    movePlayer(data->gameData, message.clientId, KEYLEFT);
     break;
   case KEYRIGHT:
-	  movePlayer(data->gameData, message.clientId, KEYRIGHT);
+    movePlayer(data->gameData, message.clientId, KEYRIGHT);
     break;
   case KEYSPACE:
-	  movePlayer(data->gameData, message.clientId, KEYSPACE);
+    movePlayer(data->gameData, message.clientId, KEYSPACE);
+    break;
+  case EXIT:
+    MessageBox(NULL, TEXT("EXIT REQUESTED"), TEXT("Exit"),
+               MB_OK | MB_ICONINFORMATION);
+    SendMessage(data->hWnd, WM_DESTROY, 0, 0);
     break;
   }
 }
-
-

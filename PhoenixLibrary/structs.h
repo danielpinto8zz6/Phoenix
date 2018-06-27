@@ -36,7 +36,8 @@ typedef enum {
   JOIN_GAME,
   IN_GAME,
   CANT_JOIN,
-  GAME_OVER
+  GAME_OVER,
+  EXIT
 } Command;
 
 typedef struct {
@@ -186,6 +187,7 @@ typedef struct {
   HANDLE tmpPipeMessage;
   HANDLE tmpPipeGame;
   HANDLE hEvent;
+  HWND hWnd;
 } Data;
 
 typedef struct {

@@ -459,6 +459,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
         writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
                              sizeof(Message));
       }
+      if (wParam == VK_ESCAPE) {
+        msg.cmd = EXIT;
+        writeDataToPipeAsync(client.hPipeMessage, client.hEvent, &msg,
+                             sizeof(Message));
+      }
     }
     break;
   case WM_CLOSE:
@@ -481,8 +486,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       if (scoreBoard.score == -1) {
         _stprintf_s(text, 40, TEXT("GAME OVER"));
       } else {
-        _stprintf_s(text, 40, TEXT("SCORE : %d | LIVES : %d | LEVEL : %d"), scoreBoard.score,
-                    scoreBoard.lives, scoreBoard.level);
+        _stprintf_s(text, 40, TEXT("SCORE : %d | LIVES : %d | LEVEL : %d"),
+                    scoreBoard.score, scoreBoard.lives, scoreBoard.level);
       }
 
       TextOut(auxDC, 450, 0, text, _tcslen(text));
